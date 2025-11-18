@@ -5,6 +5,150 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Edit Profile - NETWORX</title>
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+	<style>
+		.edit-layout {
+			max-width: 1100px;
+			margin: 0 auto;
+		}
+
+		.edit-grid {
+			display: grid;
+			grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr);
+			gap: 1.5rem;
+		}
+
+		@media (max-width: 960px) {
+			.edit-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		.section-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 1rem;
+		}
+
+		.section-title {
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: var(--text-primary);
+		}
+
+		.section-subtitle {
+			font-size: 0.85rem;
+			color: var(--text-secondary);
+		}
+
+		.badge-section {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			padding: 0.25rem 0.6rem;
+			border-radius: 999px;
+			background: #eef3f8;
+			color: #0a66c2;
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		.form-grid-2 {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1rem;
+		}
+
+		@media (max-width: 768px) {
+			.form-grid-2 {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		.chip-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.75rem;
+			padding: 0.85rem 1rem;
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			background: #fafafa;
+			margin-bottom: 0.5rem;
+		}
+
+		.chip-row-main {
+			display: flex;
+			flex-direction: column;
+			gap: 0.15rem;
+		}
+
+		.chip-row-title {
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--text-primary);
+		}
+
+		.chip-row-meta {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+		}
+
+		.child-row {
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			padding: 1rem;
+			margin-bottom: 0.75rem;
+			background-color: #fafafa;
+		}
+
+		.child-row-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 0.5rem;
+		}
+
+		.child-row-title {
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--text-primary);
+		}
+
+		.btn-ghost {
+			border-radius: 999px;
+			border: 1px dashed var(--border-color);
+			padding: 0.4rem 0.9rem;
+			font-size: 0.85rem;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			background: #f9fafb;
+			cursor: pointer;
+		}
+
+		.btn-danger-ghost {
+			border-radius: 999px;
+			border: 1px solid #fee2e2;
+			padding: 0.3rem 0.8rem;
+			font-size: 0.8rem;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.25rem;
+			background: #fef2f2;
+			color: #b91c1c;
+			cursor: pointer;
+		}
+
+		.small-hint {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+		}
+
+		textarea.form-control {
+			min-height: 80px;
+		}
+	</style>
 </head>
 <body>
 	<!-- Navbar -->
@@ -21,14 +165,14 @@
 	
 	<!-- Main Content -->
 	<main style="padding: 2rem 0;">
-		<div class="container" style="max-width: 900px;">
+		<div class="container edit-layout">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
 				<div>
 					<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
 						Edit Profile
 					</h1>
 					<p style="color: var(--text-secondary);">
-						Update your personal information and career details
+						Keep your profile up to date so others can understand your background at a glance.
 					</p>
 				</div>
 				<a href="/myprofile" class="btn btn-secondary" style="text-decoration: none;">
@@ -37,170 +181,289 @@
 			</div>
 			
 			<!-- Profile Form -->
-			<div class="card">
-				<form id="profileForm">
-					<div class="grid grid-cols-2" style="gap: 1.5rem;">
-						<!-- Full Name -->
-						<div class="form-group">
-							<label class="form-label" for="fullName">Full Name *</label>
-							<input 
-								type="text" 
-								id="fullName" 
-								name="full_name" 
-								class="form-control" 
-								required
-								placeholder="Enter your full name"
-							>
+			<form id="profileForm">
+				<div class="edit-grid">
+					<!-- Left column: main sections -->
+					<div>
+						<!-- Basic Info -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Basic Information</div>
+									<div class="section-subtitle">Your name, headline, location and industry.</div>
+								</div>
+							</div>
+							<div class="form-grid-2">
+								<div class="form-group">
+									<label class="form-label" for="fullName">Full Name *</label>
+									<input
+										type="text"
+										id="fullName"
+										name="full_name"
+										class="form-control"
+										required
+										placeholder="Enter your full name"
+									>
+								</div>
+								<div class="form-group">
+									<label class="form-label" for="headline">Headline</label>
+									<input
+										type="text"
+										id="headline"
+										name="headline"
+										class="form-control"
+										placeholder="e.g., Crafting Tech That Shapes the Future!"
+									>
+								</div>
+								<div class="form-group">
+									<label class="form-label" for="currentLocation">Location</label>
+									<input
+										type="text"
+										id="currentLocation"
+										name="current_location"
+										class="form-control"
+										placeholder="City, Country"
+									>
+								</div>
+								<div class="form-group">
+									<label class="form-label" for="industry">Industry</label>
+									<input
+										type="text"
+										id="industry"
+										name="industry"
+										class="form-control"
+										placeholder="e.g., B2B SaaS"
+									>
+								</div>
+								<div class="form-group">
+									<label class="form-label" for="profileUrl">Public Profile URL</label>
+									<input
+										type="url"
+										id="profileUrl"
+										name="profile_url"
+										class="form-control"
+										placeholder="https://www.linkedin.com/in/yourprofile"
+									>
+								</div>
+								<div class="form-group">
+									<label class="form-label" for="profileImage">Profile Image</label>
+									<input
+										type="text"
+										id="profileImage"
+										name="profile_image"
+										class="form-control"
+										placeholder="/files/your-photo.jpg"
+									>
+									<div class="small-hint">
+										Upload an image via the File Manager, then paste the file URL here.
+									</div>
+								</div>
+							</div>
+							<div class="form-group" style="margin-top: 1rem;">
+								<label class="form-label" for="profileSummary">About</label>
+								<textarea
+									id="profileSummary"
+									name="profile_summary"
+									class="form-control"
+									rows="5"
+									placeholder="Write a short summary about your experience and what you care about."
+									style="resize: vertical;"
+								></textarea>
+								<div class="small-hint">
+									Rich text is supported (HTML). You can paste formatted content from your editor.
+								</div>
+							</div>
 						</div>
-						
-						<!-- College -->
-						<div class="form-group">
-							<label class="form-label" for="college">College *</label>
-							<input 
-								type="text" 
-								id="college" 
-								name="college" 
-								class="form-control" 
-								required
-								placeholder="Enter your college name"
-							>
+
+						<!-- Experience -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Experience</div>
+									<div class="section-subtitle">Roles you’ve held and what you worked on.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addExperienceBtn">
+									<span>＋</span> Add Experience
+								</button>
+							</div>
+							<div id="experienceList"></div>
 						</div>
-						
-						<!-- Degree -->
-						<div class="form-group">
-							<label class="form-label" for="degree">Degree *</label>
-							<input 
-								type="text" 
-								id="degree" 
-								name="degree" 
-								class="form-control" 
-								required
-								placeholder="e.g., B.Tech Computer Science"
-							>
+
+						<!-- Education -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Education</div>
+									<div class="section-subtitle">Your academic background.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addEducationBtn">
+									<span>＋</span> Add Education
+								</button>
+							</div>
+							<div id="educationList"></div>
 						</div>
-						
-						<!-- Graduation Year -->
-						<div class="form-group">
-							<label class="form-label" for="graduationYear">Graduation Year *</label>
-							<input 
-								type="number" 
-								id="graduationYear" 
-								name="graduation_year" 
-								class="form-control" 
-								required
-								min="2020"
-								max="2030"
-								placeholder="e.g., 2025"
-							>
-						</div>
-						
+
 						<!-- Skills -->
-						<div class="form-group" style="grid-column: 1 / -1;">
-							<label class="form-label" for="skills">Skills</label>
-							<input 
-								type="text" 
-								id="skills" 
-								name="skills" 
-								class="form-control" 
-								placeholder="e.g., Python, JavaScript, React, Node.js"
-							>
-							<small style="color: var(--text-secondary); font-size: 0.875rem;">
-								Separate skills with commas
-							</small>
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Skills & Endorsements</div>
+									<div class="section-subtitle">Highlight the skills you’re most confident in.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addSkillBtn">
+									<span>＋</span> Add Skill
+								</button>
+							</div>
+							<div id="skillsList"></div>
 						</div>
-						
-						<!-- Bio -->
-						<div class="form-group" style="grid-column: 1 / -1;">
-							<label class="form-label" for="bio">Bio</label>
-							<textarea 
-								id="bio" 
-								name="bio" 
-								class="form-control" 
-								rows="4"
-								placeholder="Tell us about yourself, your interests, and career goals..."
-								style="resize: vertical;"
-							></textarea>
+
+						<!-- Certifications -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Licenses & Certifications</div>
+									<div class="section-subtitle">Showcase your verified credentials.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addCertificationBtn">
+									<span>＋</span> Add Certification
+								</button>
+							</div>
+							<div id="certificationsList"></div>
 						</div>
-						
-						<!-- LinkedIn URL -->
-						<div class="form-group">
-							<label class="form-label" for="linkedinUrl">LinkedIn Profile</label>
-							<input 
-								type="url" 
-								id="linkedinUrl" 
-								name="linkedin_url" 
-								class="form-control" 
-								placeholder="https://linkedin.com/in/yourprofile"
-							>
+
+						<!-- Volunteer -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Volunteer Experience</div>
+									<div class="section-subtitle">Work you’ve done for causes you care about.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addVolunteerBtn">
+									<span>＋</span> Add Volunteer Role
+								</button>
+							</div>
+							<div id="volunteerList"></div>
 						</div>
-						
-						<!-- GitHub URL -->
-						<div class="form-group">
-							<label class="form-label" for="githubUrl">GitHub Profile</label>
-							<input 
-								type="url" 
-								id="githubUrl" 
-								name="github_url" 
-								class="form-control" 
-								placeholder="https://github.com/yourusername"
-							>
-						</div>
-						
-						<!-- Resume Attachment -->
-						<div class="form-group" style="grid-column: 1 / -1;">
-							<label class="form-label" for="resumeAttachment">Resume</label>
-							<input 
-								type="text" 
-								id="resumeAttachment" 
-								name="resume_attachment" 
-								class="form-control" 
-								placeholder="Resume file URL"
-								readonly
-							>
-							<small style="color: var(--text-secondary); font-size: 0.875rem;">
-								Upload your resume using Frappe's file manager and paste the URL here
-							</small>
+
+						<!-- Awards -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Honors & Awards</div>
+									<div class="section-subtitle">Recognitions you’ve received.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addAwardBtn">
+									<span>＋</span> Add Award
+								</button>
+							</div>
+							<div id="awardsList"></div>
 						</div>
 					</div>
-					
-					<!-- Form Actions -->
-					<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-						<a href="/myprofile" class="btn btn-secondary" style="text-decoration: none;">
-							Cancel
-						</a>
-						<button type="submit" class="btn btn-primary" id="saveBtn">
-							Save Profile
-						</button>
+
+					<!-- Right column: contact & quick summary -->
+					<div>
+						<!-- Contact info -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Contact Information</div>
+									<div class="section-subtitle">How people can reach you.</div>
+								</div>
+								<button type="button" class="btn-ghost" id="addContactBtn">
+									<span>＋</span> Add Contact
+								</button>
+							</div>
+							<div id="contactList"></div>
+							<div class="small-hint" style="margin-top: 0.5rem;">
+								Tip: Add at least an email and one other way to reach you.
+							</div>
+						</div>
+
+						<!-- Live summary chips -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">At a Glance</div>
+									<div class="section-subtitle">Quick summary of what you’ve filled so far.</div>
+								</div>
+							</div>
+							<div id="summaryChips">
+								<div class="chip-row">
+									<div class="chip-row-main">
+										<div class="chip-row-title" id="chipName">Your name</div>
+										<div class="chip-row-meta" id="chipHeadline">Headline</div>
+									</div>
+									<div class="badge-section">
+										<span id="chipLocation">Location</span>
+									</div>
+								</div>
+								<div class="chip-row">
+									<div class="chip-row-main">
+										<div class="chip-row-title" id="chipExperience">Experience</div>
+										<div class="chip-row-meta" id="chipEducation">Education</div>
+									</div>
+								</div>
+								<div class="chip-row">
+									<div class="chip-row-main">
+										<div class="chip-row-title" id="chipSkills">Key skills</div>
+										<div class="chip-row-meta" id="chipCertifications">Certifications</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Actions -->
+						<div class="card">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Save Changes</div>
+									<div class="section-subtitle">We’ll update your profile instantly.</div>
+								</div>
+							</div>
+							<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.5rem;">
+								<a href="/myprofile" class="btn btn-secondary" style="text-decoration: none;">
+									Cancel
+								</a>
+								<button type="submit" class="btn btn-primary" id="saveBtn">
+									Save Profile
+								</button>
+							</div>
+						</div>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</main>
 	
 	<script>
-		// frappe.call implementation supporting both GET and POST
+		// frappe.call implementation supporting both GET and POST, with basic error handling
 		window.frappe = {
 			session: { user: 'Guest', user_fullname: 'Guest' },
-			
-			call: function(opts) {
+
+			call: function (opts) {
 				const isUpdateMethod = opts.method.includes('update');
-				
-				if (isUpdateMethod) {
+
+				const buildParams = (args) => {
 					const params = new URLSearchParams();
-					
-					if (opts.args) {
-						for (const [key, value] of Object.entries(opts.args)) {
-							if (value !== null && value !== undefined) {
-								if (typeof value === 'object') {
-									params.append(key, JSON.stringify(value));
-								} else {
-									params.append(key, value);
-								}
+					if (args) {
+						for (const [key, value] of Object.entries(args)) {
+							if (value === null || value === undefined) continue;
+							if (typeof value === 'object') {
+								if (Object.keys(value).length === 0) continue;
+								params.append(key, JSON.stringify(value));
+							} else if (value !== '') {
+								params.append(key, value);
 							}
 						}
 					}
-					
-					return fetch('/api/method/' + opts.method, {
+					return params;
+				};
+
+				if (isUpdateMethod) {
+					const params = buildParams(opts.args);
+					const url = '/api/method/' + opts.method;
+
+					return fetch(url, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded',
@@ -209,44 +472,27 @@
 						body: params.toString(),
 						credentials: 'same-origin'
 					})
-					.then(response => {
-						if (!response.ok) {
-							return response.json().then(err => {
-								throw new Error(err.exception || `HTTP error! status: ${response.status}`);
-							}).catch(() => {
-								throw new Error(`HTTP error! status: ${response.status}`);
-							});
-						}
-						return response.json();
-					})
-					.then(data => {
-						if (opts.callback) opts.callback(data);
-						return data;
-					})
-					.catch(error => {
-						console.error('API Error:', error);
-						if (opts.error) opts.error(error);
-						throw error;
-					});
-				} else {
-					const params = new URLSearchParams();
-					
-					if (opts.args) {
-						for (const [key, value] of Object.entries(opts.args)) {
-							if (value === null || value === undefined) continue;
-							if (typeof value === 'object' && Object.keys(value).length === 0) continue;
-							if (value === '') continue;
-							
-							if (typeof value === 'object') {
-								params.append(key, JSON.stringify(value));
-							} else {
-								params.append(key, value);
+						.then(async (response) => {
+							const data = await response.json().catch(() => ({}));
+							if (!response.ok || data.exc || data.exception) {
+								const msg = data.message || data.exc || data.exception || `HTTP error! status: ${response.status}`;
+								throw new Error(msg);
 							}
-						}
-					}
-					
+							return data;
+						})
+						.then((data) => {
+							if (opts.callback) opts.callback(data);
+							return data;
+						})
+						.catch((error) => {
+							console.error('API Error:', error);
+							if (opts.error) opts.error(error);
+							throw error;
+						});
+				} else {
+					const params = buildParams(opts.args);
 					const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-					
+
 					return fetch(url, {
 						method: 'GET',
 						headers: {
@@ -254,25 +500,23 @@
 						},
 						credentials: 'same-origin'
 					})
-					.then(response => {
-						if (!response.ok) {
-							return response.json().then(err => {
-								throw new Error(err.exception || `HTTP error! status: ${response.status}`);
-							}).catch(() => {
-								throw new Error(`HTTP error! status: ${response.status}`);
-							});
-						}
-						return response.json();
-					})
-					.then(data => {
-						if (opts.callback) opts.callback(data);
-						return data;
-					})
-					.catch(error => {
-						console.error('API Error:', error);
-						if (opts.error) opts.error(error);
-						throw error;
-					});
+						.then(async (response) => {
+							const data = await response.json().catch(() => ({}));
+							if (!response.ok || data.exc || data.exception) {
+								const msg = data.message || data.exc || data.exception || `HTTP error! status: ${response.status}`;
+								throw new Error(msg);
+							}
+							return data;
+						})
+						.then((data) => {
+							if (opts.callback) opts.callback(data);
+							return data;
+						})
+						.catch((error) => {
+							console.error('API Error:', error);
+							if (opts.error) opts.error(error);
+							throw error;
+						});
 				}
 			}
 		};
@@ -283,7 +527,7 @@
 		NetworkxUtils.setPageTitle('Edit Profile');
 		
 		let currentProfile = null;
-		
+
 		// Logout handler
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
 			e.preventDefault();
@@ -295,67 +539,668 @@
 			});
 		});
 		
-		// Load existing profile data
+		// ---- Helpers for building / reading child rows ----
+
+		const createContactRow = (contact = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Contact</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Type</label>
+						<select class="form-control js-contact-type">
+							<option value="Email">Email</option>
+							<option value="Phone">Phone</option>
+							<option value="Messenger ID">Messenger ID</option>
+							<option value="Website">Website</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Value</label>
+						<input type="text" class="form-control js-contact-value" placeholder="e.g., you@example.com" />
+					</div>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-contact-type').value = contact.contact_type || 'Email';
+			wrapper.querySelector('.js-contact-value').value = contact.contact_value || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createExperienceRow = (exp = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Experience</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Title</label>
+						<input type="text" class="form-control js-exp-title" placeholder="e.g., Software Engineer" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Company</label>
+						<input type="text" class="form-control js-exp-company" placeholder="Company name" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Location</label>
+						<input type="text" class="form-control js-exp-location" placeholder="City, Country" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Employment Type</label>
+						<select class="form-control js-exp-type">
+							<option value="">Select</option>
+							<option value="Full-time">Full-time</option>
+							<option value="Part-time">Part-time</option>
+							<option value="Contract">Contract</option>
+							<option value="Internship">Internship</option>
+							<option value="Freelance">Freelance</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Start Date</label>
+						<input type="date" class="form-control js-exp-start" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">End Date</label>
+						<input type="date" class="form-control js-exp-end" />
+						<div class="small-hint">
+							Leave blank if this is your current role.
+						</div>
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 0.5rem;">
+					<label class="form-label">Description</label>
+					<textarea class="form-control js-exp-description" rows="3" placeholder="What did you work on?"></textarea>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-exp-title').value = exp.title || '';
+			wrapper.querySelector('.js-exp-company').value = exp.company_name || '';
+			wrapper.querySelector('.js-exp-location').value = exp.location || '';
+			wrapper.querySelector('.js-exp-type').value = exp.employment_type || '';
+			if (exp.start_date) wrapper.querySelector('.js-exp-start').value = exp.start_date;
+			if (exp.end_date) wrapper.querySelector('.js-exp-end').value = exp.end_date;
+			wrapper.querySelector('.js-exp-description').value = exp.description || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createEducationRow = (edu = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Education</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Institution</label>
+						<input type="text" class="form-control js-edu-inst" placeholder="e.g., SRM AP" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Degree</label>
+						<input type="text" class="form-control js-edu-degree" placeholder="e.g., B.Tech" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Field of Study</label>
+						<input type="text" class="form-control js-edu-field" placeholder="e.g., Computer Science" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Start Year</label>
+						<input type="number" class="form-control js-edu-start" placeholder="2019" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">End Year</label>
+						<input type="number" class="form-control js-edu-end" placeholder="2023" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Grade</label>
+						<input type="text" class="form-control js-edu-grade" placeholder="e.g., A+" />
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 0.5rem;">
+					<label class="form-label">Activities & Societies</label>
+					<input type="text" class="form-control js-edu-activities" placeholder="Clubs, competitions, etc." />
+				</div>
+				<div class="form-group">
+					<label class="form-label">Description</label>
+					<textarea class="form-control js-edu-description" rows="3" placeholder="Key projects or experiences"></textarea>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-edu-inst').value = edu.institution_name || '';
+			wrapper.querySelector('.js-edu-degree').value = edu.degree || '';
+			wrapper.querySelector('.js-edu-field').value = edu.field_of_study || '';
+			if (edu.start_year) wrapper.querySelector('.js-edu-start').value = edu.start_year;
+			if (edu.end_year) wrapper.querySelector('.js-edu-end').value = edu.end_year;
+			wrapper.querySelector('.js-edu-grade').value = edu.grade || '';
+			wrapper.querySelector('.js-edu-activities').value = edu.activities_societies || '';
+			wrapper.querySelector('.js-edu-description').value = edu.description || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createSkillRow = (skill = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Skill</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Skill Name</label>
+						<input type="text" class="form-control js-skill-name" placeholder="e.g., Python" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Endorsements (optional)</label>
+						<input type="number" class="form-control js-skill-endorsements" placeholder="e.g., 5" />
+					</div>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-skill-name').value = skill.skill_name || '';
+			if (skill.endorsement_count != null) {
+				wrapper.querySelector('.js-skill-endorsements').value = skill.endorsement_count;
+			}
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createCertificationRow = (cert = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Certification</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Name</label>
+						<input type="text" class="form-control js-cert-name" placeholder="e.g., Data Analytics" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issuing Organization</label>
+						<input type="text" class="form-control js-cert-org" placeholder="e.g., Google" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issue Date</label>
+						<input type="date" class="form-control js-cert-issue" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Expiration Date</label>
+						<input type="date" class="form-control js-cert-exp" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Credential ID</label>
+						<input type="text" class="form-control js-cert-id" placeholder="Certificate ID" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Credential URL</label>
+						<input type="url" class="form-control js-cert-url" placeholder="Link to certificate" />
+					</div>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-cert-name').value = cert.certification_name || '';
+			wrapper.querySelector('.js-cert-org').value = cert.issuing_organization || '';
+			if (cert.issue_date) wrapper.querySelector('.js-cert-issue').value = cert.issue_date;
+			if (cert.expiration_date) wrapper.querySelector('.js-cert-exp').value = cert.expiration_date;
+			wrapper.querySelector('.js-cert-id').value = cert.credential_id || '';
+			wrapper.querySelector('.js-cert-url').value = cert.credential_url || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createVolunteerRow = (vol = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Volunteer Experience</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Organization</label>
+						<input type="text" class="form-control js-vol-org" placeholder="Organization" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Role</label>
+						<input type="text" class="form-control js-vol-role" placeholder="Role" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Cause</label>
+						<input type="text" class="form-control js-vol-cause" placeholder="Cause or domain" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Start Date</label>
+						<input type="date" class="form-control js-vol-start" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">End Date</label>
+						<input type="date" class="form-control js-vol-end" />
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 0.5rem;">
+					<label class="form-label">Description</label>
+					<textarea class="form-control js-vol-description" rows="3" placeholder="What did you do?"></textarea>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-vol-org').value = vol.organization || '';
+			wrapper.querySelector('.js-vol-role').value = vol.role || '';
+			wrapper.querySelector('.js-vol-cause').value = vol.cause || '';
+			if (vol.start_date) wrapper.querySelector('.js-vol-start').value = vol.start_date;
+			if (vol.end_date) wrapper.querySelector('.js-vol-end').value = vol.end_date;
+			wrapper.querySelector('.js-vol-description').value = vol.description || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		const createAwardRow = (award = {}) => {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'child-row';
+			wrapper.innerHTML = `
+				<div class="child-row-header">
+					<div class="child-row-title">Award</div>
+					<button type="button" class="btn-danger-ghost js-remove-row">✕ Remove</button>
+				</div>
+				<div class="form-grid-2">
+					<div class="form-group">
+						<label class="form-label">Title</label>
+						<input type="text" class="form-control js-award-title" placeholder="e.g., Best Student Award" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issuer</label>
+						<input type="text" class="form-control js-award-issuer" placeholder="Organization" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issue Date</label>
+						<input type="date" class="form-control js-award-date" />
+					</div>
+				</div>
+				<div class="form-group" style="margin-top: 0.5rem;">
+					<label class="form-label">Description</label>
+					<textarea class="form-control js-award-description" rows="3" placeholder="Why did you receive this award?"></textarea>
+				</div>
+			`;
+
+			wrapper.querySelector('.js-award-title').value = award.title || '';
+			wrapper.querySelector('.js-award-issuer').value = award.issuer || '';
+			if (award.issue_date) wrapper.querySelector('.js-award-date').value = award.issue_date;
+			wrapper.querySelector('.js-award-description').value = award.description || '';
+
+			wrapper.querySelector('.js-remove-row').addEventListener('click', () => {
+				wrapper.remove();
+				updateSummary();
+			});
+
+			return wrapper;
+		};
+
+		// ---- Load existing profile data ----
+
 		const loadProfile = async () => {
 			try {
-				const result = await NetworkxAPI.getStudentProfile();
-				
-				if (result.exists && result.profile) {
-					currentProfile = result.profile;
-					populateForm(result.profile);
-				}
+				const profile = await NetworkxAPI.getUserProfileDetails();
+				currentProfile = profile;
+				populateForm(profile);
+				updateSummary();
 			} catch (error) {
 				console.error('Error loading profile:', error);
+				NetworkxUtils.showToast('Error loading profile. Please refresh and try again.', 'error');
 			}
 		};
-		
+
 		// Populate form with existing data
 		const populateForm = (profile) => {
 			document.getElementById('fullName').value = profile.full_name || '';
-			document.getElementById('college').value = profile.college || '';
-			document.getElementById('degree').value = profile.degree || '';
-			document.getElementById('graduationYear').value = profile.graduation_year || '';
-			document.getElementById('skills').value = profile.skills || '';
-			document.getElementById('bio').value = profile.bio || '';
-			document.getElementById('linkedinUrl').value = profile.linkedin_url || '';
-			document.getElementById('githubUrl').value = profile.github_url || '';
-			document.getElementById('resumeAttachment').value = profile.resume_attachment || '';
+			document.getElementById('headline').value = profile.headline || '';
+			document.getElementById('currentLocation').value = profile.current_location || '';
+			document.getElementById('industry').value = profile.industry || '';
+			document.getElementById('profileUrl').value = profile.profile_url || '';
+			document.getElementById('profileImage').value = profile.profile_image || '';
+			document.getElementById('profileSummary').value = profile.profile_summary || '';
+
+			const contactList = document.getElementById('contactList');
+			const experienceList = document.getElementById('experienceList');
+			const educationList = document.getElementById('educationList');
+			const skillsList = document.getElementById('skillsList');
+			const certificationsList = document.getElementById('certificationsList');
+			const volunteerList = document.getElementById('volunteerList');
+			const awardsList = document.getElementById('awardsList');
+
+			contactList.innerHTML = '';
+			(profile.contact_info_details || []).forEach((row) => {
+				contactList.appendChild(createContactRow(row));
+			});
+
+			experienceList.innerHTML = '';
+			(profile.experience || []).forEach((row) => {
+				experienceList.appendChild(createExperienceRow(row));
+			});
+
+			educationList.innerHTML = '';
+			(profile.education || []).forEach((row) => {
+				educationList.appendChild(createEducationRow(row));
+			});
+
+			skillsList.innerHTML = '';
+			(profile.skills || []).forEach((row) => {
+				skillsList.appendChild(createSkillRow(row));
+			});
+
+			certificationsList.innerHTML = '';
+			(profile.certifications || []).forEach((row) => {
+				certificationsList.appendChild(createCertificationRow(row));
+			});
+
+			volunteerList.innerHTML = '';
+			(profile.volunteer_experience || []).forEach((row) => {
+				volunteerList.appendChild(createVolunteerRow(row));
+			});
+
+			awardsList.innerHTML = '';
+			(profile.awards || []).forEach((row) => {
+				awardsList.appendChild(createAwardRow(row));
+			});
 		};
-		
-		// Handle form submission
+
+		// ---- Collect data from DOM into payload ----
+
+		const collectChildRows = () => {
+			const contactInfoDetails = [];
+			document.querySelectorAll('#contactList .child-row').forEach((row) => {
+				const type = row.querySelector('.js-contact-type').value.trim();
+				const value = row.querySelector('.js-contact-value').value.trim();
+				if (type && value) {
+					contactInfoDetails.push({
+						contact_type: type,
+						contact_value: value
+					});
+				}
+			});
+
+			const experience = [];
+			document.querySelectorAll('#experienceList .child-row').forEach((row) => {
+				const title = row.querySelector('.js-exp-title').value.trim();
+				const company = row.querySelector('.js-exp-company').value.trim();
+				const location = row.querySelector('.js-exp-location').value.trim();
+				const employmentType = row.querySelector('.js-exp-type').value;
+				const start = row.querySelector('.js-exp-start').value;
+				const end = row.querySelector('.js-exp-end').value;
+				const description = row.querySelector('.js-exp-description').value.trim();
+				if (title || company || start || end || description) {
+					experience.push({
+						title,
+						company_name: company,
+						location,
+						employment_type: employmentType,
+						start_date: start || null,
+						end_date: end || null,
+						description
+					});
+				}
+			});
+
+			const education = [];
+			document.querySelectorAll('#educationList .child-row').forEach((row) => {
+				const inst = row.querySelector('.js-edu-inst').value.trim();
+				const degree = row.querySelector('.js-edu-degree').value.trim();
+				const field = row.querySelector('.js-edu-field').value.trim();
+				const startYear = row.querySelector('.js-edu-start').value;
+				const endYear = row.querySelector('.js-edu-end').value;
+				const grade = row.querySelector('.js-edu-grade').value.trim();
+				const activities = row.querySelector('.js-edu-activities').value.trim();
+				const description = row.querySelector('.js-edu-description').value.trim();
+				if (inst || degree || field || startYear || endYear || description) {
+					education.push({
+						institution_name: inst,
+						degree,
+						field_of_study: field,
+						start_year: startYear ? parseInt(startYear, 10) : null,
+						end_year: endYear ? parseInt(endYear, 10) : null,
+						grade,
+						activities_societies: activities,
+						description
+					});
+				}
+			});
+
+			const skills = [];
+			document.querySelectorAll('#skillsList .child-row').forEach((row) => {
+				const name = row.querySelector('.js-skill-name').value.trim();
+				const endorsements = row.querySelector('.js-skill-endorsements').value;
+				if (name) {
+					skills.push({
+						skill_name: name,
+						endorsement_count: endorsements ? parseInt(endorsements, 10) : 0
+					});
+				}
+			});
+
+			const certifications = [];
+			document.querySelectorAll('#certificationsList .child-row').forEach((row) => {
+				const name = row.querySelector('.js-cert-name').value.trim();
+				const org = row.querySelector('.js-cert-org').value.trim();
+				const issue = row.querySelector('.js-cert-issue').value;
+				const exp = row.querySelector('.js-cert-exp').value;
+				const id = row.querySelector('.js-cert-id').value.trim();
+				const url = row.querySelector('.js-cert-url').value.trim();
+				if (name || org || issue || exp || id || url) {
+					certifications.push({
+						certification_name: name,
+						issuing_organization: org,
+						issue_date: issue || null,
+						expiration_date: exp || null,
+						credential_id: id || null,
+						credential_url: url || null
+					});
+				}
+			});
+
+			const volunteer_experience = [];
+			document.querySelectorAll('#volunteerList .child-row').forEach((row) => {
+				const org = row.querySelector('.js-vol-org').value.trim();
+				const role = row.querySelector('.js-vol-role').value.trim();
+				const cause = row.querySelector('.js-vol-cause').value.trim();
+				const start = row.querySelector('.js-vol-start').value;
+				const end = row.querySelector('.js-vol-end').value;
+				const description = row.querySelector('.js-vol-description').value.trim();
+				if (org || role || cause || start || end || description) {
+					volunteer_experience.push({
+						organization: org,
+						role,
+						cause,
+						start_date: start || null,
+						end_date: end || null,
+						description
+					});
+				}
+			});
+
+			const awards = [];
+			document.querySelectorAll('#awardsList .child-row').forEach((row) => {
+				const title = row.querySelector('.js-award-title').value.trim();
+				const issuer = row.querySelector('.js-award-issuer').value.trim();
+				const date = row.querySelector('.js-award-date').value;
+				const description = row.querySelector('.js-award-description').value.trim();
+				if (title || issuer || date || description) {
+					awards.push({
+						title,
+						issuer,
+						issue_date: date || null,
+						description
+					});
+				}
+			});
+
+			return {
+				contact_info_details: contactInfoDetails,
+				experience,
+				education,
+				skills,
+				certifications,
+				volunteer_experience,
+				awards
+			};
+		};
+
+		// ---- Live summary ----
+
+		const updateSummary = () => {
+			const fullName = document.getElementById('fullName').value.trim() || 'Your name';
+			const headline = document.getElementById('headline').value.trim() || 'Add a short headline that captures what you do.';
+			const location = document.getElementById('currentLocation').value.trim() || 'Location';
+
+			const experienceCount = document.querySelectorAll('#experienceList .child-row').length;
+			const educationCount = document.querySelectorAll('#educationList .child-row').length;
+			const skillsCount = document.querySelectorAll('#skillsList .child-row').length;
+			const certCount = document.querySelectorAll('#certificationsList .child-row').length;
+
+			document.getElementById('chipName').textContent = fullName;
+			document.getElementById('chipHeadline').textContent = headline;
+			document.getElementById('chipLocation').textContent = location;
+
+			document.getElementById('chipExperience').textContent =
+				experienceCount > 0 ? `${experienceCount} experience item(s)` : 'No experience added yet';
+
+			document.getElementById('chipEducation').textContent =
+				educationCount > 0 ? `${educationCount} education record(s)` : 'No education added yet';
+
+			document.getElementById('chipSkills').textContent =
+				skillsCount > 0 ? `${skillsCount} skill(s)` : 'No skills added yet';
+
+			document.getElementById('chipCertifications').textContent =
+				certCount > 0 ? `${certCount} certification(s)` : 'No certifications added yet';
+		};
+
+		// Update summary on basic inputs change
+		['fullName', 'headline', 'currentLocation'].forEach((id) => {
+			const el = document.getElementById(id);
+			el.addEventListener('input', updateSummary);
+		});
+
+		// ---- Handle form submission ----
+
 		document.getElementById('profileForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
-			
+
 			const saveBtn = document.getElementById('saveBtn');
 			saveBtn.disabled = true;
 			saveBtn.textContent = 'Saving...';
-			
+
 			try {
-				const formData = new FormData(e.target);
-				const profileData = {};
-				
-				for (const [key, value] of formData.entries()) {
-					if (value.trim()) {
-						profileData[key] = value.trim();
-					}
-				}
-				
-				await NetworkxAPI.updateStudentProfile(profileData);
-				
+				const basicData = {
+					full_name: document.getElementById('fullName').value.trim(),
+					headline: document.getElementById('headline').value.trim(),
+					current_location: document.getElementById('currentLocation').value.trim(),
+					industry: document.getElementById('industry').value.trim(),
+					profile_url: document.getElementById('profileUrl').value.trim(),
+					profile_image: document.getElementById('profileImage').value.trim(),
+					profile_summary: document.getElementById('profileSummary').value.trim()
+				};
+
+				const childData = collectChildRows();
+
+				const payload = {
+					...basicData,
+					...childData
+				};
+
+				await NetworkxAPI.updateUserProfile(payload);
+
 				NetworkxUtils.showToast('Profile saved successfully!', 'success');
-				
-				// Redirect to profile view after a short delay
+
 				setTimeout(() => {
 					window.location.href = '/myprofile';
-				}, 1500);
+				}, 1200);
 			} catch (error) {
 				console.error('Error saving profile:', error);
-				NetworkxUtils.showToast('Error saving profile. Please try again.', 'error');
+				NetworkxUtils.showToast(error.message || 'Error saving profile. Please try again.', 'error');
 				saveBtn.disabled = false;
 				saveBtn.textContent = 'Save Profile';
 			}
 		});
-		
+
+		// ---- Bind add-row buttons ----
+
+		document.getElementById('addContactBtn').addEventListener('click', () => {
+			document.getElementById('contactList').appendChild(createContactRow());
+		});
+
+		document.getElementById('addExperienceBtn').addEventListener('click', () => {
+			document.getElementById('experienceList').appendChild(createExperienceRow());
+			updateSummary();
+		});
+
+		document.getElementById('addEducationBtn').addEventListener('click', () => {
+			document.getElementById('educationList').appendChild(createEducationRow());
+			updateSummary();
+		});
+
+		document.getElementById('addSkillBtn').addEventListener('click', () => {
+			document.getElementById('skillsList').appendChild(createSkillRow());
+			updateSummary();
+		});
+
+		document.getElementById('addCertificationBtn').addEventListener('click', () => {
+			document.getElementById('certificationsList').appendChild(createCertificationRow());
+			updateSummary();
+		});
+
+		document.getElementById('addVolunteerBtn').addEventListener('click', () => {
+			document.getElementById('volunteerList').appendChild(createVolunteerRow());
+			updateSummary();
+		});
+
+		document.getElementById('addAwardBtn').addEventListener('click', () => {
+			document.getElementById('awardsList').appendChild(createAwardRow());
+			updateSummary();
+		});
+
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
 			loadProfile();
