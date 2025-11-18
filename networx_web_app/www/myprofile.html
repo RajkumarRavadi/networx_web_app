@@ -736,8 +736,9 @@
 
 		// Render profile header
 		const renderProfileHeader = (profile) => {
-			const initial = profile.name ? profile.name.charAt(0).toUpperCase() : 'U';
-			const name = profile.name || 'User';
+			const displayName = profile.full_name || profile.user || 'User';
+			const initial = displayName.charAt(0).toUpperCase();
+			const name = displayName;
 			const headline = profile.headline || '';
 			const location = profile.current_location || '';
 			const industry = profile.industry || '';

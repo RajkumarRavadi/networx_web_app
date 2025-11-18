@@ -7,7 +7,8 @@
     "engine": "InnoDB",
     "field_order": [
         "user",
-        "name",
+        "full_name",
+        "profile_image",
         "headline",
         "current_location",
         "profile_url",
@@ -40,11 +41,16 @@
             "unique": 1
         },
         {
-            "fieldname": "name",
+            "fieldname": "full_name",
             "fieldtype": "Data",
             "in_list_view": 1,
             "label": "Full Name",
             "reqd": 1
+        },
+        {
+            "fieldname": "profile_image",
+            "fieldtype": "Attach Image",
+            "label": "Profile Image"
         },
         {
             "fieldname": "headline",
