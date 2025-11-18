@@ -59,6 +59,15 @@
 			font-weight: 700;
 			color: white;
 			box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08);
+			overflow: hidden;
+		}
+
+		.profile-avatar-img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			border-radius: 50%;
+			display: block;
 		}
 
 		.profile-name {
@@ -748,9 +757,14 @@
 			if (industry) metaItems.push(`💼 ${industry}`);
 			if (profile.profile_url) metaItems.push(`🔗 <a href="${profile.profile_url}" target="_blank" style="color: rgba(0,0,0,.6); text-decoration: none;">Profile URL</a>`);
 
+			const hasProfileImage = !!profile.profile_image;
+			const avatarHTML = hasProfileImage
+				? `<div class="profile-avatar"><img src="${profile.profile_image}" alt="${escapeHtml(name)}" class="profile-avatar-img" /></div>`
+				: `<div class="profile-avatar">${initial}</div>`;
+
 			document.getElementById('profileHeader').innerHTML = `
 				<div class="profile-avatar-container">
-					<div class="profile-avatar">${initial}</div>
+					${avatarHTML}
 				</div>
 				<h1 class="profile-name">${escapeHtml(name)}</h1>
 				${headline ? `<p class="profile-headline">${escapeHtml(headline)}</p>` : ''}
