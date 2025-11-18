@@ -22,7 +22,7 @@
 			margin: 0 auto;
 			padding: 24px 12px;
 		}
-
+		
 		/* Cover Photo Section */
 		.cover-photo {
 			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -98,7 +98,7 @@
 			align-items: center;
 			gap: 4px;
 		}
-
+		
 		.profile-actions {
 			display: flex;
 			gap: 8px;
@@ -140,18 +140,18 @@
 			gap: 8px;
 			transition: background-color 0.2s;
 		}
-
+		
 		.btn-secondary:hover {
 			background-color: #eef3f8;
 		}
-
+		
 		/* Content Grid */
 		.profile-content-grid {
 			display: grid;
 			grid-template-columns: 1fr 300px;
 			gap: 8px;
 		}
-
+		
 		/* Profile Card */
 		.profile-card {
 			background: white;
@@ -352,13 +352,13 @@
 			padding: 48px 24px;
 			color: rgba(0,0,0,.6);
 		}
-
+		
 		.empty-state-icon {
 			font-size: 48px;
 			margin-bottom: 16px;
 			opacity: 0.5;
 		}
-
+		
 		.empty-state-text {
 			font-size: 14px;
 		}
@@ -375,7 +375,7 @@
 			.profile-content-grid {
 				grid-template-columns: 1fr;
 			}
-
+			
 			.profile-avatar {
 				width: 120px;
 				height: 120px;
@@ -389,7 +389,7 @@
 			.profile-actions {
 				flex-direction: column;
 			}
-
+			
 			.btn-primary,
 			.btn-secondary {
 				width: 100%;
@@ -406,6 +406,186 @@
 			padding: 2px 8px;
 			border-radius: 12px;
 			margin-left: 8px;
+		}
+
+		/* Edit Mode Styles */
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 16px;
+		}
+
+		.edit-icon-btn {
+			background: none;
+			border: none;
+			color: #0a66c2;
+			cursor: pointer;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 14px;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			opacity: 0.7;
+			transition: all 0.2s;
+		}
+
+		.edit-icon-btn:hover {
+			opacity: 1;
+			background-color: #eef3f8;
+		}
+
+		.profile-card:hover .edit-icon-btn {
+			opacity: 1;
+		}
+
+		.edit-form {
+			display: none;
+		}
+
+		.edit-mode .view-content {
+			display: none;
+		}
+
+		.edit-mode .edit-form {
+			display: block;
+		}
+
+		.form-group {
+			margin-bottom: 16px;
+		}
+
+		.form-label {
+			display: block;
+			font-size: 14px;
+			font-weight: 600;
+			color: rgba(0,0,0,.9);
+			margin-bottom: 6px;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 8px 12px;
+			border: 1px solid rgba(0,0,0,.15);
+			border-radius: 4px;
+			font-size: 14px;
+			font-family: inherit;
+			transition: border-color 0.2s;
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-color: #0a66c2;
+			box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.1);
+		}
+
+		textarea.form-control {
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		.form-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 16px;
+			padding-top: 16px;
+			border-top: 1px solid rgba(0,0,0,.08);
+		}
+
+		.btn-sm {
+			padding: 6px 16px;
+			font-size: 14px;
+		}
+
+		.btn-success {
+			background-color: #057642;
+			color: white;
+			border: none;
+		}
+
+		.btn-success:hover {
+			background-color: #045d37;
+		}
+
+		.btn-outline {
+			background: white;
+			color: rgba(0,0,0,.6);
+			border: 1px solid rgba(0,0,0,.15);
+		}
+
+		.btn-outline:hover {
+			background-color: #f3f2ef;
+		}
+
+		.child-item {
+			background: #f9fafb;
+			border: 1px solid rgba(0,0,0,.08);
+			border-radius: 4px;
+			padding: 16px;
+			margin-bottom: 12px;
+			position: relative;
+		}
+
+		.child-item-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 12px;
+		}
+
+		.remove-item-btn {
+			background: none;
+			border: none;
+			color: #d32f2f;
+			cursor: pointer;
+			padding: 4px;
+			font-size: 18px;
+			opacity: 0.7;
+			transition: opacity 0.2s;
+		}
+
+		.remove-item-btn:hover {
+			opacity: 1;
+		}
+
+		.add-item-btn {
+			background: white;
+			border: 1px dashed rgba(0,0,0,.3);
+			color: rgba(0,0,0,.6);
+			padding: 12px;
+			border-radius: 4px;
+			cursor: pointer;
+			text-align: center;
+			font-size: 14px;
+			font-weight: 600;
+			margin-top: 8px;
+			transition: all 0.2s;
+		}
+
+		.add-item-btn:hover {
+			border-color: #0a66c2;
+			color: #0a66c2;
+			background-color: #eef3f8;
+		}
+
+		.grid-2 {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		.grid-3 {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 16px;
+		}
+
+		@media (max-width: 768px) {
+			.grid-2,
+			.grid-3 {
+				grid-template-columns: 1fr;
+			}
 		}
 	</style>
 </head>
@@ -436,61 +616,197 @@
 				<div class="cover-photo" id="coverPhoto"></div>
 				<div class="profile-header-card" id="profileHeader">
 					<!-- Will be populated by JavaScript -->
-				</div>
-
-				<!-- Profile Content Grid -->
+			</div>
+			
+			<!-- Profile Content Grid -->
 				<div class="profile-content-grid">
 					<!-- Main Content -->
-					<div>
+				<div>
 						<!-- Profile Summary -->
 						<div class="profile-card" id="profileSummarySection" style="display: none;">
-							<h2 class="card-title">About</h2>
-							<div class="profile-summary" id="profileSummary"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">About</h2>
+								<button class="edit-icon-btn" onclick="editSection('profileSummary')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div class="profile-summary" id="profileSummary"></div>
+							</div>
+							<div class="edit-form" id="profileSummaryEdit">
+								<div class="form-group">
+									<label class="form-label">Profile Summary</label>
+									<textarea class="form-control" id="profileSummaryInput" rows="6" placeholder="Tell us about yourself..."></textarea>
+								</div>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('profileSummary')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('profileSummary')">Cancel</button>
+								</div>
 						</div>
-
+					</div>
+					
 						<!-- Experience -->
 						<div class="profile-card" id="experienceSection" style="display: none;">
-							<h2 class="card-title">Experience</h2>
-							<div id="experienceList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Experience</h2>
+								<button class="edit-icon-btn" onclick="editSection('experience')">
+									✏️ Edit
+								</button>
+						</div>
+							<div class="view-content">
+								<div id="experienceList"></div>
+							</div>
+							<div class="edit-form" id="experienceEdit">
+								<div id="experienceItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addExperienceItem()">
+									+ Add Experience
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('experience')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('experience')">Cancel</button>
+								</div>
+							</div>
 						</div>
 
 						<!-- Education -->
 						<div class="profile-card" id="educationSection" style="display: none;">
-							<h2 class="card-title">Education</h2>
-							<div id="educationList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Education</h2>
+								<button class="edit-icon-btn" onclick="editSection('education')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div id="educationList"></div>
+							</div>
+							<div class="edit-form" id="educationEdit">
+								<div id="educationItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addEducationItem()">
+									+ Add Education
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('education')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('education')">Cancel</button>
+								</div>
+							</div>
 						</div>
 
 						<!-- Skills -->
 						<div class="profile-card" id="skillsSection" style="display: none;">
-							<h2 class="card-title">Skills & Endorsements</h2>
-							<div class="skills-grid" id="skillsList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Skills & Endorsements</h2>
+								<button class="edit-icon-btn" onclick="editSection('skills')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div class="skills-grid" id="skillsList"></div>
+							</div>
+							<div class="edit-form" id="skillsEdit">
+								<div id="skillsItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addSkillItem()">
+									+ Add Skill
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('skills')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('skills')">Cancel</button>
+								</div>
+							</div>
 						</div>
 
 						<!-- Certifications -->
 						<div class="profile-card" id="certificationsSection" style="display: none;">
-							<h2 class="card-title">Licenses & Certifications</h2>
-							<div id="certificationsList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Licenses & Certifications</h2>
+								<button class="edit-icon-btn" onclick="editSection('certifications')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div id="certificationsList"></div>
+							</div>
+							<div class="edit-form" id="certificationsEdit">
+								<div id="certificationsItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addCertificationItem()">
+									+ Add Certification
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('certifications')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('certifications')">Cancel</button>
+								</div>
+							</div>
 						</div>
 
 						<!-- Volunteer Experience -->
 						<div class="profile-card" id="volunteerSection" style="display: none;">
-							<h2 class="card-title">Volunteer Experience</h2>
-							<div id="volunteerList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Volunteer Experience</h2>
+								<button class="edit-icon-btn" onclick="editSection('volunteer')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div id="volunteerList"></div>
+							</div>
+							<div class="edit-form" id="volunteerEdit">
+								<div id="volunteerItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addVolunteerItem()">
+									+ Add Volunteer Experience
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('volunteer')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('volunteer')">Cancel</button>
+								</div>
+							</div>
 						</div>
 
 						<!-- Awards -->
 						<div class="profile-card" id="awardsSection" style="display: none;">
-							<h2 class="card-title">Honors & Awards</h2>
-							<div id="awardsList"></div>
-						</div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Honors & Awards</h2>
+								<button class="edit-icon-btn" onclick="editSection('awards')">
+									✏️ Edit
+								</button>
+							</div>
+							<div class="view-content">
+								<div id="awardsList"></div>
+							</div>
+							<div class="edit-form" id="awardsEdit">
+								<div id="awardsItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addAwardItem()">
+									+ Add Award
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('awards')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('awards')">Cancel</button>
+								</div>
+							</div>
 					</div>
-
-					<!-- Sidebar -->
-					<div>
+				</div>
+				
+				<!-- Sidebar -->
+				<div>
 						<!-- Contact Information -->
 						<div class="profile-card" id="contactSection" style="display: none;">
-							<h2 class="card-title">Contact Information</h2>
-							<div id="contactList"></div>
+							<div class="section-header">
+								<h2 class="card-title" style="margin: 0;">Contact Information</h2>
+								<button class="edit-icon-btn" onclick="editSection('contact')">
+									✏️ Edit
+								</button>
+						</div>
+							<div class="view-content">
+								<div id="contactList"></div>
+					</div>
+							<div class="edit-form" id="contactEdit">
+								<div id="contactItemsEdit"></div>
+								<button type="button" class="add-item-btn" onclick="addContactItem()">
+									+ Add Contact
+								</button>
+								<div class="form-actions">
+									<button class="btn-primary btn-sm btn-success" onclick="saveSection('contact')">Save</button>
+									<button class="btn-secondary btn-sm btn-outline" onclick="cancelEdit('contact')">Cancel</button>
+						</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -560,7 +876,7 @@
 							}
 							
 							// Check for HTTP errors
-							if (!response.ok) {
+						if (!response.ok) {
 								const errorMsg = data.exception || data.message || `HTTP error! status: ${response.status}`;
 								const error = new Error(errorMsg);
 								error.response = data;
@@ -633,7 +949,7 @@
 							}
 							
 							// Check for HTTP errors
-							if (!response.ok) {
+						if (!response.ok) {
 								const errorMsg = data.exception || data.message || `HTTP error! status: ${response.status}`;
 								const error = new Error(errorMsg);
 								error.response = data;
@@ -718,7 +1034,7 @@
 			div.textContent = text;
 			return div.innerHTML;
 		};
-
+		
 		// Load profile data
 		const loadProfile = async () => {
 			try {
@@ -742,7 +1058,7 @@
 				showError(error);
 			}
 		};
-
+		
 		// Render profile header
 		const renderProfileHeader = (profile) => {
 			const displayName = profile.full_name || profile.user || 'User';
@@ -761,19 +1077,91 @@
 			const avatarHTML = hasProfileImage
 				? `<div class="profile-avatar"><img src="${profile.profile_image}" alt="${escapeHtml(name)}" class="profile-avatar-img" /></div>`
 				: `<div class="profile-avatar">${initial}</div>`;
-
+			
 			document.getElementById('profileHeader').innerHTML = `
 				<div class="profile-avatar-container">
 					${avatarHTML}
+						</div>
+				<div class="view-content">
+					<h1 class="profile-name">${escapeHtml(name)}</h1>
+					${headline ? `<p class="profile-headline">${escapeHtml(headline)}</p>` : ''}
+					${metaItems.length > 0 ? `<div class="profile-meta">${metaItems.join(' • ')}</div>` : ''}
+					</div>
+				<div class="edit-form" id="headerEdit" style="display: none;">
+					<div class="form-group">
+						<label class="form-label">Full Name *</label>
+						<input type="text" class="form-control" id="headerFullName" value="${escapeHtml(name)}" required>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Headline</label>
+						<input type="text" class="form-control" id="headerHeadline" value="${escapeHtml(headline)}" placeholder="e.g., Software Engineer at Company">
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Location</label>
+							<input type="text" class="form-control" id="headerLocation" value="${escapeHtml(location)}" placeholder="City, Country">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Industry</label>
+							<input type="text" class="form-control" id="headerIndustry" value="${escapeHtml(industry)}" placeholder="e.g., Technology">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Profile URL</label>
+						<input type="url" class="form-control" id="headerProfileUrl" value="${escapeHtml(profile.profile_url || '')}" placeholder="https://linkedin.com/in/yourprofile">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Profile Image URL</label>
+						<input type="text" class="form-control" id="headerProfileImage" value="${escapeHtml(profile.profile_image || '')}" placeholder="/files/image.jpg">
+					</div>
+					<div class="form-actions">
+						<button class="btn-primary btn-sm btn-success" onclick="saveHeader()">Save</button>
+						<button class="btn-secondary btn-sm btn-outline" onclick="cancelHeaderEdit()">Cancel</button>
+					</div>
 				</div>
-				<h1 class="profile-name">${escapeHtml(name)}</h1>
-				${headline ? `<p class="profile-headline">${escapeHtml(headline)}</p>` : ''}
-				${metaItems.length > 0 ? `<div class="profile-meta">${metaItems.join(' • ')}</div>` : ''}
 				<div class="profile-actions">
-					<a href="/myprofile-edit" class="btn-primary">✏️ Edit Profile</a>
+					<button class="btn-primary" onclick="editHeader()" id="editHeaderBtn">✏️ Edit Profile</button>
 					<a href="/dashboard" class="btn-secondary">← Back to Dashboard</a>
 				</div>
 			`;
+		};
+		
+		// Header edit functions
+		const editHeader = () => {
+			document.querySelector('#profileHeader .view-content').style.display = 'none';
+			document.getElementById('headerEdit').style.display = 'block';
+			document.getElementById('editHeaderBtn').style.display = 'none';
+		};
+
+		const cancelHeaderEdit = () => {
+			document.querySelector('#profileHeader .view-content').style.display = 'block';
+			document.getElementById('headerEdit').style.display = 'none';
+			document.getElementById('editHeaderBtn').style.display = 'inline-flex';
+		};
+
+		const saveHeader = async () => {
+			try {
+				const data = {
+					full_name: document.getElementById('headerFullName').value,
+					headline: document.getElementById('headerHeadline').value,
+					current_location: document.getElementById('headerLocation').value,
+					industry: document.getElementById('headerIndustry').value,
+					profile_url: document.getElementById('headerProfileUrl').value,
+					profile_image: document.getElementById('headerProfileImage').value,
+				};
+
+				const updateData = { ...currentProfile, ...data };
+				const result = await NetworkxAPI.updateUserProfile(updateData);
+				
+				if (result.success) {
+					currentProfile = result.profile;
+					renderProfileHeader(currentProfile);
+					showNotification('Profile updated successfully!', 'success');
+				}
+			} catch (error) {
+				console.error('Error saving header:', error);
+				showNotification('Error saving profile. Please try again.', 'error');
+			}
 		};
 
 		// Render profile summary
@@ -810,9 +1198,9 @@
 							</h3>
 							<div class="timeline-item-company">${escapeHtml(exp.company_name || '')}</div>
 							<div class="timeline-item-meta">${metaItems.join(' • ')}</div>
-						</div>
+				</div>
 						${exp.description ? `<div class="timeline-item-description">${exp.description}</div>` : ''}
-					</div>
+				</div>
 				`;
 			}).join('');
 
@@ -840,9 +1228,9 @@
 							<div class="timeline-item-company">${escapeHtml(edu.institution_name || '')}</div>
 							${edu.field_of_study ? `<div class="timeline-item-meta">${escapeHtml(edu.field_of_study)}${metaItems.length > 0 ? ' • ' + metaItems.join(' • ') : ''}</div>` : (metaItems.length > 0 ? `<div class="timeline-item-meta">${metaItems.join(' • ')}</div>` : '')}
 							${edu.activities_societies ? `<div class="timeline-item-meta" style="margin-top: 4px;">${escapeHtml(edu.activities_societies)}</div>` : ''}
-						</div>
+				</div>
 						${edu.description ? `<div class="timeline-item-description">${edu.description}</div>` : ''}
-					</div>
+				</div>
 				`;
 			}).join('');
 
@@ -866,8 +1254,8 @@
 					<div class="skill-badge">
 						<span>${escapeHtml(skill.skill_name || '')}</span>
 						${endorsementText}
-					</div>
-				`;
+				</div>
+			`;
 			}).join('');
 
 			document.getElementById('skillsList').innerHTML = skillsHTML;
@@ -920,7 +1308,7 @@
 							<h3 class="timeline-item-title">${escapeHtml(vol.role || '')}</h3>
 							<div class="timeline-item-company">${escapeHtml(vol.organization || '')}</div>
 							${metaItems.length > 0 ? `<div class="timeline-item-meta">${metaItems.join(' • ')}</div>` : ''}
-						</div>
+				</div>
 						${vol.description ? `<div class="timeline-item-description">${vol.description}</div>` : ''}
 					</div>
 				`;
@@ -948,8 +1336,8 @@
 						${award.issuer ? `<div class="cert-org">${escapeHtml(award.issuer)}</div>` : ''}
 						${metaItems.length > 0 ? `<div class="cert-meta">${metaItems.join(' • ')}</div>` : ''}
 						${award.description ? `<div class="timeline-item-description" style="margin-top: 8px;">${award.description}</div>` : ''}
-					</div>
-				`;
+				</div>
+			`;
 			}).join('');
 
 			document.getElementById('awardsList').innerHTML = awardsHTML;
@@ -1028,12 +1416,577 @@
 						<div class="empty-state-text">${escapeHtml(errorMessage)}</div>
 						<div style="margin-top: 16px;">
 							<a href="/dashboard" class="btn-secondary">← Back to Dashboard</a>
+					</div>
+					</div>
+					</div>
+				`;
+		};
+
+		// Edit Mode State
+		let editMode = {};
+		let originalData = {};
+
+		// Enter edit mode for a section
+		const editSection = (sectionId) => {
+			editMode[sectionId] = true;
+			const section = document.getElementById(sectionId + 'Section');
+			if (section) {
+				section.classList.add('edit-mode');
+				// Store original data
+				originalData[sectionId] = getSectionData(sectionId);
+				// Populate edit form
+				populateEditForm(sectionId);
+			}
+		};
+
+		// Cancel edit mode
+		const cancelEdit = (sectionId) => {
+			editMode[sectionId] = false;
+			const section = document.getElementById(sectionId + 'Section');
+			if (section) {
+				section.classList.remove('edit-mode');
+				// Restore original data
+				restoreSectionData(sectionId);
+			}
+		};
+
+		// Save section
+		const saveSection = async (sectionId) => {
+			try {
+				const saveBtn = event?.target || document.querySelector(`#${sectionId}Edit .btn-success`);
+				if (saveBtn) {
+					saveBtn.disabled = true;
+					saveBtn.textContent = 'Saving...';
+				}
+
+				const data = collectSectionData(sectionId);
+				const updateData = { ...currentProfile, ...data };
+				
+				const result = await NetworkxAPI.updateUserProfile(updateData);
+				
+				if (result.success) {
+					currentProfile = result.profile;
+					// Re-render the section
+					renderSection(sectionId, currentProfile);
+					cancelEdit(sectionId);
+					
+					// Show success message
+					showNotification('Profile updated successfully!', 'success');
+				}
+			} catch (error) {
+				console.error('Error saving section:', error);
+				showNotification('Error saving profile. Please try again.', 'error');
+			} finally {
+				const saveBtn = document.querySelector(`#${sectionId}Edit .btn-success`);
+				if (saveBtn) {
+					saveBtn.disabled = false;
+					saveBtn.textContent = 'Save';
+				}
+			}
+		};
+
+		// Show notification
+		const showNotification = (message, type = 'success') => {
+			const notification = document.createElement('div');
+			notification.style.cssText = `
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: ${type === 'success' ? '#057642' : '#d32f2f'};
+				color: white;
+				padding: 12px 24px;
+				border-radius: 4px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+				z-index: 10000;
+				font-size: 14px;
+				font-weight: 500;
+			`;
+			notification.textContent = message;
+			document.body.appendChild(notification);
+			
+			setTimeout(() => {
+				notification.style.opacity = '0';
+				notification.style.transition = 'opacity 0.3s';
+				setTimeout(() => notification.remove(), 300);
+			}, 3000);
+		};
+
+		// Get section data (for storing original)
+		const getSectionData = (sectionId) => {
+			// This will be implemented per section
+			return {};
+		};
+
+		// Restore section data
+		const restoreSectionData = (sectionId) => {
+			// This will be implemented per section
+		};
+
+		// Populate edit form
+		const populateEditForm = (sectionId) => {
+			if (sectionId === 'profileSummary') {
+				const input = document.getElementById('profileSummaryInput');
+				if (input && currentProfile) {
+					// Strip HTML tags for textarea
+					const text = currentProfile.profile_summary || '';
+					input.value = text.replace(/<[^>]*>/g, '');
+				}
+			} else if (sectionId === 'experience') {
+				populateChildTableEdit('experience', currentProfile?.experience || []);
+			} else if (sectionId === 'education') {
+				populateChildTableEdit('education', currentProfile?.education || []);
+			} else if (sectionId === 'skills') {
+				populateChildTableEdit('skills', currentProfile?.skills || []);
+			} else if (sectionId === 'certifications') {
+				populateChildTableEdit('certifications', currentProfile?.certifications || []);
+			} else if (sectionId === 'volunteer') {
+				populateChildTableEdit('volunteer', currentProfile?.volunteer_experience || []);
+			} else if (sectionId === 'awards') {
+				populateChildTableEdit('awards', currentProfile?.awards || []);
+			} else if (sectionId === 'contact') {
+				populateChildTableEdit('contact', currentProfile?.contact_info_details || []);
+			}
+		};
+
+		// Collect section data from form
+		const collectSectionData = (sectionId) => {
+			const data = {};
+			if (sectionId === 'profileSummary') {
+				const input = document.getElementById('profileSummaryInput');
+				if (input) {
+					data.profile_summary = input.value;
+				}
+			} else if (sectionId === 'experience') {
+				data.experience = collectChildItems('experience');
+			} else if (sectionId === 'education') {
+				data.education = collectChildItems('education');
+			} else if (sectionId === 'skills') {
+				data.skills = collectChildItems('skills');
+			} else if (sectionId === 'certifications') {
+				data.certifications = collectChildItems('certifications');
+			} else if (sectionId === 'volunteer') {
+				data.volunteer_experience = collectChildItems('volunteer');
+			} else if (sectionId === 'awards') {
+				data.awards = collectChildItems('awards');
+			} else if (sectionId === 'contact') {
+				data.contact_info_details = collectChildItems('contact');
+			}
+			return data;
+		};
+
+		// Collect child items from edit form
+		const collectChildItems = (type) => {
+			const container = document.getElementById(type + 'ItemsEdit');
+			if (!container) return [];
+			
+			const items = [];
+			const childItems = container.querySelectorAll('.child-item');
+			
+			childItems.forEach(item => {
+				const itemData = {};
+				const inputs = item.querySelectorAll('input, textarea, select');
+				inputs.forEach(input => {
+					// Extract field name from ID (e.g., "experience_title_0" -> "title")
+					let fieldName = input.id;
+					if (fieldName.includes('_')) {
+						const parts = fieldName.split('_');
+						// Remove type prefix and index, keep the field name
+						fieldName = parts.slice(1, -1).join('_');
+					}
+					
+					let value = input.value;
+					
+					// Handle checkboxes
+					if (input.type === 'checkbox') {
+						value = input.checked ? 1 : 0;
+					}
+					
+					// Handle empty values
+					if (value === '' || value === null) {
+						value = null;
+					}
+					
+					itemData[fieldName] = value;
+				});
+				
+				if (Object.keys(itemData).length > 0) {
+					items.push(itemData);
+				}
+			});
+			
+			return items;
+		};
+
+		// Add experience item
+		const addExperienceItem = () => {
+			const container = document.getElementById('experienceItemsEdit');
+			const index = container.children.length;
+			const itemHTML = createExperienceItemHTML(index, {});
+			container.insertAdjacentHTML('beforeend', itemHTML);
+		};
+
+		// Create experience item HTML
+		const createExperienceItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Experience ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'experience')">×</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Title *</label>
+						<input type="text" class="form-control" id="experience_title_${index}" value="${escapeHtml(data.title || '')}" required>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Company Name *</label>
+						<input type="text" class="form-control" id="experience_company_name_${index}" value="${escapeHtml(data.company_name || '')}" required>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Location</label>
+							<input type="text" class="form-control" id="experience_location_${index}" value="${escapeHtml(data.location || '')}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Employment Type</label>
+							<select class="form-control" id="experience_employment_type_${index}">
+								<option value="">Select...</option>
+								<option value="Full-time" ${data.employment_type === 'Full-time' ? 'selected' : ''}>Full-time</option>
+								<option value="Part-time" ${data.employment_type === 'Part-time' ? 'selected' : ''}>Part-time</option>
+								<option value="Contract" ${data.employment_type === 'Contract' ? 'selected' : ''}>Contract</option>
+								<option value="Internship" ${data.employment_type === 'Internship' ? 'selected' : ''}>Internship</option>
+								<option value="Freelance" ${data.employment_type === 'Freelance' ? 'selected' : ''}>Freelance</option>
+							</select>
+						</div>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Start Date</label>
+							<input type="date" class="form-control" id="experience_start_date_${index}" value="${data.start_date || ''}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">End Date</label>
+							<input type="date" class="form-control" id="experience_end_date_${index}" value="${data.end_date || ''}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label>
+							<input type="checkbox" id="experience_is_current_${index}" ${data.is_current ? 'checked' : ''}>
+							I currently work here
+						</label>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" id="experience_description_${index}" rows="3">${escapeHtml(data.description ? data.description.replace(/<[^>]*>/g, '') : '')}</textarea>
+					</div>
+				</div>
+			`;
+		};
+
+		// Remove child item
+		const removeChildItem = (btn, type) => {
+			if (confirm('Are you sure you want to remove this item?')) {
+				btn.closest('.child-item').remove();
+			}
+		};
+
+		// Populate edit forms for child tables
+		const populateChildTableEdit = (type, items) => {
+			const container = document.getElementById(type + 'ItemsEdit');
+			if (!container) return;
+			
+			container.innerHTML = '';
+			
+			if (items && items.length > 0) {
+				items.forEach((item, index) => {
+					let itemHTML = '';
+					if (type === 'experience') {
+						itemHTML = createExperienceItemHTML(index, item);
+					} else if (type === 'education') {
+						itemHTML = createEducationItemHTML(index, item);
+					} else if (type === 'skills') {
+						itemHTML = createSkillItemHTML(index, item);
+					} else if (type === 'certifications') {
+						itemHTML = createCertificationItemHTML(index, item);
+					} else if (type === 'volunteer') {
+						itemHTML = createVolunteerItemHTML(index, item);
+					} else if (type === 'awards') {
+						itemHTML = createAwardItemHTML(index, item);
+					} else if (type === 'contact') {
+						itemHTML = createContactItemHTML(index, item);
+					}
+					container.insertAdjacentHTML('beforeend', itemHTML);
+				});
+			}
+		};
+
+		// Add item functions
+		const addEducationItem = () => {
+			const container = document.getElementById('educationItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createEducationItemHTML(index, {}));
+		};
+
+		const addSkillItem = () => {
+			const container = document.getElementById('skillsItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createSkillItemHTML(index, {}));
+		};
+
+		const addCertificationItem = () => {
+			const container = document.getElementById('certificationsItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createCertificationItemHTML(index, {}));
+		};
+
+		const addVolunteerItem = () => {
+			const container = document.getElementById('volunteerItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createVolunteerItemHTML(index, {}));
+		};
+
+		const addAwardItem = () => {
+			const container = document.getElementById('awardsItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createAwardItemHTML(index, {}));
+		};
+
+		const addContactItem = () => {
+			const container = document.getElementById('contactItemsEdit');
+			const index = container.children.length;
+			container.insertAdjacentHTML('beforeend', createContactItemHTML(index, {}));
+		};
+
+		// Create item HTML functions
+		const createEducationItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Education ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'education')">×</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Institution Name *</label>
+						<input type="text" class="form-control" id="education_institution_name_${index}" value="${escapeHtml(data.institution_name || '')}" required>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Degree</label>
+							<input type="text" class="form-control" id="education_degree_${index}" value="${escapeHtml(data.degree || '')}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Field of Study</label>
+							<input type="text" class="form-control" id="education_field_of_study_${index}" value="${escapeHtml(data.field_of_study || '')}">
+						</div>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Start Year</label>
+							<input type="number" class="form-control" id="education_start_year_${index}" value="${data.start_year || ''}" min="1900" max="2100">
+						</div>
+						<div class="form-group">
+							<label class="form-label">End Year</label>
+							<input type="number" class="form-control" id="education_end_year_${index}" value="${data.end_year || ''}" min="1900" max="2100">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Grade</label>
+						<input type="text" class="form-control" id="education_grade_${index}" value="${escapeHtml(data.grade || '')}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Activities & Societies</label>
+						<input type="text" class="form-control" id="education_activities_societies_${index}" value="${escapeHtml(data.activities_societies || '')}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" id="education_description_${index}" rows="3">${escapeHtml(data.description ? data.description.replace(/<[^>]*>/g, '') : '')}</textarea>
+					</div>
+				</div>
+			`;
+		};
+		
+		const createSkillItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Skill ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'skills')">×</button>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Skill Name *</label>
+							<input type="text" class="form-control" id="skills_skill_name_${index}" value="${escapeHtml(data.skill_name || '')}" required>
+						</div>
+						<div class="form-group">
+							<label class="form-label">Endorsement Count</label>
+							<input type="number" class="form-control" id="skills_endorsement_count_${index}" value="${data.endorsement_count || 0}" min="0">
 						</div>
 					</div>
 				</div>
 			`;
 		};
 
+		const createCertificationItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Certification ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'certifications')">×</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Certification Name *</label>
+						<input type="text" class="form-control" id="certifications_certification_name_${index}" value="${escapeHtml(data.certification_name || '')}" required>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issuing Organization *</label>
+						<input type="text" class="form-control" id="certifications_issuing_organization_${index}" value="${escapeHtml(data.issuing_organization || '')}" required>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Issue Date</label>
+							<input type="date" class="form-control" id="certifications_issue_date_${index}" value="${data.issue_date || ''}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Expiration Date</label>
+							<input type="date" class="form-control" id="certifications_expiration_date_${index}" value="${data.expiration_date || ''}">
+						</div>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Credential ID</label>
+							<input type="text" class="form-control" id="certifications_credential_id_${index}" value="${escapeHtml(data.credential_id || '')}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Credential URL</label>
+							<input type="url" class="form-control" id="certifications_credential_url_${index}" value="${escapeHtml(data.credential_url || '')}">
+						</div>
+					</div>
+				</div>
+			`;
+		};
+
+		const createVolunteerItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Volunteer Experience ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'volunteer')">×</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Organization *</label>
+						<input type="text" class="form-control" id="volunteer_organization_${index}" value="${escapeHtml(data.organization || '')}" required>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Role</label>
+							<input type="text" class="form-control" id="volunteer_role_${index}" value="${escapeHtml(data.role || '')}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">Cause</label>
+							<input type="text" class="form-control" id="volunteer_cause_${index}" value="${escapeHtml(data.cause || '')}">
+						</div>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Start Date</label>
+							<input type="date" class="form-control" id="volunteer_start_date_${index}" value="${data.start_date || ''}">
+						</div>
+						<div class="form-group">
+							<label class="form-label">End Date</label>
+							<input type="date" class="form-control" id="volunteer_end_date_${index}" value="${data.end_date || ''}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" id="volunteer_description_${index}" rows="3">${escapeHtml(data.description ? data.description.replace(/<[^>]*>/g, '') : '')}</textarea>
+					</div>
+				</div>
+			`;
+		};
+
+		const createAwardItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Award ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'awards')">×</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Title *</label>
+						<input type="text" class="form-control" id="awards_title_${index}" value="${escapeHtml(data.title || '')}" required>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issuer</label>
+						<input type="text" class="form-control" id="awards_issuer_${index}" value="${escapeHtml(data.issuer || '')}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Issue Date</label>
+						<input type="date" class="form-control" id="awards_issue_date_${index}" value="${data.issue_date || ''}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label>
+						<textarea class="form-control" id="awards_description_${index}" rows="3">${escapeHtml(data.description ? data.description.replace(/<[^>]*>/g, '') : '')}</textarea>
+					</div>
+				</div>
+			`;
+		};
+
+		const createContactItemHTML = (index, data = {}) => {
+			return `
+				<div class="child-item" data-index="${index}">
+					<div class="child-item-header">
+						<strong>Contact ${index + 1}</strong>
+						<button type="button" class="remove-item-btn" onclick="removeChildItem(this, 'contact')">×</button>
+					</div>
+					<div class="grid-2">
+						<div class="form-group">
+							<label class="form-label">Contact Type *</label>
+							<select class="form-control" id="contact_contact_type_${index}" required>
+								<option value="">Select...</option>
+								<option value="Email" ${data.contact_type === 'Email' ? 'selected' : ''}>Email</option>
+								<option value="Phone" ${data.contact_type === 'Phone' ? 'selected' : ''}>Phone</option>
+								<option value="Messenger ID" ${data.contact_type === 'Messenger ID' ? 'selected' : ''}>Messenger ID</option>
+								<option value="Website" ${data.contact_type === 'Website' ? 'selected' : ''}>Website</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label class="form-label">Contact Value *</label>
+							<input type="text" class="form-control" id="contact_contact_value_${index}" value="${escapeHtml(data.contact_value || '')}" required>
+						</div>
+					</div>
+				</div>
+			`;
+		};
+
+		// Re-render section after save
+		const renderSection = (sectionId, profile) => {
+			switch(sectionId) {
+				case 'profileSummary':
+					renderProfileSummary(profile);
+					break;
+				case 'experience':
+					renderExperience(profile);
+					break;
+				case 'education':
+					renderEducation(profile);
+					break;
+				case 'skills':
+					renderSkills(profile);
+					break;
+				case 'certifications':
+					renderCertifications(profile);
+					break;
+				case 'volunteer':
+					renderVolunteer(profile);
+					break;
+				case 'awards':
+					renderAwards(profile);
+					break;
+				case 'contact':
+					renderContact(profile);
+					break;
+			}
+		};
+		
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
 			loadProfile();
