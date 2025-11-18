@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard - NETWORX</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+</head>
+<body>
+	<!-- Navbar -->
+	<nav class="navbar">
+		<div class="container navbar-content">
+			<a href="/dashboard" class="navbar-brand">NETWORX</a>
+			<ul class="navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/jobs">Jobs</a></li>
+				<li><a href="#" id="logoutBtn">Logout</a></li>
+			</ul>
+		</div>
+	</nav>
+	
+	<!-- Main Content -->
+	<main style="padding: 2rem 0;">
+		<div class="container">
+			<h1 class="text-2xl font-bold mb-2">
+				Welcome back, <span id="userName">Student</span>! 👋
+			</h1>
+			<p class="text-slate-500 mb-6">Here's what's happening with your career journey</p>
+
+			<!-- LinkedIn-like Profile Header -->
+			<section id="profileHeader" class="mb-6"></section>
+			
+			<!-- Stats Grid -->
+			<div id="statsGrid" class="grid grid-cols-4 mb-4">
+				<div class="stat-card">
+					<div class="stat-number" id="totalJobs">-</div>
+					<div class="stat-label">Open Job Positions</div>
+				</div>
+				<div class="stat-card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+					<div class="stat-number" id="upcomingEvents">-</div>
+					<div class="stat-label">Upcoming Events</div>
+				</div>
+				<div class="stat-card" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+					<div class="stat-number" id="myApplications">-</div>
+					<div class="stat-label">My Applications</div>
+				</div>
+				<div class="stat-card" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+					<div class="stat-number" id="pendingReviews">-</div>
+					<div class="stat-label">Resume Reviews</div>
+				</div>
+			</div>
+			
+			<!-- Profile Sections (About, Education, Skills, Links) -->
+			<section id="profileSections" class="grid grid-cols-1 gap-4"></section>
+			
+			<div class="grid grid-cols-2 mt-4">
+				<!-- Recent Jobs -->
+				<div class="card">
+					<h2 class="card-title">Featured Jobs</h2>
+					<div id="recentJobs" class="mt-3">
+						<div class="loading">Loading jobs...</div>
+					</div>
+				</div>
+				
+				<!-- Upcoming Events -->
+				<div class="card">
+					<h2 class="card-title">Upcoming Events</h2>
+					<div id="upcomingEventsContainer" class="mt-3">
+						<div class="loading">Loading events...</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	
+	<script>
+		// Simple frappe.call implementation using GET
+		window.frappe = {
+			session: { user: 'Guest', user_fullname: 'Guest' },
+			
+			call: function(opts) {
+				// Build query parameters for GET request
+				const params = new URLSearchParams();
+				
+				// Add all args as query parameters
+				if (opts.args) {
+					for (const [key, value] of Object.entries(opts.args)) {
+						// Skip null, undefined, and empty objects
+						if (value === null || value === undefined) continue;
+						
+						// Skip empty objects and empty strings
+						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+						if (value === '') continue;
+						
+						// Add the parameter
+						if (typeof value === 'object') {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, value);
+						}
+					}
+				}
+				
+				// Build URL with query parameters
+				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+				
+				return fetch(url, {
+					method: 'GET',
+					headers: {
+						'Accept': 'application/json'
+					},
+					credentials: 'same-origin'
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(err => {
+							console.error('Server error:', err);
+							throw new Error(err.exception || `HTTP error! status: ${response.status}`);
+						}).catch(() => {
+							throw new Error(`HTTP error! status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (opts.callback) opts.callback(data);
+					return data;
+				})
+				.catch(error => {
+					console.error('API Error:', error);
+					if (opts.error) opts.error(error);
+					throw error;
+				});
+			}
+		};
+	</script>
+	<script src="/assets/networx_web_app/js/utils.js"></script>
+	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script>
+		// Set page title
+		NetworkxUtils.setPageTitle('Dashboard');
+		
+		// Set user name
+		document.getElementById('userName').textContent = frappe.session.user_fullname || frappe.session.user;
+		
+		// Logout handler
+		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+			e.preventDefault();
+			await frappe.call({
+				method: 'logout',
+				callback: () => {
+					window.location.href = '/login';
+				}
+			});
+		});
+		
+		// Load student profile
+		const loadStudentProfile = async () => {
+			try {
+				const result = await NetworkxAPI.getStudentProfile();
+				
+				if (!result.exists) {
+					renderNoProfile();
+				} else {
+					renderProfile(result.profile);
+				}
+			} catch (error) {
+				console.error('Error loading profile:', error);
+			}
+		};
+
+		// Helpers
+		const formatSkills = (skills) => {
+			if (!skills) return [];
+			return skills
+				.split(/[\n,]/)
+				.map(s => s.trim())
+				.filter(Boolean)
+				.slice(0, 30);
+		};
+
+		const buildHeadline = (p) => {
+			const parts = [];
+			if (p.degree) parts.push(p.degree);
+			if (p.college) parts.push(p.college);
+			if (p.graduation_year) parts.push(`Class of ${p.graduation_year}`);
+			return parts.join(' • ');
+		};
+
+		const buildLinkButton = ({ href, label, icon, disabledLabel }) => {
+			if (!href) {
+				return `<button aria-disabled="true" class="cursor-not-allowed inline-flex items-center gap-2 rounded-md bg-slate-100 text-slate-400 px-3 py-1.5 text-sm" tabindex="-1">${icon || ''}${disabledLabel || label}</button>`;
+			}
+			return `<a href="${href}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-md bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-3 py-1.5 text-sm" aria-label="${label}" tabindex="0">${icon || ''}${label}</a>`;
+		};
+
+		// Render profile content (LinkedIn-style)
+		const renderProfile = (profile) => {
+			const profileHeader = document.getElementById('profileHeader');
+			const profileSections = document.getElementById('profileSections');
+
+			const initials = (profile.full_name || 'Student').split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+			const headline = buildHeadline(profile);
+			const skills = formatSkills(profile.skills);
+
+			profileHeader.innerHTML = `
+				<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+					<div class="h-40 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+					<div class="px-6 pb-6 -mt-10">
+						<div class="flex items-end justify-between">
+							<div class="flex items-end gap-4">
+								<div class="w-24 h-24 rounded-full bg-white ring-4 ring-white shadow -mt-6 flex items-center justify-center text-2xl font-bold text-white" style="background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);" aria-label="Profile avatar" tabindex="0">${initials}</div>
+								<div class="pb-1">
+									<h2 class="text-xl font-semibold text-slate-900">${profile.full_name || 'Student'}</h2>
+									<p class="text-slate-600 text-sm">${headline || 'Add education details to complete your headline'}</p>
+								</div>
+							</div>
+							<div class="flex gap-2">
+								<a href="/myprofile" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-sm" aria-label="View Profile" tabindex="0">View Profile</a>
+								<a href="/myprofile-edit" class="inline-flex items-center gap-2 rounded-md bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-3 py-1.5 text-sm" aria-label="Edit Profile" tabindex="0">Edit Profile</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			profileSections.innerHTML = `
+				<!-- About -->
+				<div class="bg-white rounded-xl shadow-sm p-5">
+					<h3 class="text-base font-semibold mb-2">About</h3>
+					<div class="text-slate-600 text-sm leading-6">${profile.bio || 'Tell the community about yourself. Share goals, interests, and achievements.'}</div>
+				</div>
+
+				<!-- Education -->
+				<div class="bg-white rounded-xl shadow-sm p-5">
+					<h3 class="text-base font-semibold mb-3">Education</h3>
+					<div class="text-sm text-slate-700">
+						<p class="font-medium">${profile.college || 'Add your college'}</p>
+						<p class="text-slate-600">${profile.degree || 'Degree'}${profile.graduation_year ? ` • ${profile.graduation_year}` : ''}</p>
+					</div>
+				</div>
+
+				<!-- Skills -->
+				<div class="bg-white rounded-xl shadow-sm p-5">
+					<h3 class="text-base font-semibold mb-3">Skills</h3>
+					${skills.length ? `<div class="flex flex-wrap gap-2">${skills.map(s => `<span class=\"inline-flex items-center rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1\">${s}</span>`).join('')}</div>` : `<p class="text-sm text-slate-600">Add skills to showcase your strengths.</p>`}
+				</div>
+
+				<!-- Resume & Links -->
+				<div class="bg-white rounded-xl shadow-sm p-5">
+					<h3 class="text-base font-semibold mb-3">Resume & Links</h3>
+					<div class="flex flex-wrap gap-2">
+						${buildLinkButton({ href: profile.resume_attachment, label: 'View Resume', icon: '📄', disabledLabel: 'No Resume' })}
+						${buildLinkButton({ href: profile.linkedin_url, label: 'LinkedIn', icon: '💼', disabledLabel: 'No LinkedIn' })}
+						${buildLinkButton({ href: profile.github_url, label: 'GitHub', icon: '💻', disabledLabel: 'No GitHub' })}
+					</div>
+				</div>
+			`;
+		};
+
+		// Render no profile message (LinkedIn-style onboarding)
+		const renderNoProfile = () => {
+			const profileHeader = document.getElementById('profileHeader');
+			const profileSections = document.getElementById('profileSections');
+
+			profileHeader.innerHTML = `
+				<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+					<div class="h-40 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+					<div class="px-6 pb-6 -mt-10">
+						<div class="flex items-end justify-between">
+							<div class="flex items-end gap-4">
+								<div class="w-24 h-24 rounded-full bg-white ring-4 ring-white shadow -mt-6 flex items-center justify-center text-2xl font-bold text-white" style="background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);" aria-label="Profile avatar" tabindex="0">S</div>
+								<div class="pb-1">
+									<h2 class="text-xl font-semibold text-slate-900">Complete Your Profile</h2>
+									<p class="text-slate-600 text-sm">Add your education, skills, and links to get better recommendations.</p>
+								</div>
+							</div>
+							<div class="flex gap-2">
+								<a href="/myprofile-edit" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-sm" aria-label="Create Profile" tabindex="0">Create Profile</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			profileSections.innerHTML = '';
+		};
+		
+		// Load dashboard stats
+		const loadDashboardStats = async () => {
+			try {
+				const stats = await NetworkxAPI.getDashboardStats();
+				
+				document.getElementById('totalJobs').textContent = stats.total_jobs || 0;
+				document.getElementById('upcomingEvents').textContent = stats.upcoming_events || 0;
+				document.getElementById('myApplications').textContent = stats.my_applications || 0;
+				document.getElementById('pendingReviews').textContent = stats.pending_reviews || 0;
+			} catch (error) {
+				console.error('Error loading stats:', error);
+			}
+		};
+		
+		// Load recent jobs
+		const loadRecentJobs = async () => {
+			try {
+				const result = await NetworkxAPI.getJobListings({}, 5, 0);
+				const jobsContainer = document.getElementById('recentJobs');
+				
+				if (result.jobs && result.jobs.length > 0) {
+					jobsContainer.innerHTML = result.jobs.map(job => `
+						<div style="padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+							<a href="/jobs/${job.name}" style="text-decoration: none; color: var(--text-primary);">
+								<div style="font-weight: 600; margin-bottom: 0.25rem;">${job.job_title}</div>
+								<div style="font-size: 0.875rem; color: var(--text-secondary);">
+									${job.company_name} • ${job.location || 'Remote'}
+								</div>
+							</a>
+						</div>
+					`).join('');
+				} else {
+					jobsContainer.innerHTML = `
+						<div class="empty-state">
+							<div>No jobs available at the moment</div>
+						</div>
+					`;
+				}
+			} catch (error) {
+				console.error('Error loading jobs:', error);
+				document.getElementById('recentJobs').innerHTML = '<div class="error">Error loading jobs</div>';
+			}
+		};
+		
+		// Load upcoming events
+		const loadUpcomingEvents = async () => {
+			try {
+				const events = await NetworkxAPI.getRecentEvents(5);
+				const eventsContainer = document.getElementById('upcomingEventsContainer');
+				
+				if (events && events.length > 0) {
+					eventsContainer.innerHTML = events.map(event => `
+						<div style="padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+							<div style="font-weight: 600; margin-bottom: 0.25rem;">${event.event_name}</div>
+							<div style="font-size: 0.875rem; color: var(--text-secondary);">
+								${event.event_type} • ${NetworkxUtils.formatDateTime(event.event_date)}
+							</div>
+							${event.registration_link ? `
+								<a href="${event.registration_link}" target="_blank" style="font-size: 0.875rem; color: var(--primary-color); text-decoration: none;">
+									Register →
+								</a>
+							` : ''}
+						</div>
+					`).join('');
+				} else {
+					eventsContainer.innerHTML = `
+						<div class="empty-state">
+							<div>No upcoming events</div>
+						</div>
+					`;
+				}
+			} catch (error) {
+				console.error('Error loading events:', error);
+				document.getElementById('upcomingEventsContainer').innerHTML = '<div class="error">Error loading events</div>';
+			}
+		};
+		
+		// Initialize dashboard
+		document.addEventListener('DOMContentLoaded', () => {
+			loadDashboardStats();
+			loadStudentProfile();
+			loadRecentJobs();
+			loadUpcomingEvents();
+		});
+	</script>
+</body>
+</html>
+

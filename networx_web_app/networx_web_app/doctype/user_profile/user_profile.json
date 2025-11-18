@@ -1,0 +1,194 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "field:user",
+    "creation": "2025-01-15 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "user",
+        "name",
+        "headline",
+        "current_location",
+        "profile_url",
+        "column_break_1",
+        "industry",
+        "profile_summary",
+        "section_break_contact",
+        "contact_info_details",
+        "section_break_experience",
+        "experience",
+        "section_break_education",
+        "education",
+        "section_break_skills",
+        "skills",
+        "section_break_certifications",
+        "certifications",
+        "section_break_volunteer",
+        "volunteer_experience",
+        "section_break_awards",
+        "awards"
+    ],
+    "fields": [
+        {
+            "fieldname": "user",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "User",
+            "options": "User",
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "fieldname": "name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Full Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "headline",
+            "fieldtype": "Small Text",
+            "label": "Headline"
+        },
+        {
+            "fieldname": "current_location",
+            "fieldtype": "Data",
+            "label": "Current Location"
+        },
+        {
+            "fieldname": "profile_url",
+            "fieldtype": "Data",
+            "label": "Profile URL",
+            "options": "URL"
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "industry",
+            "fieldtype": "Data",
+            "label": "Industry"
+        },
+        {
+            "fieldname": "profile_summary",
+            "fieldtype": "Text Editor",
+            "label": "Profile Summary"
+        },
+        {
+            "fieldname": "section_break_contact",
+            "fieldtype": "Section Break",
+            "label": "Contact Information"
+        },
+        {
+            "fieldname": "contact_info_details",
+            "fieldtype": "Table",
+            "label": "Contact Info Details",
+            "options": "User Profile Contact Info"
+        },
+        {
+            "fieldname": "section_break_experience",
+            "fieldtype": "Section Break",
+            "label": "Experience"
+        },
+        {
+            "fieldname": "experience",
+            "fieldtype": "Table",
+            "label": "Experience",
+            "options": "User Profile Experience"
+        },
+        {
+            "fieldname": "section_break_education",
+            "fieldtype": "Section Break",
+            "label": "Education"
+        },
+        {
+            "fieldname": "education",
+            "fieldtype": "Table",
+            "label": "Education",
+            "options": "User Profile Education"
+        },
+        {
+            "fieldname": "section_break_skills",
+            "fieldtype": "Section Break",
+            "label": "Skills & Endorsements"
+        },
+        {
+            "fieldname": "skills",
+            "fieldtype": "Table",
+            "label": "Skills",
+            "options": "User Profile Skill"
+        },
+        {
+            "fieldname": "section_break_certifications",
+            "fieldtype": "Section Break",
+            "label": "Licenses & Certifications"
+        },
+        {
+            "fieldname": "certifications",
+            "fieldtype": "Table",
+            "label": "Certifications",
+            "options": "User Profile Certification"
+        },
+        {
+            "fieldname": "section_break_volunteer",
+            "fieldtype": "Section Break",
+            "label": "Volunteer Experience"
+        },
+        {
+            "fieldname": "volunteer_experience",
+            "fieldtype": "Table",
+            "label": "Volunteer Experience",
+            "options": "User Profile Volunteer"
+        },
+        {
+            "fieldname": "section_break_awards",
+            "fieldtype": "Section Break",
+            "label": "Honors & Awards"
+        },
+        {
+            "fieldname": "awards",
+            "fieldtype": "Table",
+            "label": "Awards",
+            "options": "User Profile Award"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "User Profile",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Student",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}

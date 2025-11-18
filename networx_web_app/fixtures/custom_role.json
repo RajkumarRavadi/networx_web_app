@@ -1,0 +1,10 @@
+[
+	{
+		"doctype": "Role",
+		"name": "Student",
+		"role_name": "Student",
+		"desk_access": 0,
+		"disabled": 0
+	}
+]
+

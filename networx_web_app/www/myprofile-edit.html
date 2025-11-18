@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Edit Profile - NETWORX</title>
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+</head>
+<body>
+	<!-- Navbar -->
+	<nav class="navbar">
+		<div class="container navbar-content">
+			<a href="/dashboard" class="navbar-brand">NETWORX</a>
+			<ul class="navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/jobs">Jobs</a></li>
+				<li><a href="#" id="logoutBtn">Logout</a></li>
+			</ul>
+		</div>
+	</nav>
+	
+	<!-- Main Content -->
+	<main style="padding: 2rem 0;">
+		<div class="container" style="max-width: 900px;">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+				<div>
+					<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
+						Edit Profile
+					</h1>
+					<p style="color: var(--text-secondary);">
+						Update your personal information and career details
+					</p>
+				</div>
+				<a href="/myprofile" class="btn btn-secondary" style="text-decoration: none;">
+					← Back to Profile
+				</a>
+			</div>
+			
+			<!-- Profile Form -->
+			<div class="card">
+				<form id="profileForm">
+					<div class="grid grid-cols-2" style="gap: 1.5rem;">
+						<!-- Full Name -->
+						<div class="form-group">
+							<label class="form-label" for="fullName">Full Name *</label>
+							<input 
+								type="text" 
+								id="fullName" 
+								name="full_name" 
+								class="form-control" 
+								required
+								placeholder="Enter your full name"
+							>
+						</div>
+						
+						<!-- College -->
+						<div class="form-group">
+							<label class="form-label" for="college">College *</label>
+							<input 
+								type="text" 
+								id="college" 
+								name="college" 
+								class="form-control" 
+								required
+								placeholder="Enter your college name"
+							>
+						</div>
+						
+						<!-- Degree -->
+						<div class="form-group">
+							<label class="form-label" for="degree">Degree *</label>
+							<input 
+								type="text" 
+								id="degree" 
+								name="degree" 
+								class="form-control" 
+								required
+								placeholder="e.g., B.Tech Computer Science"
+							>
+						</div>
+						
+						<!-- Graduation Year -->
+						<div class="form-group">
+							<label class="form-label" for="graduationYear">Graduation Year *</label>
+							<input 
+								type="number" 
+								id="graduationYear" 
+								name="graduation_year" 
+								class="form-control" 
+								required
+								min="2020"
+								max="2030"
+								placeholder="e.g., 2025"
+							>
+						</div>
+						
+						<!-- Skills -->
+						<div class="form-group" style="grid-column: 1 / -1;">
+							<label class="form-label" for="skills">Skills</label>
+							<input 
+								type="text" 
+								id="skills" 
+								name="skills" 
+								class="form-control" 
+								placeholder="e.g., Python, JavaScript, React, Node.js"
+							>
+							<small style="color: var(--text-secondary); font-size: 0.875rem;">
+								Separate skills with commas
+							</small>
+						</div>
+						
+						<!-- Bio -->
+						<div class="form-group" style="grid-column: 1 / -1;">
+							<label class="form-label" for="bio">Bio</label>
+							<textarea 
+								id="bio" 
+								name="bio" 
+								class="form-control" 
+								rows="4"
+								placeholder="Tell us about yourself, your interests, and career goals..."
+								style="resize: vertical;"
+							></textarea>
+						</div>
+						
+						<!-- LinkedIn URL -->
+						<div class="form-group">
+							<label class="form-label" for="linkedinUrl">LinkedIn Profile</label>
+							<input 
+								type="url" 
+								id="linkedinUrl" 
+								name="linkedin_url" 
+								class="form-control" 
+								placeholder="https://linkedin.com/in/yourprofile"
+							>
+						</div>
+						
+						<!-- GitHub URL -->
+						<div class="form-group">
+							<label class="form-label" for="githubUrl">GitHub Profile</label>
+							<input 
+								type="url" 
+								id="githubUrl" 
+								name="github_url" 
+								class="form-control" 
+								placeholder="https://github.com/yourusername"
+							>
+						</div>
+						
+						<!-- Resume Attachment -->
+						<div class="form-group" style="grid-column: 1 / -1;">
+							<label class="form-label" for="resumeAttachment">Resume</label>
+							<input 
+								type="text" 
+								id="resumeAttachment" 
+								name="resume_attachment" 
+								class="form-control" 
+								placeholder="Resume file URL"
+								readonly
+							>
+							<small style="color: var(--text-secondary); font-size: 0.875rem;">
+								Upload your resume using Frappe's file manager and paste the URL here
+							</small>
+						</div>
+					</div>
+					
+					<!-- Form Actions -->
+					<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+						<a href="/myprofile" class="btn btn-secondary" style="text-decoration: none;">
+							Cancel
+						</a>
+						<button type="submit" class="btn btn-primary" id="saveBtn">
+							Save Profile
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	
+	<script>
+		// frappe.call implementation supporting both GET and POST
+		window.frappe = {
+			session: { user: 'Guest', user_fullname: 'Guest' },
+			
+			call: function(opts) {
+				const isUpdateMethod = opts.method.includes('update');
+				
+				if (isUpdateMethod) {
+					const params = new URLSearchParams();
+					
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value !== null && value !== undefined) {
+								if (typeof value === 'object') {
+									params.append(key, JSON.stringify(value));
+								} else {
+									params.append(key, value);
+								}
+							}
+						}
+					}
+					
+					return fetch('/api/method/' + opts.method, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'Accept': 'application/json'
+						},
+						body: params.toString(),
+						credentials: 'same-origin'
+					})
+					.then(response => {
+						if (!response.ok) {
+							return response.json().then(err => {
+								throw new Error(err.exception || `HTTP error! status: ${response.status}`);
+							}).catch(() => {
+								throw new Error(`HTTP error! status: ${response.status}`);
+							});
+						}
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					})
+					.catch(error => {
+						console.error('API Error:', error);
+						if (opts.error) opts.error(error);
+						throw error;
+					});
+				} else {
+					const params = new URLSearchParams();
+					
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value === null || value === undefined) continue;
+							if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+							if (value === '') continue;
+							
+							if (typeof value === 'object') {
+								params.append(key, JSON.stringify(value));
+							} else {
+								params.append(key, value);
+							}
+						}
+					}
+					
+					const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+					
+					return fetch(url, {
+						method: 'GET',
+						headers: {
+							'Accept': 'application/json'
+						},
+						credentials: 'same-origin'
+					})
+					.then(response => {
+						if (!response.ok) {
+							return response.json().then(err => {
+								throw new Error(err.exception || `HTTP error! status: ${response.status}`);
+							}).catch(() => {
+								throw new Error(`HTTP error! status: ${response.status}`);
+							});
+						}
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					})
+					.catch(error => {
+						console.error('API Error:', error);
+						if (opts.error) opts.error(error);
+						throw error;
+					});
+				}
+			}
+		};
+	</script>
+	<script src="/assets/networx_web_app/js/utils.js"></script>
+	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script>
+		NetworkxUtils.setPageTitle('Edit Profile');
+		
+		let currentProfile = null;
+		
+		// Logout handler
+		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+			e.preventDefault();
+			await frappe.call({
+				method: 'logout',
+				callback: () => {
+					window.location.href = '/login';
+				}
+			});
+		});
+		
+		// Load existing profile data
+		const loadProfile = async () => {
+			try {
+				const result = await NetworkxAPI.getStudentProfile();
+				
+				if (result.exists && result.profile) {
+					currentProfile = result.profile;
+					populateForm(result.profile);
+				}
+			} catch (error) {
+				console.error('Error loading profile:', error);
+			}
+		};
+		
+		// Populate form with existing data
+		const populateForm = (profile) => {
+			document.getElementById('fullName').value = profile.full_name || '';
+			document.getElementById('college').value = profile.college || '';
+			document.getElementById('degree').value = profile.degree || '';
+			document.getElementById('graduationYear').value = profile.graduation_year || '';
+			document.getElementById('skills').value = profile.skills || '';
+			document.getElementById('bio').value = profile.bio || '';
+			document.getElementById('linkedinUrl').value = profile.linkedin_url || '';
+			document.getElementById('githubUrl').value = profile.github_url || '';
+			document.getElementById('resumeAttachment').value = profile.resume_attachment || '';
+		};
+		
+		// Handle form submission
+		document.getElementById('profileForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const saveBtn = document.getElementById('saveBtn');
+			saveBtn.disabled = true;
+			saveBtn.textContent = 'Saving...';
+			
+			try {
+				const formData = new FormData(e.target);
+				const profileData = {};
+				
+				for (const [key, value] of formData.entries()) {
+					if (value.trim()) {
+						profileData[key] = value.trim();
+					}
+				}
+				
+				await NetworkxAPI.updateStudentProfile(profileData);
+				
+				NetworkxUtils.showToast('Profile saved successfully!', 'success');
+				
+				// Redirect to profile view after a short delay
+				setTimeout(() => {
+					window.location.href = '/myprofile';
+				}, 1500);
+			} catch (error) {
+				console.error('Error saving profile:', error);
+				NetworkxUtils.showToast('Error saving profile. Please try again.', 'error');
+				saveBtn.disabled = false;
+				saveBtn.textContent = 'Save Profile';
+			}
+		});
+		
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			loadProfile();
+		});
+	</script>
+</body>
+</html>
+

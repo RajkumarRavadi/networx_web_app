@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>My Profile - NETWORX</title>
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			background-color: #f3f2ef;
+			margin: 0;
+			padding: 0;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		}
+
+		.profile-container {
+			max-width: 1128px;
+			margin: 0 auto;
+			padding: 24px 12px;
+		}
+
+		/* Cover Photo Section */
+		.cover-photo {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			height: 200px;
+			border-radius: 8px 8px 0 0;
+			position: relative;
+		}
+
+		/* Profile Header Card */
+		.profile-header-card {
+			background: white;
+			border-radius: 0 0 8px 8px;
+			padding: 0 24px 24px;
+			margin-bottom: 8px;
+			box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08);
+		}
+
+		.profile-avatar-container {
+			position: relative;
+			margin-top: -80px;
+			margin-bottom: 16px;
+		}
+
+		.profile-avatar {
+			width: 160px;
+			height: 160px;
+			border-radius: 50%;
+			border: 4px solid white;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 64px;
+			font-weight: 700;
+			color: white;
+			box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08);
+		}
+
+		.profile-name {
+			font-size: 32px;
+			font-weight: 600;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 4px 0;
+		}
+
+		.profile-headline {
+			font-size: 16px;
+			color: rgba(0,0,0,.6);
+			margin: 0 0 8px 0;
+			line-height: 1.5;
+		}
+
+		.profile-meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 16px;
+			margin: 8px 0 16px;
+			font-size: 14px;
+			color: rgba(0,0,0,.6);
+		}
+
+		.profile-meta-item {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+
+		.profile-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 16px;
+		}
+
+		.btn-primary {
+			background-color: #0a66c2;
+			color: white;
+			border: none;
+			padding: 8px 24px;
+			border-radius: 24px;
+			font-weight: 600;
+			font-size: 16px;
+			cursor: pointer;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			transition: background-color 0.2s;
+		}
+
+		.btn-primary:hover {
+			background-color: #004182;
+		}
+
+		.btn-secondary {
+			background-color: white;
+			color: #0a66c2;
+			border: 1px solid #0a66c2;
+			padding: 8px 24px;
+			border-radius: 24px;
+			font-weight: 600;
+			font-size: 16px;
+			cursor: pointer;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			transition: background-color 0.2s;
+		}
+
+		.btn-secondary:hover {
+			background-color: #eef3f8;
+		}
+
+		/* Content Grid */
+		.profile-content-grid {
+			display: grid;
+			grid-template-columns: 1fr 300px;
+			gap: 8px;
+		}
+
+		/* Profile Card */
+		.profile-card {
+			background: white;
+			border-radius: 8px;
+			padding: 24px;
+			margin-bottom: 8px;
+			box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08);
+		}
+
+		.card-title {
+			font-size: 20px;
+			font-weight: 600;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 16px 0;
+		}
+
+		/* Profile Summary */
+		.profile-summary {
+			color: rgba(0,0,0,.9);
+			line-height: 1.6;
+			font-size: 14px;
+		}
+
+		.profile-summary :global(.ql-editor) {
+			padding: 0;
+		}
+
+		.profile-summary :global(p) {
+			margin: 0 0 12px 0;
+		}
+
+		.profile-summary :global(p:last-child) {
+			margin-bottom: 0;
+		}
+
+		/* Experience & Education Items */
+		.timeline-item {
+			padding: 16px 0;
+			border-bottom: 1px solid rgba(0,0,0,.08);
+		}
+
+		.timeline-item:last-child {
+			border-bottom: none;
+		}
+
+		.timeline-item-header {
+			margin-bottom: 8px;
+		}
+
+		.timeline-item-title {
+			font-size: 16px;
+			font-weight: 600;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 4px 0;
+		}
+
+		.timeline-item-company {
+			font-size: 14px;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 4px 0;
+		}
+
+		.timeline-item-meta {
+			font-size: 14px;
+			color: rgba(0,0,0,.6);
+			margin: 0 0 8px 0;
+		}
+
+		.timeline-item-description {
+			font-size: 14px;
+			color: rgba(0,0,0,.9);
+			line-height: 1.5;
+			margin-top: 8px;
+		}
+
+		.timeline-item-description :global(.ql-editor) {
+			padding: 0;
+		}
+
+		.timeline-item-description :global(p) {
+			margin: 0 0 8px 0;
+		}
+
+		.timeline-item-description :global(p:last-child) {
+			margin-bottom: 0;
+		}
+
+		/* Skills */
+		.skills-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+
+		.skill-badge {
+			background-color: #eef3f8;
+			color: rgba(0,0,0,.9);
+			padding: 8px 16px;
+			border-radius: 24px;
+			font-size: 14px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.skill-endorsements {
+			color: rgba(0,0,0,.6);
+			font-size: 12px;
+			font-weight: 400;
+		}
+
+		/* Certifications */
+		.cert-item {
+			padding: 16px 0;
+			border-bottom: 1px solid rgba(0,0,0,.08);
+		}
+
+		.cert-item:last-child {
+			border-bottom: none;
+		}
+
+		.cert-name {
+			font-size: 16px;
+			font-weight: 600;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 4px 0;
+		}
+
+		.cert-org {
+			font-size: 14px;
+			color: rgba(0,0,0,.9);
+			margin: 0 0 4px 0;
+		}
+
+		.cert-meta {
+			font-size: 14px;
+			color: rgba(0,0,0,.6);
+			margin: 0;
+		}
+
+		.cert-link {
+			color: #0a66c2;
+			text-decoration: none;
+			font-size: 14px;
+		}
+
+		.cert-link:hover {
+			text-decoration: underline;
+		}
+
+		/* Contact Info */
+		.contact-item {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 12px 0;
+			border-bottom: 1px solid rgba(0,0,0,.08);
+		}
+
+		.contact-item:last-child {
+			border-bottom: none;
+		}
+
+		.contact-icon {
+			width: 24px;
+			height: 24px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 16px;
+		}
+
+		.contact-label {
+			font-size: 14px;
+			color: rgba(0,0,0,.6);
+			min-width: 80px;
+		}
+
+		.contact-value {
+			font-size: 14px;
+			color: rgba(0,0,0,.9);
+			font-weight: 500;
+		}
+
+		.contact-value a {
+			color: #0a66c2;
+			text-decoration: none;
+		}
+
+		.contact-value a:hover {
+			text-decoration: underline;
+		}
+
+		/* Empty State */
+		.empty-state {
+			text-align: center;
+			padding: 48px 24px;
+			color: rgba(0,0,0,.6);
+		}
+
+		.empty-state-icon {
+			font-size: 48px;
+			margin-bottom: 16px;
+			opacity: 0.5;
+		}
+
+		.empty-state-text {
+			font-size: 14px;
+		}
+
+		/* Loading State */
+		.loading {
+			text-align: center;
+			padding: 48px;
+			color: rgba(0,0,0,.6);
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			.profile-content-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.profile-avatar {
+				width: 120px;
+				height: 120px;
+				font-size: 48px;
+			}
+
+			.profile-name {
+				font-size: 24px;
+			}
+
+			.profile-actions {
+				flex-direction: column;
+			}
+
+			.btn-primary,
+			.btn-secondary {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+
+		/* Badge for current position */
+		.current-badge {
+			background-color: #057642;
+			color: white;
+			font-size: 12px;
+			font-weight: 600;
+			padding: 2px 8px;
+			border-radius: 12px;
+			margin-left: 8px;
+		}
+	</style>
+</head>
+<body>
+	<!-- Navbar -->
+	<nav class="navbar">
+		<div class="container navbar-content">
+			<a href="/dashboard" class="navbar-brand">NETWORX</a>
+			<ul class="navbar-nav">
+				<li><a href="/dashboard">Dashboard</a></li>
+				<li><a href="/jobs">Jobs</a></li>
+				<li><a href="#" id="logoutBtn">Logout</a></li>
+			</ul>
+		</div>
+	</nav>
+	
+	<!-- Main Content -->
+	<main style="padding: 2rem 0; min-height: calc(100vh - 80px);">
+		<div class="profile-container">
+			<!-- Loading State -->
+			<div id="loadingState" class="loading">
+				Loading profile...
+			</div>
+
+			<!-- Profile Content -->
+			<div id="profileContent" style="display: none;">
+				<!-- Cover Photo & Header -->
+				<div class="cover-photo" id="coverPhoto"></div>
+				<div class="profile-header-card" id="profileHeader">
+					<!-- Will be populated by JavaScript -->
+				</div>
+
+				<!-- Profile Content Grid -->
+				<div class="profile-content-grid">
+					<!-- Main Content -->
+					<div>
+						<!-- Profile Summary -->
+						<div class="profile-card" id="profileSummarySection" style="display: none;">
+							<h2 class="card-title">About</h2>
+							<div class="profile-summary" id="profileSummary"></div>
+						</div>
+
+						<!-- Experience -->
+						<div class="profile-card" id="experienceSection" style="display: none;">
+							<h2 class="card-title">Experience</h2>
+							<div id="experienceList"></div>
+						</div>
+
+						<!-- Education -->
+						<div class="profile-card" id="educationSection" style="display: none;">
+							<h2 class="card-title">Education</h2>
+							<div id="educationList"></div>
+						</div>
+
+						<!-- Skills -->
+						<div class="profile-card" id="skillsSection" style="display: none;">
+							<h2 class="card-title">Skills & Endorsements</h2>
+							<div class="skills-grid" id="skillsList"></div>
+						</div>
+
+						<!-- Certifications -->
+						<div class="profile-card" id="certificationsSection" style="display: none;">
+							<h2 class="card-title">Licenses & Certifications</h2>
+							<div id="certificationsList"></div>
+						</div>
+
+						<!-- Volunteer Experience -->
+						<div class="profile-card" id="volunteerSection" style="display: none;">
+							<h2 class="card-title">Volunteer Experience</h2>
+							<div id="volunteerList"></div>
+						</div>
+
+						<!-- Awards -->
+						<div class="profile-card" id="awardsSection" style="display: none;">
+							<h2 class="card-title">Honors & Awards</h2>
+							<div id="awardsList"></div>
+						</div>
+					</div>
+
+					<!-- Sidebar -->
+					<div>
+						<!-- Contact Information -->
+						<div class="profile-card" id="contactSection" style="display: none;">
+							<h2 class="card-title">Contact Information</h2>
+							<div id="contactList"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Error State -->
+			<div id="errorState" style="display: none;">
+				<div class="profile-card">
+					<div class="empty-state">
+						<div class="empty-state-icon">⚠️</div>
+						<div class="empty-state-text">Error loading profile. Please try again later.</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	
+	<script>
+		// frappe.call implementation
+		window.frappe = {
+			session: { user: 'Guest', user_fullname: 'Guest' },
+			
+			call: function(opts) {
+				const isUpdateMethod = opts.method.includes('update');
+				
+				if (isUpdateMethod) {
+					const params = new URLSearchParams();
+					
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value !== null && value !== undefined) {
+								if (typeof value === 'object') {
+									params.append(key, JSON.stringify(value));
+								} else {
+									params.append(key, value);
+								}
+							}
+						}
+					}
+					
+					console.log('Making POST request to:', '/api/method/' + opts.method);
+					
+					return fetch('/api/method/' + opts.method, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'Accept': 'application/json'
+						},
+						body: params.toString(),
+						credentials: 'same-origin'
+					})
+					.then(response => {
+						return response.json().then(data => {
+							console.log('API response data (POST):', data);
+							
+							// Check for Frappe error response (various formats)
+							if (data.exc || data.exception || data.exc_type || 
+								(data.message && (typeof data.message === 'string' && data.message.includes('Error'))) ||
+								(data.message && data.message.exc)) {
+								const errorMsg = data.message?.exc || data.exc || data.exception || 
+									(data.message && typeof data.message === 'string' ? data.message : null) ||
+									'Unknown error';
+								const error = new Error(errorMsg);
+								error.response = data;
+								console.error('Frappe error detected (POST):', errorMsg);
+								throw error;
+							}
+							
+							// Check for HTTP errors
+							if (!response.ok) {
+								const errorMsg = data.exception || data.message || `HTTP error! status: ${response.status}`;
+								const error = new Error(errorMsg);
+								error.response = data;
+								console.error('HTTP error (POST):', errorMsg);
+								throw error;
+							}
+							
+							return data;
+						}).catch(err => {
+							// If JSON parsing fails, it might be an HTML error page
+							if (err instanceof SyntaxError) {
+								console.error('Failed to parse JSON response - might be an error page');
+								throw new Error('Server returned an invalid response. Please check the console for details.');
+							}
+							throw err;
+						});
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					})
+					.catch(error => {
+						console.error('API Error:', error);
+						if (opts.error) opts.error(error);
+						throw error;
+					});
+				} else {
+					const params = new URLSearchParams();
+					
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value === null || value === undefined) continue;
+							if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+							if (value === '') continue;
+							
+							if (typeof value === 'object') {
+								params.append(key, JSON.stringify(value));
+							} else {
+								params.append(key, value);
+							}
+						}
+					}
+					
+					const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+					
+					console.log('Making GET request to:', url);
+					
+					return fetch(url, {
+						method: 'GET',
+						headers: {
+							'Accept': 'application/json'
+						},
+						credentials: 'same-origin'
+					})
+					.then(response => {
+						return response.json().then(data => {
+							console.log('API response data (GET):', data);
+							
+							// Check for Frappe error response (various formats)
+							if (data.exc || data.exception || data.exc_type || 
+								(data.message && (typeof data.message === 'string' && data.message.includes('Error'))) ||
+								(data.message && data.message.exc)) {
+								const errorMsg = data.message?.exc || data.exc || data.exception || 
+									(data.message && typeof data.message === 'string' ? data.message : null) ||
+									'Unknown error';
+								const error = new Error(errorMsg);
+								error.response = data;
+								console.error('Frappe error detected (GET):', errorMsg);
+								throw error;
+							}
+							
+							// Check for HTTP errors
+							if (!response.ok) {
+								const errorMsg = data.exception || data.message || `HTTP error! status: ${response.status}`;
+								const error = new Error(errorMsg);
+								error.response = data;
+								console.error('HTTP error (GET):', errorMsg);
+								throw error;
+							}
+							
+							return data;
+						}).catch(err => {
+							// If JSON parsing fails, it might be an HTML error page
+							if (err instanceof SyntaxError) {
+								console.error('Failed to parse JSON response - might be an error page');
+								throw new Error('Server returned an invalid response. Please check the console for details.');
+							}
+							throw err;
+						});
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					})
+					.catch(error => {
+						console.error('API Error:', error);
+						if (opts.error) opts.error(error);
+						throw error;
+					});
+				}
+			}
+		};
+	</script>
+	<script src="/assets/networx_web_app/js/utils.js"></script>
+	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script>
+		NetworkxUtils.setPageTitle('My Profile');
+		
+		let currentProfile = null;
+		
+		// Logout handler
+		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+			e.preventDefault();
+			await frappe.call({
+				method: 'logout',
+				callback: () => {
+					window.location.href = '/login';
+				}
+			});
+		});
+
+		// Format date (short format without day)
+		const formatDateShort = (dateString) => {
+			if (!dateString) return '';
+			const date = new Date(dateString);
+			return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+		};
+
+		// Format year
+		const formatYear = (year) => {
+			return year || '';
+		};
+
+		// Format date range
+		const formatDateRange = (startDate, endDate, isCurrent) => {
+			const start = formatDateShort(startDate);
+			const end = isCurrent ? 'Present' : formatDateShort(endDate);
+			return `${start} - ${end}`;
+		};
+
+		// Format year range
+		const formatYearRange = (startYear, endYear) => {
+			if (startYear && endYear) {
+				return `${startYear} - ${endYear}`;
+			} else if (startYear) {
+				return `${startYear} - Present`;
+			}
+			return '';
+		};
+
+		// Escape HTML
+		const escapeHtml = (text) => {
+			if (!text) return '';
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		};
+
+		// Load profile data
+		const loadProfile = async () => {
+			try {
+				console.log('Loading profile...');
+				const profileData = await NetworkxAPI.getUserProfileDetails();
+				console.log('Profile data received:', profileData);
+				
+				if (!profileData) {
+					throw new Error('No profile data received');
+				}
+				
+				currentProfile = profileData;
+				renderProfile(profileData);
+			} catch (error) {
+				console.error('Error loading profile:', error);
+				console.error('Error details:', {
+					message: error.message,
+					stack: error.stack,
+					error: error
+				});
+				showError(error);
+			}
+		};
+
+		// Render profile header
+		const renderProfileHeader = (profile) => {
+			const initial = profile.name ? profile.name.charAt(0).toUpperCase() : 'U';
+			const name = profile.name || 'User';
+			const headline = profile.headline || '';
+			const location = profile.current_location || '';
+			const industry = profile.industry || '';
+			
+			const metaItems = [];
+			if (location) metaItems.push(`📍 ${location}`);
+			if (industry) metaItems.push(`💼 ${industry}`);
+			if (profile.profile_url) metaItems.push(`🔗 <a href="${profile.profile_url}" target="_blank" style="color: rgba(0,0,0,.6); text-decoration: none;">Profile URL</a>`);
+
+			document.getElementById('profileHeader').innerHTML = `
+				<div class="profile-avatar-container">
+					<div class="profile-avatar">${initial}</div>
+				</div>
+				<h1 class="profile-name">${escapeHtml(name)}</h1>
+				${headline ? `<p class="profile-headline">${escapeHtml(headline)}</p>` : ''}
+				${metaItems.length > 0 ? `<div class="profile-meta">${metaItems.join(' • ')}</div>` : ''}
+				<div class="profile-actions">
+					<a href="/myprofile-edit" class="btn-primary">✏️ Edit Profile</a>
+					<a href="/dashboard" class="btn-secondary">← Back to Dashboard</a>
+				</div>
+			`;
+		};
+
+		// Render profile summary
+		const renderProfileSummary = (profile) => {
+			if (!profile.profile_summary) {
+				document.getElementById('profileSummarySection').style.display = 'none';
+				return;
+			}
+			document.getElementById('profileSummarySection').style.display = 'block';
+			document.getElementById('profileSummary').innerHTML = profile.profile_summary;
+		};
+
+		// Render experience
+		const renderExperience = (profile) => {
+			if (!profile.experience || profile.experience.length === 0) {
+				document.getElementById('experienceSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('experienceSection').style.display = 'block';
+			
+			const experienceHTML = profile.experience.map(exp => {
+				const dateRange = formatDateRange(exp.start_date, exp.end_date, exp.is_current);
+				const metaItems = [];
+				if (dateRange) metaItems.push(dateRange);
+				if (exp.employment_type) metaItems.push(exp.employment_type);
+				if (exp.location) metaItems.push(exp.location);
+
+				return `
+					<div class="timeline-item">
+						<div class="timeline-item-header">
+							<h3 class="timeline-item-title">
+								${escapeHtml(exp.title || '')}
+								${exp.is_current ? '<span class="current-badge">Current</span>' : ''}
+							</h3>
+							<div class="timeline-item-company">${escapeHtml(exp.company_name || '')}</div>
+							<div class="timeline-item-meta">${metaItems.join(' • ')}</div>
+						</div>
+						${exp.description ? `<div class="timeline-item-description">${exp.description}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('experienceList').innerHTML = experienceHTML;
+		};
+
+		// Render education
+		const renderEducation = (profile) => {
+			if (!profile.education || profile.education.length === 0) {
+				document.getElementById('educationSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('educationSection').style.display = 'block';
+			
+			const educationHTML = profile.education.map(edu => {
+				const yearRange = formatYearRange(edu.start_year, edu.end_year);
+				const metaItems = [];
+				if (yearRange) metaItems.push(yearRange);
+				if (edu.grade) metaItems.push(`Grade: ${edu.grade}`);
+
+				return `
+					<div class="timeline-item">
+						<div class="timeline-item-header">
+							<h3 class="timeline-item-title">${escapeHtml(edu.degree || '')}</h3>
+							<div class="timeline-item-company">${escapeHtml(edu.institution_name || '')}</div>
+							${edu.field_of_study ? `<div class="timeline-item-meta">${escapeHtml(edu.field_of_study)}${metaItems.length > 0 ? ' • ' + metaItems.join(' • ') : ''}</div>` : (metaItems.length > 0 ? `<div class="timeline-item-meta">${metaItems.join(' • ')}</div>` : '')}
+							${edu.activities_societies ? `<div class="timeline-item-meta" style="margin-top: 4px;">${escapeHtml(edu.activities_societies)}</div>` : ''}
+						</div>
+						${edu.description ? `<div class="timeline-item-description">${edu.description}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('educationList').innerHTML = educationHTML;
+		};
+
+		// Render skills
+		const renderSkills = (profile) => {
+			if (!profile.skills || profile.skills.length === 0) {
+				document.getElementById('skillsSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('skillsSection').style.display = 'block';
+			
+			const skillsHTML = profile.skills.map(skill => {
+				const endorsementText = skill.endorsement_count > 0 
+					? `<span class="skill-endorsements">${skill.endorsement_count} endorsement${skill.endorsement_count !== 1 ? 's' : ''}</span>`
+					: '';
+				
+				return `
+					<div class="skill-badge">
+						<span>${escapeHtml(skill.skill_name || '')}</span>
+						${endorsementText}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('skillsList').innerHTML = skillsHTML;
+		};
+
+		// Render certifications
+		const renderCertifications = (profile) => {
+			if (!profile.certifications || profile.certifications.length === 0) {
+				document.getElementById('certificationsSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('certificationsSection').style.display = 'block';
+			
+			const certsHTML = profile.certifications.map(cert => {
+				const metaItems = [];
+				if (cert.issue_date) metaItems.push(`Issued ${formatDateShort(cert.issue_date)}`);
+				if (cert.expiration_date) metaItems.push(`Expires ${formatDateShort(cert.expiration_date)}`);
+				if (cert.credential_id) metaItems.push(`Credential ID: ${cert.credential_id}`);
+
+				return `
+					<div class="cert-item">
+						<div class="cert-name">${escapeHtml(cert.certification_name || '')}</div>
+						<div class="cert-org">${escapeHtml(cert.issuing_organization || '')}</div>
+						${metaItems.length > 0 ? `<div class="cert-meta">${metaItems.join(' • ')}</div>` : ''}
+						${cert.credential_url ? `<div style="margin-top: 8px;"><a href="${cert.credential_url}" target="_blank" class="cert-link">Show credential</a></div>` : ''}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('certificationsList').innerHTML = certsHTML;
+		};
+
+		// Render volunteer experience
+		const renderVolunteer = (profile) => {
+			if (!profile.volunteer_experience || profile.volunteer_experience.length === 0) {
+				document.getElementById('volunteerSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('volunteerSection').style.display = 'block';
+			
+			const volunteerHTML = profile.volunteer_experience.map(vol => {
+				const dateRange = formatDateRange(vol.start_date, vol.end_date, false);
+				const metaItems = [];
+				if (dateRange) metaItems.push(dateRange);
+				if (vol.cause) metaItems.push(vol.cause);
+
+				return `
+					<div class="timeline-item">
+						<div class="timeline-item-header">
+							<h3 class="timeline-item-title">${escapeHtml(vol.role || '')}</h3>
+							<div class="timeline-item-company">${escapeHtml(vol.organization || '')}</div>
+							${metaItems.length > 0 ? `<div class="timeline-item-meta">${metaItems.join(' • ')}</div>` : ''}
+						</div>
+						${vol.description ? `<div class="timeline-item-description">${vol.description}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('volunteerList').innerHTML = volunteerHTML;
+		};
+
+		// Render awards
+		const renderAwards = (profile) => {
+			if (!profile.awards || profile.awards.length === 0) {
+				document.getElementById('awardsSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('awardsSection').style.display = 'block';
+			
+			const awardsHTML = profile.awards.map(award => {
+				const metaItems = [];
+				if (award.issue_date) metaItems.push(`Issued ${formatDateShort(award.issue_date)}`);
+				if (award.issuer) metaItems.push(`by ${award.issuer}`);
+
+				return `
+					<div class="cert-item">
+						<div class="cert-name">${escapeHtml(award.title || '')}</div>
+						${award.issuer ? `<div class="cert-org">${escapeHtml(award.issuer)}</div>` : ''}
+						${metaItems.length > 0 ? `<div class="cert-meta">${metaItems.join(' • ')}</div>` : ''}
+						${award.description ? `<div class="timeline-item-description" style="margin-top: 8px;">${award.description}</div>` : ''}
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('awardsList').innerHTML = awardsHTML;
+		};
+
+		// Render contact information
+		const renderContact = (profile) => {
+			if (!profile.contact_info_details || profile.contact_info_details.length === 0) {
+				document.getElementById('contactSection').style.display = 'none';
+				return;
+			}
+			document.getElementById('contactSection').style.display = 'block';
+			
+			const getContactIcon = (type) => {
+				switch(type) {
+					case 'Email': return '📧';
+					case 'Phone': return '📱';
+					case 'Website': return '🌐';
+					case 'Messenger ID': return '💬';
+					default: return '📌';
+				}
+			};
+
+			const contactHTML = profile.contact_info_details.map(contact => {
+				const icon = getContactIcon(contact.contact_type);
+				let value = escapeHtml(contact.contact_value || '');
+				
+				if (contact.contact_type === 'Email') {
+					value = `<a href="mailto:${contact.contact_value}">${value}</a>`;
+				} else if (contact.contact_type === 'Phone') {
+					value = `<a href="tel:${contact.contact_value}">${value}</a>`;
+				} else if (contact.contact_value && (contact.contact_value.startsWith('http://') || contact.contact_value.startsWith('https://'))) {
+					value = `<a href="${contact.contact_value}" target="_blank">${value}</a>`;
+				}
+
+				return `
+					<div class="contact-item">
+						<div class="contact-icon">${icon}</div>
+						<div class="contact-label">${escapeHtml(contact.contact_type || '')}</div>
+						<div class="contact-value">${value}</div>
+					</div>
+				`;
+			}).join('');
+
+			document.getElementById('contactList').innerHTML = contactHTML;
+		};
+
+		// Main render function
+		const renderProfile = (profile) => {
+			document.getElementById('loadingState').style.display = 'none';
+			document.getElementById('profileContent').style.display = 'block';
+			
+			renderProfileHeader(profile);
+			renderProfileSummary(profile);
+			renderExperience(profile);
+			renderEducation(profile);
+			renderSkills(profile);
+			renderCertifications(profile);
+			renderVolunteer(profile);
+			renderAwards(profile);
+			renderContact(profile);
+		};
+
+		// Show error state
+		const showError = (error = null) => {
+			document.getElementById('loadingState').style.display = 'none';
+			document.getElementById('profileContent').style.display = 'none';
+			
+			const errorMessage = error?.message || 'Error loading profile. Please try again later.';
+			const errorStateDiv = document.getElementById('errorState');
+			errorStateDiv.style.display = 'block';
+			errorStateDiv.innerHTML = `
+				<div class="profile-card">
+					<div class="empty-state">
+						<div class="empty-state-icon">⚠️</div>
+						<div class="empty-state-text">${escapeHtml(errorMessage)}</div>
+						<div style="margin-top: 16px;">
+							<a href="/dashboard" class="btn-secondary">← Back to Dashboard</a>
+						</div>
+					</div>
+				</div>
+			`;
+		};
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			loadProfile();
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Student Login - NETWORX</title>
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+	<style>
+		body {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		}
+		
+		.login-container {
+			width: 100%;
+			max-width: 420px;
+			padding: 1rem;
+		}
+		
+		.login-card {
+			background: white;
+			border-radius: 1rem;
+			padding: 2.5rem;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+		}
+		
+		.logo {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+		
+		.logo-text {
+			font-size: 2rem;
+			font-weight: 800;
+			color: var(--primary-color);
+			margin-bottom: 0.5rem;
+		}
+		
+		.logo-subtitle {
+			color: var(--text-secondary);
+			font-size: 0.875rem;
+		}
+		
+		.error-message {
+			background-color: #FEE2E2;
+			color: #991B1B;
+			padding: 0.75rem;
+			border-radius: 0.5rem;
+			margin-bottom: 1rem;
+			font-size: 0.875rem;
+			display: none;
+		}
+		
+		.success-message {
+			background-color: #D1FAE5;
+			color: #065F46;
+			padding: 0.75rem;
+			border-radius: 0.5rem;
+			margin-bottom: 1rem;
+			font-size: 0.875rem;
+			display: none;
+		}
+		
+		.forgot-password {
+			text-align: right;
+			margin-top: 0.5rem;
+		}
+		
+		.forgot-password a {
+			color: var(--primary-color);
+			text-decoration: none;
+			font-size: 0.875rem;
+		}
+		
+		.forgot-password a:hover {
+			text-decoration: underline;
+		}
+		
+		.btn-login {
+			width: 100%;
+			padding: 0.875rem;
+			font-size: 1rem;
+			margin-top: 1.5rem;
+		}
+		
+		.footer-text {
+			text-align: center;
+			margin-top: 1.5rem;
+			color: var(--text-secondary);
+			font-size: 0.875rem;
+		}
+	</style>
+</head>
+<body>
+	<div class="login-container">
+		<div class="login-card">
+			<div class="logo">
+				<div class="logo-text">NETWORX</div>
+				<div class="logo-subtitle">Student Portal</div>
+			</div>
+			
+			<div id="errorMessage" class="error-message"></div>
+			<div id="successMessage" class="success-message"></div>
+			
+			<form id="loginForm">
+				<div class="form-group">
+					<label class="form-label" for="username">Email or Username</label>
+					<input 
+						type="text" 
+						id="username" 
+						name="usr" 
+						class="form-control" 
+						placeholder="Enter your email or username"
+						required
+						autocomplete="username"
+					>
+				</div>
+				
+				<div class="form-group">
+					<label class="form-label" for="password">Password</label>
+					<input 
+						type="password" 
+						id="password" 
+						name="pwd" 
+						class="form-control" 
+						placeholder="Enter your password"
+						required
+						autocomplete="current-password"
+					>
+				</div>
+				
+				<div class="forgot-password">
+					<a href="/forgot-password">Forgot Password?</a>
+				</div>
+				
+				<button type="submit" class="btn btn-primary btn-login">
+					Sign In
+				</button>
+			</form>
+			
+			<div class="footer-text">
+				Don't have an account? Contact your administrator
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		document.getElementById('loginForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const errorDiv = document.getElementById('errorMessage');
+			const successDiv = document.getElementById('successMessage');
+			const submitBtn = e.target.querySelector('button[type="submit"]');
+			
+			// Hide messages
+			errorDiv.style.display = 'none';
+			successDiv.style.display = 'none';
+			
+			// Get form data
+			const formData = new FormData(e.target);
+			const username = formData.get('usr');
+			const password = formData.get('pwd');
+			
+			// Disable button
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Signing In...';
+			
+			try {
+				// Call Frappe login API
+				const response = await fetch('/api/method/login', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify({
+						usr: username,
+						pwd: password
+					})
+				});
+				
+				const data = await response.json();
+				
+				if (response.ok && data.message === 'Logged In') {
+					// Success
+					successDiv.textContent = 'Login successful! Redirecting...';
+					successDiv.style.display = 'block';
+					
+					// Redirect to dashboard
+					setTimeout(() => {
+						window.location.href = '/dashboard';
+					}, 1000);
+				} else {
+					// Error
+					errorDiv.textContent = data.message || 'Invalid credentials. Please try again.';
+					errorDiv.style.display = 'block';
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Sign In';
+				}
+			} catch (error) {
+				console.error('Login error:', error);
+				errorDiv.textContent = 'An error occurred. Please try again.';
+				errorDiv.style.display = 'block';
+				submitBtn.disabled = false;
+				submitBtn.textContent = 'Sign In';
+			}
+		});
+	</script>
+</body>
+</html>
+
+
+
