@@ -9,5 +9,8 @@ def get_context(context):
 	context.no_cache = 1
 	context.show_sidebar = False
 	
+	# Add CSRF token to context for use in JavaScript
+	context.csrf_token = frappe.sessions.get_csrf_token()
+	
 	return context
 

@@ -15,6 +15,15 @@
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
 
+	<!-- CSRF Token -->
+	{% if csrf_token %}
+	<meta name="csrf-token" content="{{ csrf_token }}">
+	<script>
+		window.frappe = window.frappe || {};
+		window.frappe.csrf_token = "{{ csrf_token }}";
+	</script>
+	{% endif %}
+
 	<style>
 		/* Profile Specific Overrides */
 		.profile-cover {
@@ -95,6 +104,24 @@
 		[data-theme="dark"] .ql-toolbar {
 			background: white;
 		}
+
+		/* Form Input Styling */
+		.form-input {
+			background: var(--bg-card);
+			border: 1px solid var(--border-color);
+			color: var(--text-main);
+			transition: all 0.2s;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+		}
+
+		.form-input::placeholder {
+			color: var(--text-muted);
+		}
 	</style>
 </head>
 
@@ -141,7 +168,9 @@
 						</div>
 
 						<div class="flex flex-col md:flex-row justify-between items-start gap-4">
-							<div>
+							<div class="flex-1">
+								<!-- View Mode -->
+								<div id="headerView">
 								<h1 class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="profileName">
 									Loading...</h1>
 								<p class="text-lg mb-4" style="color: var(--text-muted);" id="profileHeadline">
@@ -154,10 +183,32 @@
 											id="profileCollege">College</span></span>
 									<span class="flex items-center gap-1"><i class="ri-calendar-line"></i> Class of
 										<span id="profileGradYear">Year</span></span>
+									</div>
+								</div>
+
+								<!-- Edit Mode -->
+								<div id="headerEdit" class="hidden space-y-3">
+									<input type="text" id="editFullName" class="w-full p-2 rounded-lg form-input text-3xl font-bold"
+										placeholder="Full Name">
+									<input type="text" id="editHeadline" class="w-full p-2 rounded-lg form-input text-lg"
+										placeholder="Headline">
+									<input type="text" id="editLocation" class="w-full p-2 rounded-lg form-input"
+										placeholder="Current Location">
+									<div class="flex gap-2 mt-2">
+										<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm"
+											onclick="saveHeader()">Save</button>
+										<button class="px-4 py-2 rounded-lg border hover:bg-white/5 text-sm"
+											style="border-color: var(--border-color); color: var(--text-main);"
+											onclick="cancelHeaderEdit()">Cancel</button>
+									</div>
 								</div>
 							</div>
 
 							<div class="flex gap-3">
+								<button class="px-6 py-2 rounded-full btn-primary font-medium flex items-center gap-2"
+									onclick="editHeader()" id="editHeaderBtn">
+									<i class="ri-pencil-line"></i> Edit
+								</button>
 								<button class="px-6 py-2 rounded-full btn-primary font-medium flex items-center gap-2">
 									<i class="ri-share-line"></i> Share
 								</button>
@@ -283,15 +334,14 @@
 							</div>
 
 							<div class="edit-form hidden" id="contactEdit">
-								<!-- Contact form fields -->
-								<div class="space-y-3 mb-4">
-									<input type="text" class="w-full p-2 rounded form-input" placeholder="LinkedIn URL"
-										id="linkedinInput">
-									<input type="text" class="w-full p-2 rounded form-input" placeholder="GitHub URL"
-										id="githubInput">
-									<input type="text" class="w-full p-2 rounded form-input" placeholder="Portfolio URL"
-										id="portfolioInput">
+								<div id="contactItemsEdit" class="space-y-3 mb-4">
+									<!-- Contact items will be added here -->
 								</div>
+								<button class="w-full py-2 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
+									style="border-color: var(--text-muted); color: var(--text-muted);"
+									onclick="addContactItem()">
+									+ Add Contact Info
+								</button>
 								<div class="flex gap-2">
 									<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
 										onclick="saveSection('contact')">Save</button>
@@ -341,10 +391,141 @@
 
 	<!-- Scripts -->
 	<script>
+		// Helper function to get CSRF token
+		const getCSRFToken = () => {
+			// Try multiple sources for CSRF token
+			if (window.frappe && window.frappe.csrf_token) {
+				return window.frappe.csrf_token;
+			}
+			
+			// Try meta tag
+			const metaTag = document.querySelector('meta[name="csrf-token"]');
+			if (metaTag) {
+				const token = metaTag.getAttribute('content');
+				if (token) {
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+			
+			// Try to get from cookies (Frappe stores it in session)
+			const cookies = document.cookie.split(';');
+			for (let cookie of cookies) {
+				const [name, value] = cookie.trim().split('=');
+				if (name === 'csrf_token') {
+					const token = decodeURIComponent(value);
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+			
+			console.warn('CSRF token not found');
+			return null;
+		};
+
 		// Simple frappe.call implementation
 		window.frappe = {
 			session: { user: 'Guest', user_fullname: 'Guest' },
+			csrf_token: getCSRFToken(),
 			call: function (opts) {
+				// Determine if this is a write operation (update, create, delete)
+				const isWriteOperation = opts.method && (
+					opts.method.includes('update') || 
+					opts.method.includes('create') || 
+					opts.method.includes('delete') ||
+					opts.method.includes('insert') ||
+					opts.method.includes('save')
+				);
+
+				// Use POST for write operations, GET for read operations
+				const method = isWriteOperation ? 'POST' : 'GET';
+
+				if (method === 'POST') {
+					// POST request - send data as form-encoded in body
+					// Frappe expects objects/arrays to be JSON stringified
+					const params = new URLSearchParams();
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value === null || value === undefined) continue;
+							// Don't skip empty strings - they might be valid values
+							// Don't skip empty objects - they might be needed
+							if (typeof value === 'object' || Array.isArray(value)) {
+								// Stringify objects and arrays (Frappe will parse them)
+								params.append(key, JSON.stringify(value));
+							} else {
+								params.append(key, String(value));
+							}
+						}
+					}
+					
+					const url = '/api/method/' + opts.method;
+					console.log('POST request to:', url);
+					console.log('POST data:', Array.from(params.entries()));
+					
+					// Get CSRF token
+					const csrfToken = getCSRFToken();
+					
+					const headers = { 
+						'Accept': 'application/json',
+						'Content-Type': 'application/x-www-form-urlencoded'
+					};
+					
+					// Add CSRF token if available (required for POST requests)
+					if (csrfToken) {
+						headers['X-Frappe-CSRF-Token'] = csrfToken;
+						console.log('CSRF Token added to request');
+					} else {
+						console.error('CSRF token not found - request will fail');
+					}
+					
+					return fetch(url, {
+						method: 'POST',
+						body: params,
+						headers: headers,
+						credentials: 'same-origin'
+					})
+						.then(async response => {
+							if (!response.ok) {
+								// Try to get error message from response
+								const text = await response.text();
+								console.error('Error response text:', text);
+								let errorMsg = `HTTP error! status: ${response.status}`;
+								try {
+									const errorData = JSON.parse(text);
+									console.error('Error response JSON:', errorData);
+									if (errorData.exc) {
+										// Try to parse exc if it's a JSON string
+										try {
+											const excData = JSON.parse(errorData.exc);
+											errorMsg = excData[0] || errorData.exc;
+										} catch {
+											errorMsg = errorData.exc;
+										}
+									} else if (errorData.message) {
+										errorMsg = errorData.message;
+									} else if (errorData._server_messages) {
+										errorMsg = errorData._server_messages;
+									}
+								} catch (e) {
+									console.error('Error parsing response:', e);
+									// If parsing fails, use the text or default message
+									if (text) errorMsg = text.substring(0, 200);
+								}
+								const error = new Error(errorMsg);
+								error.status = response.status;
+								error.responseText = text;
+								throw error;
+							}
+							return response.json();
+						})
+						.then(data => {
+							if (opts.callback) opts.callback(data);
+							return data;
+						});
+				} else {
+					// GET request - send data as query parameters
 				const params = new URLSearchParams();
 				if (opts.args) {
 					for (const [key, value] of Object.entries(opts.args)) {
@@ -372,6 +553,7 @@
 						if (opts.callback) opts.callback(data);
 						return data;
 					});
+				}
 			}
 		};
 	</script>
@@ -453,7 +635,7 @@
 			// College - get from education array
 			let college = 'Not set';
 			if (profileData.education && profileData.education.length > 0) {
-				college = profileData.education[0].school || profileData.education[0].institution || 'Not set';
+				college = profileData.education[0].institution_name || profileData.education[0].school || profileData.education[0].institution || 'Not set';
 			}
 			document.getElementById('profileCollege').textContent = college;
 			
@@ -531,12 +713,12 @@
 				const location = item.location || '';
 				
 				return `
-					<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+                <div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
 						<h3 class="font-bold text-lg" style="color: var(--text-main);">${title}</h3>
 						<div class="text-sm font-medium" style="color: var(--text-main);">${company}${location ? ` • ${location}` : ''}</div>
 						<div class="text-xs mb-2" style="color: var(--text-muted);">${startDate}${endDate ? ` - ${endDate}` : ''}</div>
 						${description ? `<p class="text-sm mt-2" style="color: var(--text-main);">${description}</p>` : ''}
-					</div>
+                </div>
 				`;
 			}).join('');
 		};
@@ -551,18 +733,19 @@
 			}
 
 			list.innerHTML = items.map(item => {
-				const school = item.school || item.institution || item.university || 'Unknown School';
-				const degree = item.degree || item.field_of_study || '';
-				const startYear = item.start_year || item.start || '';
-				const endYear = item.end_year || item.end_year || item.graduation_year || '';
-				const gpa = item.gpa || '';
+				const institution = item.institution_name || item.school || item.institution || item.university || 'Unknown Institution';
+				const degree = item.degree || '';
+				const fieldOfStudy = item.field_of_study || '';
+				const startYear = item.start_year || '';
+				const endYear = item.end_year || '';
+				const grade = item.grade || '';
 				
 				return `
 					<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
-						<h3 class="font-bold text-lg" style="color: var(--text-main);">${school}</h3>
-						${degree ? `<div class="text-sm font-medium" style="color: var(--text-main);">${degree}</div>` : ''}
-						<div class="text-xs" style="color: var(--text-muted);">${startYear}${endYear ? ` - ${endYear}` : 'Present'}</div>
-						${gpa ? `<div class="text-xs mt-1" style="color: var(--text-muted);">GPA: ${gpa}</div>` : ''}
+						<h3 class="font-bold text-lg" style="color: var(--text-main);">${institution}</h3>
+						${degree ? `<div class="text-sm font-medium" style="color: var(--text-main);">${degree}${fieldOfStudy ? ` - ${fieldOfStudy}` : ''}</div>` : fieldOfStudy ? `<div class="text-sm font-medium" style="color: var(--text-main);">${fieldOfStudy}</div>` : ''}
+						<div class="text-xs" style="color: var(--text-muted);">${startYear ? startYear : ''}${endYear ? ` - ${endYear}` : startYear ? ' - Present' : ''}</div>
+						${grade ? `<div class="text-xs mt-1" style="color: var(--text-muted);">Grade: ${grade}</div>` : ''}
 					</div>
 				`;
 			}).join('');
@@ -584,7 +767,7 @@
 				return `
 					<span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20">
 						${skillName}
-					</span>
+                </span>
 				`;
 			}).filter(html => html).join('');
 		};
@@ -595,17 +778,12 @@
 
 			if (contactItems.length === 0) {
 				list.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No contact information added yet.</div>';
-				// Clear inputs if they are tied to specific contact types
-				const linkedinInput = document.getElementById('linkedinInput');
-				const githubInput = document.getElementById('githubInput');
-				if (linkedinInput) linkedinInput.value = '';
-				if (githubInput) githubInput.value = '';
 				return;
 			}
 
 			list.innerHTML = contactItems.map(item => {
-				const type = item.type || item.contact_type || '';
-				const value = item.value || item.contact_value || '';
+				const type = item.contact_type || item.type || '';
+				const value = item.contact_value || item.value || '';
 				
 				if (!value) return '';
 
@@ -615,14 +793,6 @@
 
 				// Determine icon and href based on type
 				switch (type.toLowerCase()) {
-					case 'linkedin':
-						iconClass = 'ri-linkedin-box-fill';
-						if (!href.startsWith('http')) href = `https://${href}`;
-						break;
-					case 'github':
-						iconClass = 'ri-github-fill';
-						if (!href.startsWith('http')) href = `https://${href}`;
-						break;
 					case 'email':
 						iconClass = 'ri-mail-fill';
 						href = `mailto:${value}`;
@@ -631,7 +801,22 @@
 						iconClass = 'ri-phone-fill';
 						href = `tel:${value}`;
 						break;
+					case 'messenger id':
+						iconClass = 'ri-messenger-fill';
+						// Messenger ID might not need a link, or could link to messenger
+						break;
 					case 'website':
+						iconClass = 'ri-global-line';
+						if (!href.startsWith('http')) href = `https://${href}`;
+						break;
+					case 'linkedin':
+						iconClass = 'ri-linkedin-box-fill';
+						if (!href.startsWith('http')) href = `https://${href}`;
+						break;
+					case 'github':
+						iconClass = 'ri-github-fill';
+						if (!href.startsWith('http')) href = `https://${href}`;
+						break;
 					case 'portfolio':
 						iconClass = 'ri-global-line';
 						if (!href.startsWith('http')) href = `https://${href}`;
@@ -656,48 +841,456 @@
 				`;
 			}).filter(html => html).join('');
 
-			// Populate edit form inputs based on existing contact info
-			const linkedinItem = contactItems.find(item => (item.type || '').toLowerCase() === 'linkedin');
-			const linkedinInput = document.getElementById('linkedinInput');
-			if (linkedinInput) {
-				linkedinInput.value = linkedinItem ? (linkedinItem.value || '') : '';
-			}
+			// Contact edit form will be populated by renderContactEdit() when edit is clicked
+		};
 
-			const githubItem = contactItems.find(item => (item.type || '').toLowerCase() === 'github');
-			const githubInput = document.getElementById('githubInput');
-			if (githubInput) {
-				githubInput.value = githubItem ? (githubItem.value || '') : '';
+		// Header Edit Functions
+		window.editHeader = () => {
+			document.getElementById('headerView').classList.add('hidden');
+			document.getElementById('headerEdit').classList.remove('hidden');
+			document.getElementById('editFullName').value = profileData.full_name || '';
+			document.getElementById('editHeadline').value = profileData.headline || '';
+			document.getElementById('editLocation').value = profileData.current_location || '';
+		};
+
+		window.cancelHeaderEdit = () => {
+			document.getElementById('headerView').classList.remove('hidden');
+			document.getElementById('headerEdit').classList.add('hidden');
+		};
+
+		window.saveHeader = async () => {
+			try {
+				const updateData = {
+					full_name: document.getElementById('editFullName').value.trim(),
+					headline: document.getElementById('editHeadline').value.trim(),
+					current_location: document.getElementById('editLocation').value.trim()
+				};
+
+				await NetworkxAPI.updateUserProfile(updateData);
+				await loadProfile();
+				cancelHeaderEdit();
+			} catch (error) {
+				console.error('Error saving header:', error);
+				alert('Failed to save changes');
 			}
 		};
 
 		// Edit Logic
 		window.editSection = (section) => {
-			document.getElementById(`${section}Section`).querySelector('.view-content').classList.add('hidden');
-			document.getElementById(`${section}Edit`).classList.remove('hidden');
+			const sectionElement = document.getElementById(`${section}Section`);
+			if (!sectionElement) return;
+			
+			sectionElement.querySelector('.view-content').classList.add('hidden');
+			const editForm = document.getElementById(`${section}Edit`);
+			if (editForm) {
+				editForm.classList.remove('hidden');
+				// Populate edit forms with current data
+				populateEditForm(section);
+			}
 		};
 
 		window.cancelEdit = (section) => {
-			document.getElementById(`${section}Section`).querySelector('.view-content').classList.remove('hidden');
-			document.getElementById(`${section}Edit`).classList.add('hidden');
+			const sectionElement = document.getElementById(`${section}Section`);
+			if (!sectionElement) return;
+			
+			sectionElement.querySelector('.view-content').classList.remove('hidden');
+			const editForm = document.getElementById(`${section}Edit`);
+			if (editForm) {
+				editForm.classList.add('hidden');
+			}
 		};
 
-		window.saveSection = async (section) => {
-			// Simplified save logic - in real app would gather data and call API
-			if (section === 'profileSummary') {
-				profileData.bio = document.getElementById('profileSummaryInput').value;
+		// Populate edit forms with current data
+		const populateEditForm = (section) => {
+			if (section === 'experience') {
+				renderExperienceEdit();
+			} else if (section === 'education') {
+				renderEducationEdit();
+			} else if (section === 'skills') {
+				renderSkillsEdit();
 			} else if (section === 'contact') {
-				profileData.linkedin_url = document.getElementById('linkedinInput').value;
-				profileData.github_url = document.getElementById('githubInput').value;
+				renderContactEdit();
 			}
+		};
 
-			// Call API to update
+		// Render Edit Forms
+		const renderExperienceEdit = () => {
+			const container = document.getElementById('experienceItemsEdit');
+			const items = profileData.experience || [];
+			
+			container.innerHTML = items.map((item, index) => `
+				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-3">
+						<span class="text-sm font-medium" style="color: var(--text-main);">Experience ${index + 1}</span>
+						<button onclick="removeExperienceItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<input type="text" class="p-2 rounded form-input" placeholder="Job Title *" 
+							value="${(item.title || item.job_title || '').replace(/"/g, '&quot;')}" 
+							data-field="title" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Company Name *" 
+							value="${(item.company_name || item.company || '').replace(/"/g, '&quot;')}" 
+							data-field="company_name" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Location" 
+							value="${(item.location || '').replace(/"/g, '&quot;')}" 
+							data-field="location">
+						<select class="p-2 rounded form-input" data-field="employment_type">
+							<option value="">Employment Type</option>
+							<option value="Full-time" ${item.employment_type === 'Full-time' ? 'selected' : ''}>Full-time</option>
+							<option value="Part-time" ${item.employment_type === 'Part-time' ? 'selected' : ''}>Part-time</option>
+							<option value="Contract" ${item.employment_type === 'Contract' ? 'selected' : ''}>Contract</option>
+							<option value="Internship" ${item.employment_type === 'Internship' ? 'selected' : ''}>Internship</option>
+							<option value="Freelance" ${item.employment_type === 'Freelance' ? 'selected' : ''}>Freelance</option>
+						</select>
+						<input type="date" class="p-2 rounded form-input" placeholder="Start Date *" 
+							value="${item.start_date || ''}" 
+							data-field="start_date" required>
+						<input type="date" class="p-2 rounded form-input" placeholder="End Date" 
+							value="${item.end_date || ''}" 
+							data-field="end_date">
+						<label class="flex items-center gap-2 cursor-pointer">
+							<input type="checkbox" ${item.is_current ? 'checked' : ''} data-field="is_current" class="rounded">
+							<span class="text-sm" style="color: var(--text-main);">Currently working here</span>
+						</label>
+					</div>
+					<textarea class="w-full p-2 rounded form-input mt-3" rows="3" placeholder="Description" 
+						data-field="description">${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+				</div>
+			`).join('');
+		};
+
+		const renderEducationEdit = () => {
+			const container = document.getElementById('educationItemsEdit');
+			const items = profileData.education || [];
+			
+			container.innerHTML = items.map((item, index) => `
+				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-3">
+						<span class="text-sm font-medium" style="color: var(--text-main);">Education ${index + 1}</span>
+						<button onclick="removeEducationItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<input type="text" class="p-2 rounded form-input" placeholder="Institution Name *" 
+							value="${(item.institution_name || item.school || item.institution || item.university || '').replace(/"/g, '&quot;')}" 
+							data-field="institution_name" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Degree" 
+							value="${(item.degree || '').replace(/"/g, '&quot;')}" 
+							data-field="degree">
+						<input type="text" class="p-2 rounded form-input" placeholder="Field of Study" 
+							value="${(item.field_of_study || '').replace(/"/g, '&quot;')}" 
+							data-field="field_of_study">
+						<input type="number" class="p-2 rounded form-input" placeholder="Start Year" 
+							value="${item.start_year || ''}" 
+							data-field="start_year">
+						<input type="number" class="p-2 rounded form-input" placeholder="End Year" 
+							value="${item.end_year || ''}" 
+							data-field="end_year">
+						<input type="text" class="p-2 rounded form-input" placeholder="Grade (Optional)" 
+							value="${(item.grade || '').replace(/"/g, '&quot;')}" 
+							data-field="grade">
+					</div>
+					<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description (Optional)" 
+						data-field="description">${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+				</div>
+			`).join('');
+		};
+
+		const renderSkillsEdit = () => {
+			const container = document.getElementById('skillsItemsEdit');
+			const items = profileData.skills || [];
+			
+			container.innerHTML = items.map((item, index) => `
+				<div class="flex items-center gap-2 p-2 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<input type="text" class="flex-1 p-2 rounded form-input" placeholder="Skill Name" 
+						value="${(item.skill_name || item.name || item.skill || '').replace(/"/g, '&quot;')}" 
+						data-field="skill_name">
+					<button onclick="removeSkillItem(${index})" class="text-red-400 hover:text-red-300 p-2">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+			`).join('');
+		};
+
+		const renderContactEdit = () => {
+			const container = document.getElementById('contactItemsEdit');
+			const items = profileData.contact_info_details || [];
+			
+			container.innerHTML = items.map((item, index) => {
+				const contactType = item.contact_type || item.type || '';
+				const contactValue = item.contact_value || item.value || '';
+				
+				return `
+				<div class="p-3 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-2">
+						<span class="text-sm font-medium" style="color: var(--text-main);">${contactType || 'Contact'}</span>
+						<button onclick="removeContactItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+						<select class="p-2 rounded form-input" data-field="contact_type" required>
+							<option value="">Select Type</option>
+							<option value="Email" ${contactType === 'Email' ? 'selected' : ''}>Email</option>
+							<option value="Phone" ${contactType === 'Phone' ? 'selected' : ''}>Phone</option>
+							<option value="Messenger ID" ${contactType === 'Messenger ID' ? 'selected' : ''}>Messenger ID</option>
+							<option value="Website" ${contactType === 'Website' ? 'selected' : ''}>Website</option>
+						</select>
+						<input type="text" class="p-2 rounded form-input" placeholder="Contact Value *" 
+							value="${(contactValue || '').replace(/"/g, '&quot;')}" 
+							data-field="contact_value" required>
+					</div>
+				</div>
+			`;
+			}).join('');
+		};
+
+		// Add Item Functions
+		window.addExperienceItem = () => {
+			const container = document.getElementById('experienceItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-4 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-3">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Experience</span>
+					<button onclick="removeExperienceItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" class="p-2 rounded form-input" placeholder="Job Title *" data-field="title" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Company Name *" data-field="company_name" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Location" data-field="location">
+					<select class="p-2 rounded form-input" data-field="employment_type">
+						<option value="">Employment Type</option>
+						<option value="Full-time">Full-time</option>
+						<option value="Part-time">Part-time</option>
+						<option value="Contract">Contract</option>
+						<option value="Internship">Internship</option>
+						<option value="Freelance">Freelance</option>
+					</select>
+					<input type="date" class="p-2 rounded form-input" placeholder="Start Date *" data-field="start_date" required>
+					<input type="date" class="p-2 rounded form-input" placeholder="End Date" data-field="end_date">
+					<label class="flex items-center gap-2 cursor-pointer">
+						<input type="checkbox" data-field="is_current" class="rounded">
+						<span class="text-sm" style="color: var(--text-main);">Currently working here</span>
+					</label>
+				</div>
+				<textarea class="w-full p-2 rounded form-input mt-3" rows="3" placeholder="Description" data-field="description"></textarea>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.addEducationItem = () => {
+			const container = document.getElementById('educationItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-4 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-3">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Education</span>
+					<button onclick="removeEducationItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" class="p-2 rounded form-input" placeholder="Institution Name *" data-field="institution_name" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Degree" data-field="degree">
+					<input type="text" class="p-2 rounded form-input" placeholder="Field of Study" data-field="field_of_study">
+					<input type="number" class="p-2 rounded form-input" placeholder="Start Year" data-field="start_year">
+					<input type="number" class="p-2 rounded form-input" placeholder="End Year" data-field="end_year">
+					<input type="text" class="p-2 rounded form-input" placeholder="Grade (Optional)" data-field="grade">
+				</div>
+				<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description (Optional)" data-field="description"></textarea>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.addSkillItem = () => {
+			const container = document.getElementById('skillsItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'flex items-center gap-2 p-2 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<input type="text" class="flex-1 p-2 rounded form-input" placeholder="Skill Name" data-field="skill_name">
+				<button onclick="removeSkillItem(${newIndex})" class="text-red-400 hover:text-red-300 p-2">
+					<i class="ri-delete-bin-line"></i>
+				</button>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.addContactItem = () => {
+			const container = document.getElementById('contactItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-3 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Contact</span>
+					<button onclick="removeContactItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+					<select class="p-2 rounded form-input" data-field="contact_type" required>
+						<option value="">Select Type</option>
+						<option value="Email">Email</option>
+						<option value="Phone">Phone</option>
+						<option value="Messenger ID">Messenger ID</option>
+						<option value="Website">Website</option>
+					</select>
+					<input type="text" class="p-2 rounded form-input" placeholder="Contact Value *" data-field="contact_value" required>
+				</div>
+			`;
+			container.appendChild(newItem);
+		};
+
+		// Remove Item Functions
+		window.removeExperienceItem = (index) => {
+			const container = document.getElementById('experienceItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			// Reindex remaining items
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeExperienceItem(${i})`);
+			});
+		};
+
+		window.removeEducationItem = (index) => {
+			const container = document.getElementById('educationItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeEducationItem(${i})`);
+			});
+		};
+
+		window.removeSkillItem = (index) => {
+			const container = document.getElementById('skillsItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeSkillItem(${i})`);
+			});
+		};
+
+		window.removeContactItem = (index) => {
+			const container = document.getElementById('contactItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeContactItem(${i})`);
+			});
+		};
+
+		// Save Section Function
+		window.saveSection = async (section) => {
 			try {
-				await NetworkxAPI.updateUserProfile(profileData);
-				renderProfile();
+				let updateData = {};
+
+			if (section === 'profileSummary') {
+					const summaryValue = document.getElementById('profileSummaryInput').value.trim();
+					updateData.profile_summary = summaryValue || ''; // Allow empty strings
+					console.log('Saving profile summary:', updateData);
+				} else if (section === 'experience') {
+					const container = document.getElementById('experienceItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							if (input.type === 'checkbox') {
+								fields[field] = input.checked ? 1 : 0;
+							} else {
+								const value = input.value.trim();
+								if (value) fields[field] = value;
+							}
+						});
+						return fields;
+					}).filter(item => Object.keys(item).length > 0);
+					updateData.experience = items;
+				} else if (section === 'education') {
+					const container = document.getElementById('educationItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							let value = input.value.trim();
+							
+							// Convert numeric fields to integers
+							if (field === 'start_year' || field === 'end_year') {
+								value = value ? parseInt(value, 10) : null;
+								if (value && !isNaN(value)) {
+									fields[field] = value;
+								}
+							} else if (value) {
+								fields[field] = value;
+							}
+						});
+						
+						// Ensure institution_name is present (required field)
+						if (!fields.institution_name) {
+							console.warn('Education item missing required institution_name');
+							return null;
+						}
+						
+						return fields;
+					}).filter(item => item !== null && Object.keys(item).length > 0);
+					updateData.education = items;
+				} else if (section === 'skills') {
+					const container = document.getElementById('skillsItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const skillName = item.querySelector('[data-field="skill_name"]').value.trim();
+						return skillName ? { skill_name: skillName } : null;
+					}).filter(item => item !== null);
+					updateData.skills = items;
+			} else if (section === 'contact') {
+					const container = document.getElementById('contactItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							const value = input.value.trim();
+							if (value) fields[field] = value;
+						});
+						
+						// Ensure required fields are present
+						if (!fields.contact_type || !fields.contact_value) {
+							console.warn('Contact item missing required fields');
+							return null;
+						}
+						
+						return fields;
+					}).filter(item => item !== null && Object.keys(item).length > 0);
+					updateData.contact_info_details = items;
+				}
+
+				await NetworkxAPI.updateUserProfile(updateData);
+				await loadProfile();
 				cancelEdit(section);
 			} catch (error) {
 				console.error('Error saving:', error);
-				alert('Failed to save changes');
+				alert('Failed to save changes. Please try again.');
 			}
 		};
 

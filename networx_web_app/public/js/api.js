@@ -196,6 +196,7 @@ const NetworkxAPI = {
 	// Update user profile (User Profile doctype)
 	updateUserProfile: async (data) => {
 		try {
+			console.log('updateUserProfile called with data:', data);
 			const response = await frappe.call({
 				method: 'networx_web_app.networx_web_app.apis.user_profile.update_user_profile.update_user_profile',
 				args: {
@@ -204,9 +205,14 @@ const NetworkxAPI = {
 				freeze: true,
 				freeze_message: 'Updating profile...'
 			});
+			console.log('updateUserProfile response:', response);
 			return response.message;
 		} catch (error) {
 			console.error('Error updating user profile:', error);
+			console.error('Error details:', {
+				message: error.message,
+				stack: error.stack
+			});
 			throw error;
 		}
 	},
