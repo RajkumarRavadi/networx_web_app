@@ -21,6 +21,8 @@
 			background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
 			height: 200px;
 			border-radius: 1rem 1rem 0 0;
+			position: relative;
+			overflow: hidden;
 		}
 
 		.profile-avatar {
@@ -29,6 +31,60 @@
 			border: 4px solid var(--bg-card);
 			background: var(--bg-body);
 			box-shadow: var(--glass-shadow);
+		}
+
+		/* Motivational Quotes Background */
+		.quote-background {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			pointer-events: none;
+			overflow: hidden;
+			z-index: 1;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			padding-right: 2rem;
+		}
+
+		.quote-item {
+			position: relative;
+			font-size: 1.8rem;
+			font-weight: 700;
+			color: rgba(255, 255, 255, 0.6);
+			text-align: right;
+			max-width: 50%;
+			text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 255, 255, 0.2);
+			z-index: 1;
+			letter-spacing: 0.5px;
+			line-height: 1.4;
+			padding: 1rem;
+		}
+
+		/* Responsive quotes */
+		@media (max-width: 768px) {
+			.quote-background {
+				padding-right: 1rem;
+			}
+			.quote-item {
+				font-size: 1.2rem;
+				max-width: 60%;
+				padding: 0.5rem;
+			}
+		}
+
+		/* Responsive quotes */
+		@media (max-width: 768px) {
+			.quote-item {
+				font-size: 0.9rem;
+			}
+			.quote-item:nth-child(1) { font-size: 0.8rem; }
+			.quote-item:nth-child(2) { font-size: 0.9rem; }
+			.quote-item:nth-child(3) { font-size: 0.85rem; }
+			.quote-item:nth-child(4) { font-size: 0.75rem; }
+			.quote-item:nth-child(5) { font-size: 1rem; }
 		}
 
 		/* Quill Editor Dark Mode Fixes */
@@ -70,7 +126,12 @@
 
 				<!-- Header Card -->
 				<div class="glass-panel rounded-2xl mb-6 relative">
-					<div class="profile-cover"></div>
+					<div class="profile-cover">
+						<!-- Motivational Quotes Background -->
+						<div class="quote-background">
+							<!-- Quote will be inserted by JavaScript -->
+						</div>
+					</div>
 					<div class="px-8 pb-8">
 						<div class="relative -mt-20 mb-4">
 							<div class="profile-avatar rounded-full flex items-center justify-center text-6xl font-bold overflow-hidden"
@@ -208,7 +269,7 @@
 					<div class="space-y-6">
 
 						<!-- Contact Info -->
-						<div class="glass-panel rounded-2xl p-6">
+						<div class="glass-panel rounded-2xl p-6" id="contactSection">
 							<div class="flex justify-between items-center mb-4">
 								<h2 class="text-lg font-bold" style="color: var(--text-main);">Contact Info</h2>
 								<button class="text-sm font-medium hover:underline flex items-center gap-1"
@@ -242,7 +303,7 @@
 						</div>
 
 						<!-- Skills -->
-						<div class="glass-panel rounded-2xl p-6">
+						<div class="glass-panel rounded-2xl p-6" id="skillsSection">
 							<div class="flex justify-between items-center mb-4">
 								<h2 class="text-lg font-bold" style="color: var(--text-main);">Skills</h2>
 								<button class="text-sm font-medium hover:underline flex items-center gap-1"
@@ -322,6 +383,36 @@
 		// Profile Data State
 		let profileData = {};
 
+		// Helper function to convert private file path to accessible URL
+		const getFileUrl = (filePath) => {
+			if (!filePath) return null;
+			
+			// If it's already a full URL, return as is
+			if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+				return filePath;
+			}
+			
+			// If it's a private file, use Frappe's file serving endpoint
+			if (filePath.startsWith('/private/files/')) {
+				// Encode the file path for the API
+				const encodedPath = encodeURIComponent(filePath);
+				return `/api/method/frappe.handler.upload_file.get_file?file_url=${encodedPath}`;
+			}
+			
+			// If it's a public file, return as is
+			if (filePath.startsWith('/files/')) {
+				return filePath;
+			}
+			
+			// If it doesn't start with /, assume it's a filename in /files/
+			if (!filePath.startsWith('/')) {
+				return `/files/${filePath}`;
+			}
+			
+			// Default: return as is
+			return filePath;
+		};
+
 		// Logout
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
 			e.preventDefault();
@@ -338,6 +429,7 @@
 
 				if (result) {
 					profileData = result;
+					console.log('Profile data loaded:', profileData);
 					renderProfile();
 					document.getElementById('loadingState').style.display = 'none';
 					document.getElementById('profileContent').style.display = 'block';
@@ -351,24 +443,61 @@
 		// Render Profile
 		const renderProfile = () => {
 			// Header
-			document.getElementById('profileName').textContent = profileData.full_name || frappe.session.user_fullname;
+			document.getElementById('profileName').textContent = profileData.full_name || frappe.session.user_fullname || 'User';
 			document.getElementById('profileHeadline').textContent = profileData.headline || 'Student';
-			document.getElementById('profileLocation').textContent = profileData.location || 'Not set';
-			document.getElementById('profileCollege').textContent = profileData.college || 'Not set';
-			document.getElementById('profileGradYear').textContent = profileData.graduation_year || 'N/A';
+			
+			// Location
+			const location = profileData.current_location || 'Not set';
+			document.getElementById('profileLocation').textContent = location;
+			
+			// College - get from education array
+			let college = 'Not set';
+			if (profileData.education && profileData.education.length > 0) {
+				college = profileData.education[0].school || profileData.education[0].institution || 'Not set';
+			}
+			document.getElementById('profileCollege').textContent = college;
+			
+			// Graduation Year - get from education array
+			let gradYear = 'N/A';
+			if (profileData.education && profileData.education.length > 0) {
+				gradYear = profileData.education[0].end_year || profileData.education[0].graduation_year || 'N/A';
+			}
+			document.getElementById('profileGradYear').textContent = gradYear;
 
-			// Avatar
+			// Avatar - use profile_image from API response
 			const avatarContainer = document.getElementById('profileAvatarContainer');
-			if (profileData.user_image) {
-				avatarContainer.innerHTML = `<img src="${profileData.user_image}" class="w-full h-full object-cover">`;
+			const profileImage = profileData.profile_image;
+			
+			if (profileImage) {
+				const imageUrl = getFileUrl(profileImage);
+				avatarContainer.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover" alt="Profile Image" onerror="this.parentElement.innerHTML='<span style=\\'color: var(--primary);\\'>${(profileData.full_name || 'U').charAt(0).toUpperCase()}</span>'">`;
 			} else {
 				const initials = (profileData.full_name || 'U').charAt(0).toUpperCase();
 				avatarContainer.innerHTML = `<span style="color: var(--primary);">${initials}</span>`;
 			}
 
-			// Summary
-			document.getElementById('profileSummary').textContent = profileData.bio || 'No summary added yet.';
-			document.getElementById('profileSummaryInput').value = profileData.bio || '';
+			// Summary - use profile_summary from API response
+			const summary = profileData.profile_summary || '';
+			const summaryElement = document.getElementById('profileSummary');
+			
+			if (!summary || summary.trim() === '') {
+				summaryElement.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No summary added yet.</div>';
+			} else {
+				// Check if summary contains HTML
+				if (summary.includes('<') || summary.includes('&lt;')) {
+					summaryElement.innerHTML = summary;
+				} else {
+					summaryElement.textContent = summary;
+				}
+			}
+			
+			// Set input value for editing
+			const summaryInput = document.getElementById('profileSummaryInput');
+			if (summaryInput) {
+				// Strip HTML tags for textarea
+				const textOnly = summary ? summary.replace(/<[^>]*>/g, '').trim() : '';
+				summaryInput.value = textOnly || '';
+			}
 
 			// Experience
 			renderExperience();
@@ -383,7 +512,7 @@
 			renderContact();
 		};
 
-		// Render Helpers (Simplified for brevity, full logic would mirror original but with new classes)
+		// Render Helpers
 		const renderExperience = () => {
 			const list = document.getElementById('experienceList');
 			const items = profileData.experience || [];
@@ -393,14 +522,23 @@
 				return;
 			}
 
-			list.innerHTML = items.map(item => `
-                <div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
-                    <h3 class="font-bold text-lg" style="color: var(--text-main);">${item.title}</h3>
-                    <div class="text-sm font-medium" style="color: var(--text-main);">${item.company_name}</div>
-                    <div class="text-xs mb-2" style="color: var(--text-muted);">${item.start_date} - ${item.end_date || 'Present'}</div>
-                    <p class="text-sm" style="color: var(--text-main);">${item.description || ''}</p>
-                </div>
-            `).join('');
+			list.innerHTML = items.map(item => {
+				const title = item.title || item.job_title || item.position || 'Untitled Position';
+				const company = item.company_name || item.company || 'Unknown Company';
+				const startDate = item.start_date || item.start || '';
+				const endDate = item.end_date || item.end || (item.is_current ? 'Present' : '');
+				const description = item.description || item.summary || '';
+				const location = item.location || '';
+				
+				return `
+					<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+						<h3 class="font-bold text-lg" style="color: var(--text-main);">${title}</h3>
+						<div class="text-sm font-medium" style="color: var(--text-main);">${company}${location ? ` • ${location}` : ''}</div>
+						<div class="text-xs mb-2" style="color: var(--text-muted);">${startDate}${endDate ? ` - ${endDate}` : ''}</div>
+						${description ? `<p class="text-sm mt-2" style="color: var(--text-main);">${description}</p>` : ''}
+					</div>
+				`;
+			}).join('');
 		};
 
 		const renderEducation = () => {
@@ -412,13 +550,22 @@
 				return;
 			}
 
-			list.innerHTML = items.map(item => `
-                <div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
-                    <h3 class="font-bold text-lg" style="color: var(--text-main);">${item.school}</h3>
-                    <div class="text-sm font-medium" style="color: var(--text-main);">${item.degree}</div>
-                    <div class="text-xs" style="color: var(--text-muted);">${item.start_year} - ${item.end_year || 'Present'}</div>
-                </div>
-            `).join('');
+			list.innerHTML = items.map(item => {
+				const school = item.school || item.institution || item.university || 'Unknown School';
+				const degree = item.degree || item.field_of_study || '';
+				const startYear = item.start_year || item.start || '';
+				const endYear = item.end_year || item.end_year || item.graduation_year || '';
+				const gpa = item.gpa || '';
+				
+				return `
+					<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+						<h3 class="font-bold text-lg" style="color: var(--text-main);">${school}</h3>
+						${degree ? `<div class="text-sm font-medium" style="color: var(--text-main);">${degree}</div>` : ''}
+						<div class="text-xs" style="color: var(--text-muted);">${startYear}${endYear ? ` - ${endYear}` : 'Present'}</div>
+						${gpa ? `<div class="text-xs mt-1" style="color: var(--text-muted);">GPA: ${gpa}</div>` : ''}
+					</div>
+				`;
+			}).join('');
 		};
 
 		const renderSkills = () => {
@@ -430,72 +577,97 @@
 				return;
 			}
 
-			list.innerHTML = items.map(item => `
-                <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    ${item.skill_name}
-                </span>
-            `).join('');
+			list.innerHTML = items.map(item => {
+				const skillName = item.skill_name || item.name || item.skill || '';
+				if (!skillName) return '';
+				
+				return `
+					<span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20">
+						${skillName}
+					</span>
+				`;
+			}).filter(html => html).join('');
 		};
 
 		const renderContact = () => {
 			const list = document.getElementById('contactList');
-			const contactItems = profileData.contact_info || [];
+			const contactItems = profileData.contact_info_details || profileData.contact_info || [];
 
 			if (contactItems.length === 0) {
 				list.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No contact information added yet.</div>';
 				// Clear inputs if they are tied to specific contact types
-				document.getElementById('linkedinInput').value = '';
-				document.getElementById('githubInput').value = '';
+				const linkedinInput = document.getElementById('linkedinInput');
+				const githubInput = document.getElementById('githubInput');
+				if (linkedinInput) linkedinInput.value = '';
+				if (githubInput) githubInput.value = '';
 				return;
 			}
 
 			list.innerHTML = contactItems.map(item => {
+				const type = item.type || item.contact_type || '';
+				const value = item.value || item.contact_value || '';
+				
+				if (!value) return '';
+
 				let iconClass = '';
-				let href = item.value;
-				let displayValue = item.value;
+				let href = value;
+				let displayValue = value;
 
 				// Determine icon and href based on type
-				switch (item.type) {
-					case 'LinkedIn':
-						iconClass = 'ri-linkedin-box-fill text-blue-500';
+				switch (type.toLowerCase()) {
+					case 'linkedin':
+						iconClass = 'ri-linkedin-box-fill';
 						if (!href.startsWith('http')) href = `https://${href}`;
 						break;
-					case 'GitHub':
+					case 'github':
 						iconClass = 'ri-github-fill';
 						if (!href.startsWith('http')) href = `https://${href}`;
 						break;
-					case 'Email':
+					case 'email':
 						iconClass = 'ri-mail-fill';
-						href = `mailto:${item.value}`;
+						href = `mailto:${value}`;
 						break;
-					case 'Phone':
+					case 'phone':
 						iconClass = 'ri-phone-fill';
-						href = `tel:${item.value}`;
+						href = `tel:${value}`;
 						break;
-					case 'Website':
+					case 'website':
+					case 'portfolio':
 						iconClass = 'ri-global-line';
 						if (!href.startsWith('http')) href = `https://${href}`;
 						break;
-					default:
-						iconClass = 'ri-link'; // Generic link icon
+					case 'twitter':
+						iconClass = 'ri-twitter-fill';
 						if (!href.startsWith('http')) href = `https://${href}`;
+						break;
+					default:
+						iconClass = 'ri-link';
+						if (!href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+							href = `https://${href}`;
+						}
 						break;
 				}
 
 				return `
 					<div class="flex items-center gap-3">
-						<i class="text-xl" style="color: var(--text-main); ${item.type === 'LinkedIn' ? '' : 'color: var(--text-main);'} ${iconClass}"></i>
-						<a href="${href || '#'}" class="text-sm hover:underline" style="color: var(--text-main);" target="_blank" rel="noopener noreferrer">${displayValue || `Add ${item.type}`}</a>
+						<i class="${iconClass} text-xl" style="color: ${type.toLowerCase() === 'linkedin' ? '#0077b5' : 'var(--text-main)'};"></i>
+						<a href="${href || '#'}" class="text-sm hover:underline" style="color: var(--text-main);" target="_blank" rel="noopener noreferrer">${displayValue}</a>
 					</div>
 				`;
-			}).join('');
+			}).filter(html => html).join('');
 
 			// Populate edit form inputs based on existing contact info
-			const linkedinItem = contactItems.find(item => item.type === 'LinkedIn');
-			document.getElementById('linkedinInput').value = linkedinItem ? linkedinItem.value : '';
+			const linkedinItem = contactItems.find(item => (item.type || '').toLowerCase() === 'linkedin');
+			const linkedinInput = document.getElementById('linkedinInput');
+			if (linkedinInput) {
+				linkedinInput.value = linkedinItem ? (linkedinItem.value || '') : '';
+			}
 
-			const githubItem = contactItems.find(item => item.type === 'GitHub');
-			document.getElementById('githubInput').value = githubItem ? githubItem.value : '';
+			const githubItem = contactItems.find(item => (item.type || '').toLowerCase() === 'github');
+			const githubInput = document.getElementById('githubInput');
+			if (githubInput) {
+				githubInput.value = githubItem ? (githubItem.value || '') : '';
+			}
 		};
 
 		// Edit Logic
@@ -529,8 +701,60 @@
 			}
 		};
 
+		// Motivational Quotes Array
+		const motivationalQuotes = [
+			"Education is the most powerful weapon",
+			"Success is a journey, not a destination",
+			"The future belongs to those who learn",
+			"Dream big, work hard, stay focused",
+			"Knowledge is power",
+			"Invest in yourself, your career will thank you",
+			"Every expert was once a beginner",
+			"Learning never exhausts the mind",
+			"Your limitation—it's only your imagination",
+			"Push yourself, because no one else is going to do it for you",
+			"Great things never come from comfort zones",
+			"Success doesn't just find you, you have to go out and get it",
+			"Think big, start small, act now",
+			"The only way to do great work is to love what you do",
+			"Don't stop when you're tired, stop when you're done",
+			"Hard work beats talent when talent doesn't work hard",
+			"Believe you can and you're halfway there",
+			"Opportunities don't happen, you create them",
+			"Excellence is not a skill, it's an attitude",
+			"The way to get started is to quit talking and begin doing"
+		];
+
+		// Initialize Quotes
+		const initializeQuotes = () => {
+			// Wait a bit to ensure DOM is ready
+			setTimeout(() => {
+				const quoteContainer = document.querySelector('.quote-background');
+				if (!quoteContainer) {
+					console.log('Quote container not found');
+					return;
+				}
+
+				// Clear existing quotes
+				quoteContainer.innerHTML = '';
+
+				// Select only 1 random quote
+				const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+				const selectedQuote = motivationalQuotes[randomIndex];
+
+				// Create single quote element
+				const quoteElement = document.createElement('div');
+				quoteElement.className = 'quote-item';
+				quoteElement.textContent = `"${selectedQuote}"`;
+				quoteContainer.appendChild(quoteElement);
+			}, 100);
+		};
+
 		// Initialize
-		document.addEventListener('DOMContentLoaded', loadProfile);
+		document.addEventListener('DOMContentLoaded', () => {
+			loadProfile();
+			initializeQuotes();
+		});
 	</script>
 </body>
 
