@@ -1,77 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Dashboard - NETWORX</title>
-		<script src="https://cdn.tailwindcss.com"></script>
-	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+
+	<!-- Tailwind -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Icons -->
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+	<!-- Custom Theme -->
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
 </head>
-<body>
-	<!-- Navbar -->
-	<nav class="navbar">
-		<div class="container navbar-content">
-			<a href="/dashboard" class="navbar-brand">NETWORX</a>
-			<ul class="navbar-nav">
-				<li><a href="/dashboard">Dashboard</a></li>
-				<li><a href="/jobs">Jobs</a></li>
-				<li><a href="/myprofile">My Profile</a></li>
-				<li><a href="#" id="logoutBtn">Logout</a></li>
-			</ul>
-		</div>
-	</nav>
-	
+
+<body class="flex h-screen overflow-hidden">
+
+	<!-- Sidebar -->
+	{% set active_page = 'dashboard' %}
+	{% include "networx_web_app/templates/includes/sidebar.html" %}
+
 	<!-- Main Content -->
-	<main style="padding: 2rem 0;">
-		<div class="container">
-			<h1 class="text-2xl font-bold mb-2">
-				Welcome back, <span id="userName">Student</span>! 👋
-			</h1>
-			<p class="text-slate-500 mb-6">Here's what's happening with your career journey</p>
-			
-			<!-- Stats Grid -->
-			<div id="statsGrid" class="grid grid-cols-4 mb-4">
-				<div class="stat-card">
-					<div class="stat-number" id="totalJobs">-</div>
-					<div class="stat-label">Open Job Positions</div>
+	<main class="flex-1 overflow-y-auto relative">
+		<!-- Mobile Header -->
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
+			<button class="p-2" style="color: var(--text-main);">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+		</header>
+
+		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+
+			<!-- Top Bar -->
+			<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+				<div>
+					<h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: var(--text-main);">
+						Welcome back, <span id="userName" class="text-gradient">Student</span>! 👋
+					</h1>
+					<p class="text-lg" style="color: var(--text-muted);">Ready to crush your career goals today?</p>
 				</div>
-				<div class="stat-card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
-					<div class="stat-number" id="upcomingEvents">-</div>
-					<div class="stat-label">Upcoming Events</div>
-				</div>
-				<div class="stat-card" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
-					<div class="stat-number" id="myApplications">-</div>
-					<div class="stat-label">My Applications</div>
-				</div>
-				<div class="stat-card" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-					<div class="stat-number" id="pendingReviews">-</div>
-					<div class="stat-label">Resume Reviews</div>
+
+				<div class="flex items-center gap-4">
+					<div class="hidden md:block text-right">
+						<div class="text-sm" style="color: var(--text-muted);" id="currentDate">Loading date...</div>
+						<div class="text-xs text-emerald-400 font-medium">● Online</div>
+					</div>
+					<button
+						class="w-12 h-12 rounded-full glass-panel flex items-center justify-center transition-colors relative"
+						style="color: var(--text-muted);">
+						<i class="ri-notification-3-line text-xl"></i>
+						<span class="absolute top-3 right-3 w-2 h-2 bg-pink-500 rounded-full"></span>
+					</button>
+					<a href="/myprofile"
+						class="w-12 h-12 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 p-0.5">
+						<div class="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+							style="background: var(--bg-body);">
+							<i class="ri-user-line text-xl" style="color: var(--text-main);"></i>
+						</div>
+					</a>
 				</div>
 			</div>
-			
+
+			<!-- Stats Grid -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+				<!-- Stat 1 -->
+				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+						<i class="ri-briefcase-4-fill text-6xl text-violet-500"></i>
+					</div>
+					<div class="relative z-10">
+						<div
+							class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-4 text-violet-400">
+							<i class="ri-briefcase-4-line text-2xl"></i>
+						</div>
+						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="totalJobs">-</div>
+						<div class="text-sm font-medium" style="color: var(--text-muted);">Open Job Positions</div>
+					</div>
+				</div>
+
+				<!-- Stat 2 -->
+				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+						<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
+					</div>
+					<div class="relative z-10">
+						<div
+							class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+							<i class="ri-calendar-event-line text-2xl"></i>
+						</div>
+						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="upcomingEvents">-
+						</div>
+						<div class="text-sm font-medium" style="color: var(--text-muted);">Upcoming Events</div>
+					</div>
+				</div>
+
+				<!-- Stat 3 -->
+				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+						<i class="ri-file-paper-2-fill text-6xl text-amber-500"></i>
+					</div>
+					<div class="relative z-10">
+						<div
+							class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+							<i class="ri-file-paper-2-line text-2xl"></i>
+						</div>
+						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="myApplications">-
+						</div>
+						<div class="text-sm font-medium" style="color: var(--text-muted);">My Applications</div>
+					</div>
+				</div>
+
+				<!-- Stat 4 -->
+				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+						<i class="ri-shield-star-fill text-6xl text-pink-500"></i>
+					</div>
+					<div class="relative z-10">
+						<div
+							class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4 text-pink-400">
+							<i class="ri-shield-star-line text-2xl"></i>
+						</div>
+						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="pendingReviews">-
+						</div>
+						<div class="text-sm font-medium" style="color: var(--text-muted);">Resume Reviews</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Content Grid -->
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+				<!-- Left Column (Main) -->
+				<div class="lg:col-span-2 space-y-8">
+
+					<!-- Quick Actions -->
+					<div class="glass-panel rounded-2xl p-6">
+						<h3 class="text-xl font-bold mb-4" style="color: var(--text-main);">Quick Actions</h3>
+						<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<a href="/jobs"
+								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
+								style="background: var(--bg-card);">
+								<div
+									class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+									<i class="ri-search-line text-xl"></i>
+								</div>
+								<span class="text-sm font-medium" style="color: var(--text-muted);">Find Jobs</span>
+							</a>
+							<a href="/myprofile"
+								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
+								style="background: var(--bg-card);">
+								<div
+									class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+									<i class="ri-user-edit-line text-xl"></i>
+								</div>
+								<span class="text-sm font-medium" style="color: var(--text-muted);">Update
+									Profile</span>
+							</a>
+							<a href="#"
+								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
+								style="background: var(--bg-card);">
+								<div
+									class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+									<i class="ri-team-line text-xl"></i>
+								</div>
+								<span class="text-sm font-medium" style="color: var(--text-muted);">Mentorship</span>
+							</a>
+							<a href="#"
+								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
+								style="background: var(--bg-card);">
+								<div
+									class="w-10 h-10 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+									<i class="ri-rocket-line text-xl"></i>
+								</div>
+								<span class="text-sm font-medium" style="color: var(--text-muted);">Hackathons</span>
+							</a>
+						</div>
+					</div>
+
+					<!-- Recent Applications -->
+					<div class="glass-panel rounded-2xl p-6">
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-xl font-bold" style="color: var(--text-main);">Recent Applications</h3>
+							<a href="#" class="text-sm text-violet-400 hover:text-violet-300 font-medium">View All</a>
+						</div>
+
+						<div id="recentApplicationsList" class="space-y-4">
+							<!-- Loading State -->
+							<div class="flex justify-center py-8">
+								<div class="loader"></div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<!-- Right Column (Sidebar) -->
+				<div class="space-y-8">
+
+					<!-- Profile Strength -->
+					<div class="glass-card rounded-2xl p-6 text-center">
+						<h3 class="text-lg font-bold mb-6" style="color: var(--text-main);">Profile Strength</h3>
+						<div class="relative w-32 h-32 mx-auto mb-4 flex items-center justify-center">
+							<svg class="w-full h-full transform -rotate-90">
+								<circle cx="64" cy="64" r="56" stroke="var(--border-color)" stroke-width="8"
+									fill="none"></circle>
+								<circle cx="64" cy="64" r="56" stroke="#8b5cf6" stroke-width="8" fill="none"
+									stroke-dasharray="351.86" stroke-dashoffset="70" stroke-linecap="round"></circle>
+							</svg>
+							<div class="absolute inset-0 flex flex-col items-center justify-center">
+								<span class="text-3xl font-bold" style="color: var(--text-main);">80%</span>
+							</div>
+						</div>
+						<p class="text-sm mb-4" style="color: var(--text-muted);">You're doing great! Add a project to
+							reach 100%.</p>
+						<button class="w-full py-2 rounded-lg text-sm font-medium transition-colors border"
+							style="background: var(--bg-card); color: var(--text-main); border-color: var(--border-color);">
+							Improve Profile
+						</button>
+					</div>
+
+					<!-- Upcoming Events -->
+					<div class="glass-panel rounded-2xl p-6">
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-lg font-bold" style="color: var(--text-main);">Upcoming Events</h3>
+							<button style="color: var(--text-muted);"><i class="ri-more-fill"></i></button>
+						</div>
+
+						<div id="upcomingEventsList" class="space-y-4">
+							<!-- Loading State -->
+							<div class="flex justify-center py-4">
+								<div class="loader"></div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
 		</div>
 	</main>
-	
+
+	<!-- Scripts -->
 	<script>
 		// Simple frappe.call implementation using GET
 		window.frappe = {
 			session: { user: 'Guest', user_fullname: 'Guest' },
-			
-			call: function(opts) {
-				// Build query parameters for GET request
+			call: function (opts) {
 				const params = new URLSearchParams();
-				
-				// Add all args as query parameters
 				if (opts.args) {
 					for (const [key, value] of Object.entries(opts.args)) {
-						// Skip null, undefined, and empty objects
 						if (value === null || value === undefined) continue;
-						
-						// Skip empty objects and empty strings
 						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
 						if (value === '') continue;
-						
-						// Add the parameter
 						if (typeof value === 'object') {
 							params.append(key, JSON.stringify(value));
 						} else {
@@ -79,79 +262,142 @@
 						}
 					}
 				}
-				
-				// Build URL with query parameters
 				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				
 				return fetch(url, {
 					method: 'GET',
-					headers: {
-						'Accept': 'application/json'
-					},
+					headers: { 'Accept': 'application/json' },
 					credentials: 'same-origin'
 				})
-				.then(response => {
-					if (!response.ok) {
-						return response.json().then(err => {
-							console.error('Server error:', err);
-							throw new Error(err.exception || `HTTP error! status: ${response.status}`);
-						}).catch(() => {
-							throw new Error(`HTTP error! status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(data => {
-					if (opts.callback) opts.callback(data);
-					return data;
-				})
-				.catch(error => {
-					console.error('API Error:', error);
-					if (opts.error) opts.error(error);
-					throw error;
-				});
+					.then(response => {
+						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					});
 			}
 		};
 	</script>
 	<script src="/assets/networx_web_app/js/utils.js"></script>
-	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+
 	<script>
-		// Set page title
-		NetworkxUtils.setPageTitle('Dashboard');
-		
-		// Set user name
-		document.getElementById('userName').textContent = frappe.session.user_fullname || frappe.session.user;
-		
-		// Logout handler
+		// Set Date
+		const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+		document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', dateOptions);
+
+		// Set User Name
+		document.getElementById('userName').textContent = frappe.session.user_fullname || 'Student';
+
+		// Logout
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
 			e.preventDefault();
 			await frappe.call({
 				method: 'logout',
-				callback: () => {
-					window.location.href = '/login';
-				}
+				callback: () => window.location.href = '/login'
 			});
 		});
-		
-		// Load dashboard stats
-		const loadDashboardStats = async () => {
+
+		// Format Date Helper
+		const formatDate = (dateString) => {
+			const options = { month: 'short', day: 'numeric' };
+			return new Date(dateString).toLocaleDateString('en-US', options);
+		};
+
+		// Load Data
+		const loadDashboardData = async () => {
 			try {
+				// 1. Stats
 				const stats = await NetworkxAPI.getDashboardStats();
-				
 				document.getElementById('totalJobs').textContent = stats.total_jobs || 0;
 				document.getElementById('upcomingEvents').textContent = stats.upcoming_events || 0;
 				document.getElementById('myApplications').textContent = stats.my_applications || 0;
 				document.getElementById('pendingReviews').textContent = stats.pending_reviews || 0;
+
+				// 2. Recent Applications
+				const applications = await NetworkxAPI.getRecentApplications(3);
+				const appList = document.getElementById('recentApplicationsList');
+				appList.innerHTML = '';
+
+				if (applications && applications.length > 0) {
+					applications.forEach(app => {
+						const statusColors = {
+							'Applied': 'bg-blue-500/20 text-blue-400',
+							'Interview': 'bg-yellow-500/20 text-yellow-400',
+							'Rejected': 'bg-red-500/20 text-red-400',
+							'Hired': 'bg-green-500/20 text-green-400'
+						};
+						const statusClass = statusColors[app.status] || 'bg-slate-500/20 text-slate-400';
+
+						appList.innerHTML += `
+                            <div class="flex items-center justify-between p-4 rounded-xl transition-colors group" style="background: var(--bg-card);">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--bg-body); color: var(--text-muted);">
+                                        <i class="ri-briefcase-line"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold transition-colors group-hover:text-violet-400" style="color: var(--text-main);">${app.job_title || 'Unknown Job'}</h4>
+                                        <p class="text-xs" style="color: var(--text-muted);">${app.company_name || 'Unknown Company'} • Applied ${formatDate(app.creation)}</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                    ${app.status}
+                                </span>
+                            </div>
+                        `;
+					});
+				} else {
+					appList.innerHTML = `
+                        <div class="text-center py-6" style="color: var(--text-muted);">
+                            <i class="ri-file-search-line text-3xl mb-2 opacity-50"></i>
+                            <p>No applications yet.</p>
+                            <a href="/jobs" class="text-violet-400 text-sm hover:underline mt-2 inline-block">Find a job</a>
+                        </div>
+                    `;
+				}
+
+				// 3. Upcoming Events
+				const events = await NetworkxAPI.getRecentEvents(3);
+				const eventList = document.getElementById('upcomingEventsList');
+				eventList.innerHTML = '';
+
+				if (events && events.length > 0) {
+					events.forEach(event => {
+						const date = new Date(event.event_date);
+						const day = date.getDate();
+						const month = date.toLocaleString('default', { month: 'short' });
+
+						eventList.innerHTML += `
+                            <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-xl border flex flex-col items-center justify-center text-center" style="background: var(--bg-card); border-color: var(--border-color);">
+                                    <span class="text-xs uppercase font-bold" style="color: var(--text-muted);">${month}</span>
+                                    <span class="text-lg font-bold leading-none" style="color: var(--text-main);">${day}</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm line-clamp-1" style="color: var(--text-main);">${event.event_name}</h4>
+                                    <p class="text-xs mt-0.5" style="color: var(--text-muted);"><i class="ri-map-pin-line align-bottom"></i> ${event.location || 'Online'}</p>
+                                </div>
+                            </div>
+                        `;
+					});
+				} else {
+					eventList.innerHTML = `
+                        <div class="text-center py-4" style="color: var(--text-muted);">
+                            <p>No upcoming events.</p>
+                        </div>
+                    `;
+				}
+
 			} catch (error) {
-				console.error('Error loading stats:', error);
+				console.error('Error loading dashboard:', error);
 			}
 		};
-		
-		// Initialize dashboard
-		document.addEventListener('DOMContentLoaded', () => {
-			loadDashboardStats();
-		});
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', loadDashboardData);
 	</script>
 </body>
-</html>
 
+</html>

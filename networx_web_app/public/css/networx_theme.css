@@ -1,0 +1,169 @@
+/* Networx Theme System */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Core Colors */
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --secondary: #14b8a6;
+    --accent: #ec4899;
+    
+    /* Light Mode Defaults */
+    --bg-body: #f8fafc;
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --bg-panel: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(0, 0, 0, 0.1);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --sidebar-bg: rgba(255, 255, 255, 0.8);
+    --input-bg: rgba(255, 255, 255, 0.8);
+    --input-border: #cbd5e1;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] {
+    --bg-body: #020617;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --bg-panel: rgba(15, 23, 42, 0.6);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --glass-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    --sidebar-bg: rgba(15, 23, 42, 0.6);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --input-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+}
+
+/* Background Gradients (Dynamic based on theme) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 20%);
+    pointer-events: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+}
+
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Sidebar Links */
+.sidebar-link {
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    color: var(--text-muted);
+}
+
+.sidebar-link:hover, .sidebar-link.active {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+    border-left-color: var(--primary);
+    color: var(--text-main);
+}
+
+.sidebar-link i {
+    transition: transform 0.2s ease;
+}
+
+.sidebar-link:hover i {
+    transform: translateX(3px);
+    color: var(--primary);
+}
+
+/* Text Gradients */
+.text-gradient {
+    background: linear-gradient(to right, #c084fc, #2dd4bf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Form Elements */
+.form-input {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-body); 
+}
+::-webkit-scrollbar-thumb {
+    background: #334155; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569; 
+}
+
+/* Loader */
+.loader {
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    border-top: 3px solid var(--primary);
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

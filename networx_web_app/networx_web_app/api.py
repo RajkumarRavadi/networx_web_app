@@ -43,7 +43,7 @@ def get_dashboard_stats():
 	}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_job_listings(filters=None, limit=20, offset=0, search_term=None):
 	"""Get paginated job listings with optional filters"""
 	try:
@@ -327,4 +327,104 @@ def get_recent_events(limit=5):
 	return events
 
 
+
+
+@frappe.whitelist(allow_guest=True)
+def get_recent_applications(limit=5):
+	"""Get recent job applications for the current user"""
+	user = frappe.session.user
+	student_profile = frappe.db.get_value("Student Profile", {"user": user}, "name")
+	
+	if not student_profile:
+		return []
+		
+	applications = frappe.db.get_all(
+		"Job Application",
+		filters={"student_profile": student_profile},
+		fields=["name", "job_opening", "status", "creation", "modified"],
+		order_by="creation DESC",
+		limit=limit
+	)
+	
+	# Fetch job titles
+	for app in applications:
+		job = frappe.db.get_value("Job Opening", app.job_opening, ["job_title", "company_name"], as_dict=True)
+		if job:
+			app.job_title = job.job_title
+			app.company_name = job.company_name
+			
+	return applications
+
+
+@frappe.whitelist(allow_guest=True)
+def get_user_profile_details():
+	"""Get detailed profile for the current user"""
+	user = frappe.session.user
+	if user == "Guest":
+		return None
+		
+	# Get user details (fallback)
+	user_details = frappe.db.get_value("User", user, ["user_image", "full_name"], as_dict=True)
+	
+	# Get User Profile
+	profile_name = frappe.db.get_value("User Profile", {"user": user}, "name")
+	
+	if not profile_name:
+		return {
+			"full_name": user_details.get("full_name"),
+			"user_image": user_details.get("user_image"),
+			"email": user
+		}
+		
+	profile = frappe.get_doc("User Profile", profile_name)
+	
+	# Map fields
+	return {
+		"name": profile.name,
+		"full_name": profile.full_name or user_details.get("full_name"),
+		"user_image": profile.profile_image or user_details.get("user_image"),
+		"headline": profile.headline or "Student",
+		"bio": profile.profile_summary,
+		"location": profile.current_location,
+		"college": profile.education[0].school if profile.education else "Not set", # Infer from education
+		"graduation_year": profile.education[0].end_year if profile.education else "N/A", # Infer from education
+		"degree": profile.education[0].degree if profile.education else "N/A", # Infer from education
+		"linkedin_url": profile.profile_url,
+		"github_url": "", # Extract from contact info if needed
+		"skills": profile.skills,
+		"experience": profile.experience,
+		"education": profile.education,
+		"contact_info": profile.contact_info_details
+	}
+
+@frappe.whitelist()
+def update_user_profile(data):
+	"""Update user profile"""
+	if isinstance(data, str):
+		import json
+		data = json.loads(data)
+		
+	user = frappe.session.user
+	profile_name = frappe.db.get_value("User Profile", {"user": user}, "name")
+	
+	if not profile_name:
+		# Create new profile
+		profile = frappe.new_doc("User Profile")
+		profile.user = user
+	else:
+		profile = frappe.get_doc("User Profile", profile_name)
+		
+	# Update fields
+	if "full_name" in data: profile.full_name = data["full_name"]
+	if "headline" in data: profile.headline = data["headline"]
+	if "bio" in data: profile.profile_summary = data["bio"]
+	if "location" in data: profile.current_location = data["location"]
+	if "linkedin_url" in data: profile.profile_url = data["linkedin_url"]
+	
+	# Note: Updating child tables (skills, experience, education) requires more complex logic 
+	# (clearing and re-adding, or updating specific rows). 
+	# For this task, we'll focus on the main fields unless specific child table update logic is requested.
+	
+	profile.save()
+	return profile.name
 

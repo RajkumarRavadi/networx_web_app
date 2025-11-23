@@ -1,173 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Student Login - NETWORX</title>
-	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
-	<style>
-		body {
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		}
-		
-		.login-container {
-			width: 100%;
-			max-width: 420px;
-			padding: 1rem;
-		}
-		
-		.login-card {
-			background: white;
-			border-radius: 1rem;
-			padding: 2.5rem;
-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-		}
-		
-		.logo {
-			text-align: center;
-			margin-bottom: 2rem;
-		}
-		
-		.logo-text {
-			font-size: 2rem;
-			font-weight: 800;
-			color: var(--primary-color);
-			margin-bottom: 0.5rem;
-		}
-		
-		.logo-subtitle {
-			color: var(--text-secondary);
-			font-size: 0.875rem;
-		}
-		
-		.error-message {
-			background-color: #FEE2E2;
-			color: #991B1B;
-			padding: 0.75rem;
-			border-radius: 0.5rem;
-			margin-bottom: 1rem;
-			font-size: 0.875rem;
-			display: none;
-		}
-		
-		.success-message {
-			background-color: #D1FAE5;
-			color: #065F46;
-			padding: 0.75rem;
-			border-radius: 0.5rem;
-			margin-bottom: 1rem;
-			font-size: 0.875rem;
-			display: none;
-		}
-		
-		.forgot-password {
-			text-align: right;
-			margin-top: 0.5rem;
-		}
-		
-		.forgot-password a {
-			color: var(--primary-color);
-			text-decoration: none;
-			font-size: 0.875rem;
-		}
-		
-		.forgot-password a:hover {
-			text-decoration: underline;
-		}
-		
-		.btn-login {
-			width: 100%;
-			padding: 0.875rem;
-			font-size: 1rem;
-			margin-top: 1.5rem;
-		}
-		
-		.footer-text {
-			text-align: center;
-			margin-top: 1.5rem;
-			color: var(--text-secondary);
-			font-size: 0.875rem;
-		}
-	</style>
+
+	<!-- Tailwind -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Icons -->
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+	<!-- Custom Theme -->
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
 </head>
-<body>
-	<div class="login-container">
-		<div class="login-card">
-			<div class="logo">
-				<div class="logo-text">NETWORX</div>
-				<div class="logo-subtitle">Student Portal</div>
+
+<body class="flex items-center justify-center min-h-screen p-4">
+
+	<div class="w-full max-w-md">
+		<!-- Logo -->
+		<div class="text-center mb-8">
+			<div
+				class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/30 mb-4">
+				<span class="text-3xl font-bold text-white">N</span>
 			</div>
-			
-			<div id="errorMessage" class="error-message"></div>
-			<div id="successMessage" class="success-message"></div>
-			
-			<form id="loginForm">
-				<div class="form-group">
-					<label class="form-label" for="username">Email or Username</label>
-					<input 
-						type="text" 
-						id="username" 
-						name="usr" 
-						class="form-control" 
-						placeholder="Enter your email or username"
-						required
-						autocomplete="username"
-					>
+			<h1 class="text-3xl font-bold mb-1" style="color: var(--text-main);">NETWORX</h1>
+			<p style="color: var(--text-muted);">Student Portal Login</p>
+		</div>
+
+		<!-- Login Card -->
+		<div class="glass-panel rounded-2xl p-8 shadow-xl">
+			<div id="errorMessage"
+				class="hidden bg-red-500/10 text-red-500 p-3 rounded-lg mb-4 text-sm border border-red-500/20"></div>
+			<div id="successMessage"
+				class="hidden bg-emerald-500/10 text-emerald-500 p-3 rounded-lg mb-4 text-sm border border-emerald-500/20">
+			</div>
+
+			<form id="loginForm" class="space-y-6">
+				<div>
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Email or
+						Username</label>
+					<div class="relative">
+						<i class="ri-user-line absolute left-3 top-3 text-gray-400"></i>
+						<input type="text" name="usr"
+							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
+							placeholder="Enter your email" required autocomplete="username">
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label class="form-label" for="password">Password</label>
-					<input 
-						type="password" 
-						id="password" 
-						name="pwd" 
-						class="form-control" 
-						placeholder="Enter your password"
-						required
-						autocomplete="current-password"
-					>
+
+				<div>
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Password</label>
+					<div class="relative">
+						<i class="ri-lock-line absolute left-3 top-3 text-gray-400"></i>
+						<input type="password" name="pwd"
+							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
+							placeholder="Enter your password" required autocomplete="current-password">
+					</div>
+					<div class="text-right mt-2">
+						<a href="/forgot-password" class="text-sm hover:underline" style="color: var(--primary);">Forgot
+							Password?</a>
+					</div>
 				</div>
-				
-				<div class="forgot-password">
-					<a href="/forgot-password">Forgot Password?</a>
-				</div>
-				
-				<button type="submit" class="btn btn-primary btn-login">
+
+				<button type="submit"
+					class="w-full py-3 rounded-lg btn-primary font-bold text-lg shadow-lg shadow-violet-500/20">
 					Sign In
 				</button>
 			</form>
-			
-			<div class="footer-text">
-				Don't have an account? Contact your administrator
+
+			<div class="text-center mt-6 text-sm" style="color: var(--text-muted);">
+				Don't have an account? <a href="#" class="font-medium hover:underline"
+					style="color: var(--primary);">Contact Admin</a>
 			</div>
 		</div>
+
+		<!-- Theme Toggle (Floating) -->
+		<button id="themeToggleBtn"
+			class="fixed bottom-6 right-6 w-12 h-12 rounded-full glass-panel flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+			style="color: var(--text-main);">
+			<i class="ri-moon-line text-xl"></i>
+		</button>
 	</div>
-	
+
+	<!-- Scripts -->
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
 	<script>
 		document.getElementById('loginForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
-			
+
 			const errorDiv = document.getElementById('errorMessage');
 			const successDiv = document.getElementById('successMessage');
 			const submitBtn = e.target.querySelector('button[type="submit"]');
-			
+
 			// Hide messages
-			errorDiv.style.display = 'none';
-			successDiv.style.display = 'none';
-			
+			errorDiv.classList.add('hidden');
+			successDiv.classList.add('hidden');
+
 			// Get form data
 			const formData = new FormData(e.target);
 			const username = formData.get('usr');
 			const password = formData.get('pwd');
-			
+
 			// Disable button
 			submitBtn.disabled = true;
-			submitBtn.textContent = 'Signing In...';
-			
+			submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Signing In...';
+
 			try {
 				// Call Frappe login API
 				const response = await fetch('/api/method/login', {
@@ -181,14 +119,14 @@
 						pwd: password
 					})
 				});
-				
+
 				const data = await response.json();
-				
+
 				if (response.ok && data.message === 'Logged In') {
 					// Success
 					successDiv.textContent = 'Login successful! Redirecting...';
-					successDiv.style.display = 'block';
-					
+					successDiv.classList.remove('hidden');
+
 					// Redirect to dashboard
 					setTimeout(() => {
 						window.location.href = '/dashboard';
@@ -196,21 +134,19 @@
 				} else {
 					// Error
 					errorDiv.textContent = data.message || 'Invalid credentials. Please try again.';
-					errorDiv.style.display = 'block';
+					errorDiv.classList.remove('hidden');
 					submitBtn.disabled = false;
 					submitBtn.textContent = 'Sign In';
 				}
 			} catch (error) {
 				console.error('Login error:', error);
 				errorDiv.textContent = 'An error occurred. Please try again.';
-				errorDiv.style.display = 'block';
+				errorDiv.classList.remove('hidden');
 				submitBtn.disabled = false;
 				submitBtn.textContent = 'Sign In';
 			}
 		});
 	</script>
 </body>
+
 </html>
-
-
-

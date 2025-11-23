@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Job Openings - NETWORX</title>
-	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+
+	<!-- Tailwind -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Icons -->
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+	<!-- Custom Theme -->
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
 </head>
-<body>
-	<!-- Navbar -->
-	<nav class="navbar">
-		<div class="container navbar-content">
-			<a href="/dashboard" class="navbar-brand">NETWORX</a>
-			<ul class="navbar-nav">
-				<li><a href="/dashboard">Dashboard</a></li>
-				<li><a href="/jobs">Jobs</a></li>
-				<li><a href="/myprofile">My Profile</a></li>
-				<li><a href="#" id="logoutBtn">Logout</a></li>
-			</ul>
-		</div>
-	</nav>
-	
+
+<body class="flex h-screen overflow-hidden">
+
+	<!-- Sidebar -->
+	{% set active_page = 'jobs' %}
+	{% include "networx_web_app/templates/includes/sidebar.html" %}
+
 	<!-- Main Content -->
-	<main style="padding: 2rem 0;">
-		<div class="container">
-			<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
-				Job Openings
-			</h1>
-			<p style="color: var(--text-secondary); margin-bottom: 2rem;">
-				Find your dream job from top companies
-			</p>
-			
+	<main class="flex-1 overflow-y-auto relative">
+		<!-- Mobile Header -->
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
+			<button class="p-2" style="color: var(--text-main);">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+		</header>
+
+		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+
+			<!-- Header -->
+			<div class="mb-8">
+				<h1 class="text-3xl font-bold mb-2" style="color: var(--text-main);">Job Openings</h1>
+				<p class="text-lg" style="color: var(--text-muted);">Find your dream job from top companies</p>
+			</div>
+
 			<!-- Filters -->
-			<div class="card mb-3">
-				<div class="grid grid-cols-4">
+			<div class="glass-panel rounded-2xl p-6 mb-8">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<div class="form-group">
-						<label class="form-label" for="searchInput">Search</label>
-						<input 
-							type="text" 
-							id="searchInput" 
-							class="form-control" 
-							placeholder="Job title, company, location..."
-						>
+						<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Search</label>
+						<div class="relative">
+							<i class="ri-search-line absolute left-3 top-3 text-gray-400"></i>
+							<input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 rounded-lg form-input"
+								placeholder="Job title, company...">
+						</div>
 					</div>
 					<div class="form-group">
-						<label class="form-label" for="jobTypeFilter">Job Type</label>
-						<select id="jobTypeFilter" class="form-control">
+						<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Job Type</label>
+						<select id="jobTypeFilter" class="w-full px-4 py-2 rounded-lg form-input">
 							<option value="">All Types</option>
 							<option value="Internship">Internship</option>
 							<option value="Full-time">Full-time</option>
@@ -52,56 +61,51 @@
 						</select>
 					</div>
 					<div class="form-group">
-						<label class="form-label" for="locationFilter">Location</label>
-						<input 
-							type="text" 
-							id="locationFilter" 
-							class="form-control" 
-							placeholder="City or Remote"
-						>
+						<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Location</label>
+						<div class="relative">
+							<i class="ri-map-pin-line absolute left-3 top-3 text-gray-400"></i>
+							<input type="text" id="locationFilter" class="w-full pl-10 pr-4 py-2 rounded-lg form-input"
+								placeholder="City or Remote">
+						</div>
 					</div>
-					<div class="form-group" style="display: flex; align-items: flex-end;">
-						<button id="applyFiltersBtn" class="btn btn-primary" style="width: 100%;">
+					<div class="form-group flex items-end">
+						<button id="applyFiltersBtn" class="w-full py-2 rounded-lg btn-primary font-medium">
 							Apply Filters
 						</button>
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- Results Info -->
-			<div style="margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+			<div class="mb-6 text-sm" style="color: var(--text-muted);">
 				<span id="resultsInfo">Loading jobs...</span>
 			</div>
-			
+
 			<!-- Jobs Grid -->
-			<div id="jobsGrid" class="grid grid-cols-3">
-				<div class="loading">Loading jobs...</div>
+			<div id="jobsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<!-- Loading State -->
+				<div class="col-span-full flex justify-center py-12">
+					<div class="loader"></div>
+				</div>
 			</div>
-			
+
 			<!-- Pagination -->
-			<div id="paginationContainer" style="display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem;">
-			</div>
+			<div id="paginationContainer" class="flex justify-center mt-10 gap-2"></div>
+
 		</div>
 	</main>
-	
+
+	<!-- Scripts -->
 	<script>
 		// Simple frappe.call implementation
 		window.frappe = {
-			call: function(opts) {
-				// Build query parameters for GET request
+			call: function (opts) {
 				const params = new URLSearchParams();
-				
-				// Add all args as query parameters
 				if (opts.args) {
 					for (const [key, value] of Object.entries(opts.args)) {
-						// Skip null, undefined, and empty objects
 						if (value === null || value === undefined) continue;
-						
-						// Skip empty objects and empty strings
 						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
 						if (value === '') continue;
-						
-						// Add the parameter
 						if (typeof value === 'object') {
 							params.append(key, JSON.stringify(value));
 						} else {
@@ -109,52 +113,35 @@
 						}
 					}
 				}
-				
-				// Build URL with query parameters
 				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				
 				return fetch(url, {
 					method: 'GET',
-					headers: {
-						'Accept': 'application/json'
-					},
+					headers: { 'Accept': 'application/json' },
 					credentials: 'same-origin'
 				})
-				.then(response => {
-					if (!response.ok) {
-						return response.json().then(err => {
-							console.error('Server error:', err);
-							throw new Error(err.exception || `HTTP error! status: ${response.status}`);
-						}).catch(() => {
-							throw new Error(`HTTP error! status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(data => {
-					if (opts.callback) opts.callback(data);
-					return data;
-				})
-				.catch(error => {
-					console.error('API Error:', error);
-					if (opts.error) opts.error(error);
-					throw error;
-				});
+					.then(response => {
+						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					});
 			}
 		};
 	</script>
 	<script src="/assets/networx_web_app/js/utils.js"></script>
-	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+
 	<script>
-		NetworkxUtils.setPageTitle('Job Openings');
-		
 		// State
 		let currentPage = 0;
 		const jobsPerPage = 12;
 		let totalJobs = 0;
 		let currentFilters = {};
 		let currentSearchTerm = null;
-		
+
 		// Logout handler
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
 			e.preventDefault();
@@ -165,181 +152,171 @@
 				}
 			});
 		});
-		
+
 		// Load jobs
 		const loadJobs = async (page = 0) => {
 			try {
 				currentPage = page;
 				const offset = page * jobsPerPage;
-				
+
 				const result = await NetworkxAPI.getJobListings(
 					currentFilters,
 					jobsPerPage,
 					offset,
 					currentSearchTerm
 				);
-				
+
 				totalJobs = result.total_count;
-				
+
 				// Update results info
 				const start = offset + 1;
 				const end = Math.min(offset + jobsPerPage, totalJobs);
-				document.getElementById('resultsInfo').textContent = 
+				document.getElementById('resultsInfo').textContent =
 					`Showing ${start}-${end} of ${totalJobs} jobs`;
-				
+
 				// Render jobs
 				renderJobs(result.jobs);
-				
+
 				// Render pagination
 				renderPagination();
 			} catch (error) {
 				console.error('Error loading jobs:', error);
-				document.getElementById('jobsGrid').innerHTML = 
-					'<div class="error">Error loading jobs. Please try again.</div>';
+				document.getElementById('jobsGrid').innerHTML = `
+                    <div class="col-span-full text-center text-red-400 py-12">
+                        <i class="ri-error-warning-line text-4xl mb-2"></i>
+                        <p>Error loading jobs.</p>
+                        <p class="text-sm opacity-75 mt-1">${error.message || 'Unknown error'}</p>
+                        <button onclick="location.reload()" class="mt-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm">
+                            Try Again
+                        </button>
+                    </div>
+                `;
 			}
 		};
-		
+
 		// Render jobs
 		const renderJobs = (jobs) => {
 			const jobsGrid = document.getElementById('jobsGrid');
-			
+
 			if (jobs.length === 0) {
 				jobsGrid.innerHTML = `
-					<div class="empty-state" style="grid-column: 1 / -1;">
-						<div class="empty-state-icon">💼</div>
-						<div>No jobs found matching your criteria</div>
-					</div>
-				`;
+                    <div class="col-span-full glass-panel rounded-2xl p-12 text-center">
+                        <div class="text-6xl mb-4">💼</div>
+                        <h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">No jobs found</h3>
+                        <p style="color: var(--text-muted);">Try adjusting your search or filters</p>
+                    </div>
+                `;
 				return;
 			}
-			
-			jobsGrid.innerHTML = jobs.map(job => `
-				<div class="card job-card" onclick="window.location.href='/job-detail?id=${job.name}'">
-					<div class="job-card-header">
-						${job.company_logo ? 
-							`<img src="${job.company_logo}" alt="${job.company_name}" class="job-logo">` : 
-							`<div class="job-logo" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-color);">${job.company_name.charAt(0)}</div>`
-						}
-						<div style="flex: 1;">
-							<h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;">
-								${job.job_title}
-							</h3>
-							<div style="color: var(--text-secondary); font-size: 0.875rem;">
-								${job.company_name}
-							</div>
-						</div>
-					</div>
-					<div style="margin-bottom: 1rem;">
-						<span class="job-badge">${job.job_type || 'Full-time'}</span>
-						<span class="job-badge">${job.location || 'Remote'}</span>
-						${job.is_external_listing ? '<span class="job-badge" style="background: #F59E0B; color: white;">🔗 External</span>' : ''}
-					</div>
-					<div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
-						${job.experience_required || 'Fresher'}
-					</div>
-					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem;">
-						<span style="color: var(--text-secondary);">
-							Posted ${NetworkxUtils.formatDate(job.posted_date)}
-						</span>
-						<span style="color: var(--primary-color); font-weight: 500;">
-							View Details →
-						</span>
-					</div>
-				</div>
-			`).join('');
+
+			jobsGrid.innerHTML = jobs.map(job => {
+				const logoHtml = job.company_logo ?
+					`<img src="${job.company_logo}" alt="${job.company_name}" class="w-12 h-12 rounded-lg object-cover bg-white">` :
+					`<div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold" style="background: var(--bg-body); color: var(--primary);">${job.company_name.charAt(0)}</div>`;
+
+				return `
+                <div class="glass-card rounded-xl p-6 relative overflow-hidden flex flex-col">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-4">
+                            ${logoHtml}
+                            <div>
+                                <h3 class="font-bold text-lg leading-tight mb-1" style="color: var(--text-main);">${job.job_title}</h3>
+                                <div class="text-sm font-medium" style="color: var(--text-muted);">${job.company_name}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-2 text-sm" style="color: var(--text-muted);">
+                            <i class="ri-map-pin-line text-emerald-400"></i> ${job.location || 'Remote'}
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" style="color: var(--text-muted);">
+                            <i class="ri-briefcase-line text-violet-400"></i> ${job.job_type || 'Full-time'}
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" style="color: var(--text-muted);">
+                            <i class="ri-money-dollar-circle-line text-green-400"></i> ${job.salary_range || 'Not disclosed'}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t" style="border-color: var(--border-color);">
+                        <span class="text-xs font-medium" style="color: var(--text-muted);">
+                            Posted ${NetworkxUtils.formatDate(job.posted_date)}
+                        </span>
+                        <a href="/job_detail?id=${job.name}" class="text-sm font-bold hover:underline" style="color: var(--primary);">
+                            View Details <i class="ri-arrow-right-line ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                `;
+			}).join('');
 		};
-		
+
 		// Render pagination
 		const renderPagination = () => {
 			const paginationContainer = document.getElementById('paginationContainer');
 			const totalPages = Math.ceil(totalJobs / jobsPerPage);
-			
+
 			if (totalPages <= 1) {
 				paginationContainer.innerHTML = '';
 				return;
 			}
-			
+
 			let paginationHTML = '';
-			
+
 			// Previous button
 			if (currentPage > 0) {
 				paginationHTML += `
-					<button class="btn btn-secondary" onclick="loadJobs(${currentPage - 1})">
-						← Previous
-					</button>
-				`;
+			< button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style = "border-color: var(--border-color); color: var(--text-main);" onclick = "loadJobs(${currentPage - 1})" >
+				Previous
+                    </button >
+			`;
 			}
-			
-			// Page numbers (show max 5 pages)
-			const startPage = Math.max(0, currentPage - 2);
-			const endPage = Math.min(totalPages - 1, currentPage + 2);
-			
-			for (let i = startPage; i <= endPage; i++) {
-				if (i === currentPage) {
-					paginationHTML += `
-						<button class="btn btn-primary" disabled>
-							${i + 1}
-						</button>
-					`;
-				} else {
-					paginationHTML += `
-						<button class="btn btn-secondary" onclick="loadJobs(${i})">
-							${i + 1}
-						</button>
-					`;
-				}
-			}
-			
+
+			// Page info
+			paginationHTML += `
+			< span class="px-4 py-2" style = "color: var(--text-muted);" >
+				Page ${currentPage + 1} of ${totalPages}
+                </span >
+			`;
+
 			// Next button
 			if (currentPage < totalPages - 1) {
 				paginationHTML += `
-					<button class="btn btn-secondary" onclick="loadJobs(${currentPage + 1})">
-						Next →
-					</button>
-				`;
+			< button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style = "border-color: var(--border-color); color: var(--text-main);" onclick = "loadJobs(${currentPage + 1})" >
+				Next
+                    </button >
+                `;
 			}
-			
+
 			paginationContainer.innerHTML = paginationHTML;
 		};
-		
+
 		// Apply filters
 		const applyFilters = () => {
 			const searchInput = document.getElementById('searchInput').value.trim();
 			const jobType = document.getElementById('jobTypeFilter').value;
 			const location = document.getElementById('locationFilter').value.trim();
-			
+
 			currentFilters = {};
 			currentSearchTerm = searchInput || null;
-			
-			if (jobType) {
-				currentFilters.job_type = jobType;
-			}
-			
-			if (location) {
-				currentFilters.location = location;
-			}
-			
+
+			if (jobType) currentFilters.job_type = jobType;
+			if (location) currentFilters.location = location;
+
 			loadJobs(0);
 		};
-		
+
 		// Event listeners
 		document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
-		
-		// Search on enter
 		document.getElementById('searchInput').addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
-				applyFilters();
-			}
+			if (e.key === 'Enter') applyFilters();
 		});
-		
-		// Make loadJobs globally accessible for pagination
-		window.loadJobs = loadJobs;
-		
+
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
 			loadJobs(0);
 		});
 	</script>
 </body>
-</html>
 
+</html>

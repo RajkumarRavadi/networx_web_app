@@ -19,7 +19,7 @@ const NetworkxAPI = {
 	getJobListings: async (filters = {}, limit = 20, offset = 0, searchTerm = null) => {
 		try {
 			const response = await frappe.call({
-				method: 'networx_web_app.networx_web_app.apis.job_opening.job_opening.get_job_openings',
+				method: 'networx_web_app.networx_web_app.api.get_job_listings',
 				args: {
 					filters: filters,
 					limit: limit,
@@ -207,6 +207,22 @@ const NetworkxAPI = {
 			return response.message;
 		} catch (error) {
 			console.error('Error updating user profile:', error);
+			throw error;
+		}
+	},
+
+	// Get recent applications
+	getRecentApplications: async (limit = 5) => {
+		try {
+			const response = await frappe.call({
+				method: 'networx_web_app.networx_web_app.api.get_recent_applications',
+				args: {
+					limit: limit
+				}
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error fetching applications:', error);
 			throw error;
 		}
 	}

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Job Details - NETWORX</title>
+
+	<!-- Tailwind -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Icons -->
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+	<!-- Custom Theme -->
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+	<!-- Sidebar -->
+	{% set active_page = 'jobs' %}
+	{% include "networx_web_app/templates/includes/sidebar.html" %}
+
+	<!-- Main Content -->
+	<main class="flex-1 overflow-y-auto relative">
+		<!-- Mobile Header -->
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
+			<button class="p-2" style="color: var(--text-main);">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+		</header>
+
+		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+
+			<!-- Back Button -->
+			<a href="/jobs" class="inline-flex items-center gap-2 mb-6 text-sm font-medium hover:underline"
+				style="color: var(--text-muted);">
+				<i class="ri-arrow-left-line"></i> Back to Jobs
+			</a>
+
+			<!-- Loading State -->
+			<div id="loadingState" class="flex justify-center py-20">
+				<div class="loader"></div>
+			</div>
+
+			<!-- Job Content -->
+			<div id="jobContent" class="hidden">
+
+				<!-- Header Card -->
+				<div class="glass-panel rounded-2xl p-8 mb-8 relative overflow-hidden">
+					<div class="absolute top-0 right-0 p-8 opacity-5">
+						<i class="ri-briefcase-4-fill text-9xl" style="color: var(--primary);"></i>
+					</div>
+
+					<div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+						<!-- Logo -->
+						<div id="jobLogoContainer"
+							class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl font-bold shadow-lg flex-shrink-0"
+							style="background: var(--bg-body); color: var(--primary);">
+							<!-- Logo or Initial -->
+						</div>
+
+						<div class="flex-1">
+							<h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: var(--text-main);"
+								id="jobTitle">Loading...</h1>
+							<div class="text-xl mb-4 font-medium" style="color: var(--text-muted);" id="companyName">
+								Loading...</div>
+
+							<div class="flex flex-wrap gap-4 text-sm mb-6">
+								<span
+									class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
+									style="color: var(--text-main);">
+									<i class="ri-map-pin-line text-emerald-400"></i> <span
+										id="jobLocation">Location</span>
+								</span>
+								<span
+									class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
+									style="color: var(--text-main);">
+									<i class="ri-briefcase-line text-violet-400"></i> <span id="jobType">Type</span>
+								</span>
+								<span
+									class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
+									style="color: var(--text-main);">
+									<i class="ri-time-line text-amber-400"></i> Posted <span id="postedDate">Date</span>
+								</span>
+								<span id="salaryContainer"
+									class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
+									style="color: var(--text-main);">
+									<i class="ri-money-dollar-circle-line text-green-400"></i> <span
+										id="salaryRange">Salary</span>
+								</span>
+							</div>
+
+							<div id="actionButtons" class="flex gap-4">
+								<!-- Buttons injected by JS -->
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+					<!-- Main Info -->
+					<div class="lg:col-span-2 space-y-8">
+
+						<!-- Description -->
+						<div class="glass-panel rounded-2xl p-8">
+							<h2 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--text-main);">
+								<i class="ri-file-text-line text-violet-400"></i> About the Role
+							</h2>
+							<div class="prose prose-invert max-w-none" style="color: var(--text-muted);"
+								id="jobDescription">
+								<!-- Description content -->
+							</div>
+						</div>
+
+						<!-- Requirements -->
+						<div class="glass-panel rounded-2xl p-8">
+							<h2 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--text-main);">
+								<i class="ri-checkbox-circle-line text-emerald-400"></i> Requirements
+							</h2>
+							<div class="prose prose-invert max-w-none" style="color: var(--text-muted);"
+								id="jobRequirements">
+								<!-- Requirements content -->
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Sidebar Info -->
+					<div class="space-y-6">
+						<div class="glass-card rounded-2xl p-6">
+							<h3 class="text-lg font-bold mb-4" style="color: var(--text-main);">Job Information</h3>
+
+							<div class="space-y-4">
+								<div class="pb-4 border-b" style="border-color: var(--border-color);">
+									<div class="text-xs font-medium uppercase tracking-wider mb-1"
+										style="color: var(--text-muted);">Experience Required</div>
+									<div class="font-medium" style="color: var(--text-main);" id="experienceRequired">-
+									</div>
+								</div>
+
+								<div class="pb-4 border-b" style="border-color: var(--border-color);">
+									<div class="text-xs font-medium uppercase tracking-wider mb-1"
+										style="color: var(--text-muted);">Application Deadline</div>
+									<div class="font-medium" style="color: var(--text-main);" id="deadline">-</div>
+								</div>
+
+								<div>
+									<div class="text-xs font-medium uppercase tracking-wider mb-1"
+										style="color: var(--text-muted);">Status</div>
+									<div class="font-medium text-emerald-400" id="jobStatus">-</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+
+	<!-- Application Modal -->
+	<div id="applicationModal"
+		class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+		<div class="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl transform transition-all scale-95 opacity-0"
+			id="modalContent">
+			<div class="flex justify-between items-center mb-6">
+				<h3 class="text-xl font-bold" style="color: var(--text-main);">Apply for this Job</h3>
+				<button onclick="closeApplicationModal()" class="text-gray-400 hover:text-white transition-colors">
+					<i class="ri-close-line text-2xl"></i>
+				</button>
+			</div>
+
+			<form id="applicationForm">
+				<div class="mb-6">
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Cover Letter</label>
+					<textarea id="coverLetter" name="cover_letter"
+						class="w-full p-4 rounded-xl form-input min-h-[150px]"
+						placeholder="Tell us why you're a great fit for this role..." required></textarea>
+				</div>
+
+				<div class="flex justify-end gap-3">
+					<button type="button" onclick="closeApplicationModal()"
+						class="px-6 py-2.5 rounded-xl border font-medium hover:bg-white/5 transition-colors"
+						style="border-color: var(--border-color); color: var(--text-main);">
+						Cancel
+					</button>
+					<button type="submit"
+						class="px-6 py-2.5 rounded-xl btn-primary font-medium shadow-lg shadow-violet-500/20">
+						Submit Application
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script>
+		// Simple frappe.call implementation
+		window.frappe = {
+			session: { user: 'Guest', user_fullname: 'Guest' },
+			call: function (opts) {
+				const params = new URLSearchParams();
+				if (opts.args) {
+					for (const [key, value] of Object.entries(opts.args)) {
+						if (value === null || value === undefined) continue;
+						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+						if (value === '') continue;
+						if (typeof value === 'object') {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, value);
+						}
+					}
+				}
+				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+				return fetch(url, {
+					method: 'GET',
+					headers: { 'Accept': 'application/json' },
+					credentials: 'same-origin'
+				})
+					.then(response => {
+						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					});
+			}
+		};
+	</script>
+	<script src="/assets/networx_web_app/js/utils.js"></script>
+	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+
+	<script>
+		// Get job ID
+		const urlParams = new URLSearchParams(window.location.search);
+		const jobId = urlParams.get('id');
+
+		if (!jobId) {
+			document.getElementById('loadingState').innerHTML = '<div class="text-red-400">Job ID is required</div>';
+			throw new Error('Job ID is required');
+		}
+
+		let jobData = null;
+		let hasApplied = false;
+
+		// Logout
+		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+			e.preventDefault();
+			await frappe.call({
+				method: 'logout',
+				callback: () => window.location.href = '/login'
+			});
+		});
+
+		// Load Details
+		const loadJobDetails = async () => {
+			try {
+				const result = await NetworkxAPI.getJobDetail(jobId);
+				jobData = result.job;
+				hasApplied = result.has_applied;
+
+				document.title = `${jobData.job_title} - NETWORX`;
+
+				renderJobDetails();
+
+				document.getElementById('loadingState').classList.add('hidden');
+				document.getElementById('jobContent').classList.remove('hidden');
+			} catch (error) {
+				console.error('Error loading job:', error);
+				document.getElementById('loadingState').innerHTML = `
+                    <div class="text-center text-red-400">
+                        <i class="ri-error-warning-line text-4xl mb-2"></i>
+                        <p>Error loading job details.</p>
+                        <p class="text-sm opacity-75 mt-1">${error.message || 'Unknown error'}</p>
+                        <button onclick="location.reload()" class="mt-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+			}
+		};
+
+		// Render
+		const renderJobDetails = () => {
+			// Header
+			document.getElementById('jobTitle').textContent = jobData.job_title;
+			document.getElementById('companyName').textContent = jobData.company_name;
+			document.getElementById('jobLocation').textContent = jobData.location || 'Remote';
+			document.getElementById('jobType').textContent = jobData.job_type || 'Full-time';
+			document.getElementById('postedDate').textContent = NetworkxUtils.formatDate(jobData.posted_date);
+
+			if (jobData.salary_range) {
+				document.getElementById('salaryRange').textContent = jobData.salary_range;
+				document.getElementById('salaryContainer').classList.remove('hidden');
+				document.getElementById('salaryContainer').classList.add('flex');
+			}
+
+			// Logo
+			const logoContainer = document.getElementById('jobLogoContainer');
+			if (jobData.company_logo) {
+				logoContainer.innerHTML = `<img src="${jobData.company_logo}" alt="${jobData.company_name}" class="w-full h-full object-cover rounded-xl">`;
+			} else {
+				logoContainer.innerHTML = `<span>${jobData.company_name.charAt(0)}</span>`;
+			}
+
+			// Buttons
+			const btnContainer = document.getElementById('actionButtons');
+			if (jobData.is_external_listing) {
+				btnContainer.innerHTML = `
+                    <a href="${jobData.source_url || '#'}" target="_blank" class="px-8 py-3 rounded-xl btn-primary font-bold shadow-lg shadow-violet-500/20 inline-flex items-center gap-2">
+                        Apply on External Site <i class="ri-external-link-line"></i>
+                    </a>
+                `;
+			} else if (hasApplied) {
+				btnContainer.innerHTML = `
+                    <button disabled class="px-8 py-3 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/20 cursor-not-allowed flex items-center gap-2">
+                        <i class="ri-check-line"></i> Applied
+                    </button>
+                `;
+			} else {
+				btnContainer.innerHTML = `
+                    <button onclick="openApplicationModal()" class="px-8 py-3 rounded-xl btn-primary font-bold shadow-lg shadow-violet-500/20 hover:scale-105 transition-transform">
+                        Apply Now
+                    </button>
+                `;
+			}
+
+			// Content
+			document.getElementById('jobDescription').innerHTML = jobData.description || '<p class="italic">No description available.</p>';
+			document.getElementById('jobRequirements').innerHTML = jobData.requirements || '<p class="italic">No specific requirements listed.</p>';
+
+			// Sidebar
+			document.getElementById('experienceRequired').textContent = jobData.experience_required || 'Not specified';
+			document.getElementById('deadline').textContent = jobData.application_deadline ? NetworkxUtils.formatDate(jobData.application_deadline) : 'Open until filled';
+			document.getElementById('jobStatus').textContent = jobData.status;
+		};
+
+		// Modal Logic
+		window.openApplicationModal = () => {
+			const modal = document.getElementById('applicationModal');
+			const content = document.getElementById('modalContent');
+			modal.classList.remove('hidden');
+			// Small delay for animation
+			setTimeout(() => {
+				content.classList.remove('scale-95', 'opacity-0');
+				content.classList.add('scale-100', 'opacity-100');
+			}, 10);
+		};
+
+		window.closeApplicationModal = () => {
+			const modal = document.getElementById('applicationModal');
+			const content = document.getElementById('modalContent');
+			content.classList.remove('scale-100', 'opacity-100');
+			content.classList.add('scale-95', 'opacity-0');
+			setTimeout(() => {
+				modal.classList.add('hidden');
+				document.getElementById('applicationForm').reset();
+			}, 200);
+		};
+
+		// Submit Application
+		document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const btn = e.target.querySelector('button[type="submit"]');
+			const originalText = btn.innerHTML;
+			const coverLetter = document.getElementById('coverLetter').value;
+
+			btn.disabled = true;
+			btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Submitting...';
+
+			try {
+				await NetworkxAPI.applyForJob(jobId, coverLetter);
+
+				// Show success (simple alert for now, could be toast)
+				alert('Application submitted successfully!');
+
+				hasApplied = true;
+				renderJobDetails(); // Update button state
+				closeApplicationModal();
+			} catch (error) {
+				console.error('Error applying:', error);
+				alert('Failed to submit application. Please try again.');
+			} finally {
+				btn.disabled = false;
+				btn.innerHTML = originalText;
+			}
+		});
+
+		// Close on outside click
+		document.getElementById('applicationModal').addEventListener('click', (e) => {
+			if (e.target.id === 'applicationModal') closeApplicationModal();
+		});
+
+		// Init
+		document.addEventListener('DOMContentLoaded', loadJobDetails);
+	</script>
+</body>
+
+</html>
