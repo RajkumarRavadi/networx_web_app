@@ -5,6 +5,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Edit Profile - NETWORX</title>
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx.css">
+	<script>
+		window.tailwind = {
+			config: {
+				corePlugins: {
+					preflight: false
+				}
+			}
+		};
+	</script>
+	<script src="https://cdn.tailwindcss.com"></script>
 	<style>
 		.edit-layout {
 			max-width: 1100px;
@@ -363,6 +373,61 @@
 					
 					<!-- Right column: contact & quick summary -->
 					<div>
+						<!-- Public portfolio sharing -->
+						<div class="card" style="margin-bottom: 1.5rem;">
+							<div class="section-header">
+								<div>
+									<div class="section-title">Public Portfolio Link</div>
+									<div class="section-subtitle">Share your profile with recruiters using a unique URL.</div>
+								</div>
+							</div>
+							<div class="flex flex-col gap-4">
+								<label class="inline-flex items-center gap-3 text-sm font-medium text-slate-700">
+									<input type="checkbox" id="isPublic" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" tabindex="0" aria-label="Toggle public portfolio visibility" />
+									<span>Make my profile public</span>
+								</label>
+								<p id="shareInfoText" class="text-xs text-slate-500">Private — only you can view this profile.</p>
+								<div id="publicShareFields" class="hidden flex flex-col gap-4">
+									<div class="flex flex-col gap-2">
+										<label for="publicSlug" class="text-sm font-medium text-slate-700">Public link slug</label>
+										<input
+											type="text"
+											id="publicSlug"
+											name="publicSlug"
+											class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+											placeholder="e.g., jessica-ramirez"
+											autocomplete="off"
+											inputmode="text"
+											maxlength="60"
+											aria-label="Public link slug"
+											disabled />
+										<p class="text-xs text-slate-500">Lowercase letters, numbers, and hyphens only.</p>
+									</div>
+									<div class="flex flex-col gap-2">
+										<label for="shareableLink" class="text-sm font-medium text-slate-700">Shareable link</label>
+										<input
+											type="text"
+											id="shareableLink"
+											class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-sm bg-slate-50 text-slate-600"
+											readonly
+											aria-label="Shareable profile link" />
+										<button
+											type="button"
+											id="copyShareUrlBtn"
+											class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition"
+											aria-label="Copy link"
+											tabindex="0">
+											<span>Copy link</span>
+											<svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none">
+												<path d="M15 8h1a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												<path d="M9 16H8a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<!-- Contact info -->
 						<div class="card" style="margin-bottom: 1.5rem;">
 							<div class="section-header">
@@ -528,6 +593,109 @@
 		NetworkxUtils.setPageTitle('Edit Profile');
 		
 		let currentProfile = null;
+		const isPublicToggle = document.getElementById('isPublic');
+		const publicSlugInput = document.getElementById('publicSlug');
+		const publicShareFields = document.getElementById('publicShareFields');
+		const shareableLinkInput = document.getElementById('shareableLink');
+		const copyShareUrlBtn = document.getElementById('copyShareUrlBtn');
+		const shareInfoText = document.getElementById('shareInfoText');
+
+		const sanitizeSlug = (value = '') => {
+			return value
+				.toLowerCase()
+				.replace(/[^a-z0-9]+/g, '-')
+				.replace(/-+/g, '-')
+				.replace(/^-|-$/g, '');
+		};
+
+		const generateSlugFromName = () => {
+			const fullNameField = document.getElementById('fullName');
+			const fullNameValue = fullNameField ? fullNameField.value.trim() : '';
+			const fallback = currentProfile?.full_name || currentProfile?.user || 'profile';
+			return sanitizeSlug(fullNameValue || fallback) || `profile-${Date.now().toString(36).slice(-4)}`;
+		};
+
+		const setShareInfo = (message, variant = 'muted') => {
+			if (!shareInfoText) return;
+			const palette = {
+				muted: 'text-slate-500',
+				success: 'text-emerald-600',
+				danger: 'text-red-500'
+			};
+			shareInfoText.className = `text-xs ${palette[variant] || palette.muted}`;
+			shareInfoText.textContent = message;
+		};
+
+		const updateSharePreview = () => {
+			if (!publicSlugInput || !shareableLinkInput) return '';
+			const slug = sanitizeSlug(publicSlugInput.value.trim());
+			publicSlugInput.value = slug;
+			const link = slug ? `${window.location.origin}/profiles/${slug}` : '';
+			shareableLinkInput.value = link;
+			return link;
+		};
+
+		const togglePublicFields = () => {
+			if (!isPublicToggle || !publicSlugInput || !publicShareFields) return;
+			if (isPublicToggle.checked) {
+				publicShareFields.classList.remove('hidden');
+				publicSlugInput.disabled = false;
+				if (!publicSlugInput.value.trim()) {
+					publicSlugInput.value = generateSlugFromName();
+					publicSlugInput.dataset.userEdited = '';
+				}
+				updateSharePreview();
+				setShareInfo('Public — share the link with anyone.', 'success');
+			} else {
+				publicShareFields.classList.add('hidden');
+				publicSlugInput.disabled = true;
+				publicSlugInput.value = '';
+				if (shareableLinkInput) {
+					shareableLinkInput.value = '';
+				}
+				setShareInfo('Private — only you can view this profile.', 'muted');
+			}
+		};
+
+		const handleShareCopy = async () => {
+			const link = updateSharePreview();
+			if (!link) {
+				setShareInfo('Enable the public link to copy it.', 'danger');
+				return;
+			}
+			try {
+				await navigator.clipboard.writeText(link);
+				setShareInfo('Link copied successfully!', 'success');
+				setTimeout(() => setShareInfo('Public — share the link with anyone.', 'success'), 2000);
+			} catch (error) {
+				console.error('Unable to copy link', error);
+				setShareInfo('Copy failed. Please copy the link manually.', 'danger');
+			}
+		};
+
+		if (isPublicToggle) {
+			isPublicToggle.addEventListener('change', () => {
+				togglePublicFields();
+			});
+		}
+
+		if (publicSlugInput) {
+			publicSlugInput.addEventListener('input', () => {
+				publicSlugInput.value = sanitizeSlug(publicSlugInput.value);
+				publicSlugInput.dataset.userEdited = publicSlugInput.value ? '1' : '';
+				updateSharePreview();
+			});
+		}
+
+		if (copyShareUrlBtn) {
+			copyShareUrlBtn.addEventListener('click', handleShareCopy);
+			copyShareUrlBtn.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					handleShareCopy();
+				}
+			});
+		}
 		
 		// Logout handler
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
@@ -904,6 +1072,15 @@
 			document.getElementById('profileUrl').value = profile.profile_url || '';
 			document.getElementById('profileImage').value = profile.profile_image || '';
 			document.getElementById('profileSummary').value = profile.profile_summary || '';
+			if (isPublicToggle) {
+				isPublicToggle.checked = Boolean(Number(profile.is_public));
+			}
+			if (publicSlugInput) {
+				publicSlugInput.value = profile.public_slug || '';
+				publicSlugInput.dataset.userEdited = publicSlugInput.value ? '1' : '';
+			}
+			togglePublicFields();
+			updateSharePreview();
 
 			const contactList = document.getElementById('contactList');
 			const experienceList = document.getElementById('experienceList');
@@ -1119,10 +1296,29 @@
 		};
 
 		// Update summary on basic inputs change
-		['fullName', 'headline', 'currentLocation'].forEach((id) => {
-			const el = document.getElementById(id);
-			el.addEventListener('input', updateSummary);
+		const fullNameInput = document.getElementById('fullName');
+		const headlineInput = document.getElementById('headline');
+		const locationInput = document.getElementById('currentLocation');
+
+		[fullNameInput, headlineInput, locationInput].forEach((el) => {
+			if (el) {
+				el.addEventListener('input', updateSummary);
+			}
 		});
+
+		if (fullNameInput) {
+			fullNameInput.addEventListener('input', () => {
+				if (
+					isPublicToggle &&
+					isPublicToggle.checked &&
+					publicSlugInput &&
+					!publicSlugInput.dataset.userEdited
+				) {
+					publicSlugInput.value = sanitizeSlug(fullNameInput.value);
+					updateSharePreview();
+				}
+			});
+		}
 
 		// ---- Handle form submission ----
 
@@ -1141,7 +1337,9 @@
 					industry: document.getElementById('industry').value.trim(),
 					profile_url: document.getElementById('profileUrl').value.trim(),
 					profile_image: document.getElementById('profileImage').value.trim(),
-					profile_summary: document.getElementById('profileSummary').value.trim()
+					profile_summary: document.getElementById('profileSummary').value.trim(),
+					is_public: isPublicToggle && isPublicToggle.checked ? 1 : 0,
+					public_slug: publicSlugInput ? publicSlugInput.value.trim() : ''
 				};
 
 				const childData = collectChildRows();

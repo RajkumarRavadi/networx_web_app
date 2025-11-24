@@ -12,6 +12,8 @@
         "headline",
         "current_location",
         "profile_url",
+        "is_public",
+        "public_slug",
         "column_break_1",
         "industry",
         "profile_summary",
@@ -67,6 +69,23 @@
             "fieldtype": "Data",
             "label": "Profile URL",
             "options": "URL"
+        },
+        {
+            "default": "0",
+            "fieldname": "is_public",
+            "fieldtype": "Check",
+            "label": "Make Profile Public"
+        },
+        {
+            "depends_on": "eval:doc.is_public",
+            "description": "Unique slug used to build your public link (e.g. profiles/jane-doe)",
+            "fieldname": "public_slug",
+            "fieldtype": "Data",
+            "label": "Public Link Slug",
+            "mandatory_depends_on": "eval:doc.is_public",
+            "read_only_depends_on": "eval:!doc.is_public",
+            "reqd": 0,
+            "unique": 1
         },
         {
             "fieldname": "column_break_1",

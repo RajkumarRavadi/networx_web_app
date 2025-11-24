@@ -69,6 +69,9 @@ app_license = "mit"
 
 # automatically create page for each record of this doctype
 # website_generators = ["Web Page"]
+website_route_rules = [
+	{"from_route": "/profiles/<slug>", "to_route": "public_profile"},
+]
 
 # Jinja
 # ----------

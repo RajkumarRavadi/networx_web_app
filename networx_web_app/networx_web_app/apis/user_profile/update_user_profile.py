@@ -1,5 +1,7 @@
-import frappe
 import json
+
+import frappe
+from frappe.utils import cint
 
 
 @frappe.whitelist()
@@ -64,11 +66,15 @@ def update_user_profile(data=None, user=None):
         "profile_url",
         "industry",
         "profile_summary",
+        "public_slug",
     ]
 
     for field in main_fields:
         if field in data:
             profile.set(field, data[field])
+
+    if "is_public" in data:
+        profile.is_public = cint(data.get("is_public"))
 
     # Helper to clean child row dictionaries
     def clean_child_row(row):

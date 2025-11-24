@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ page_title }}</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<script>
+		window.tailwind = {
+			config: {
+				corePlugins: {
+					preflight: false
+				}
+			}
+		};
+	</script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body {
+			font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		}
+	</style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+	<div class="min-h-screen flex flex-col">
+		<header class="bg-white/90 backdrop-blur border-b border-slate-200">
+			<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between gap-4">
+				<a href="/" class="text-2xl font-semibold tracking-tight text-slate-900" aria-label="Go to Networx home">
+					NETWORX
+				</a>
+				<nav class="flex items-center gap-3 text-sm font-medium">
+					<a href="/jobs" class="px-3 py-2 rounded-full border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition" aria-label="Browse jobs">
+						Browse Jobs
+					</a>
+					<a href="/login" class="px-4 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition" aria-label="Sign in to Networx">
+						Sign in
+					</a>
+				</nav>
+			</div>
+		</header>
+
+		<main class="flex-1">
+			<section class="bg-gradient-to-b from-white to-slate-50">
+				<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+					<div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 sm:p-8 flex flex-col gap-6 md:flex-row md:items-center">
+						<div class="flex items-center gap-6 flex-1">
+							{% if profile.profile_image %}
+								<img src="{{ profile.profile_image }}" alt="{{ profile.full_name }} profile picture" class="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-slate-100" loading="lazy" />
+							{% else %}
+								<div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-100 flex items-center justify-center text-3xl font-semibold text-slate-500 border-4 border-slate-50" role="img" aria-label="Profile initials">
+									{{ (profile.full_name or profile.user)[0] }}
+								</div>
+							{% endif %}
+							<div class="space-y-2">
+								<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Portfolio</p>
+								<h1 class="text-3xl md:text-4xl font-semibold text-slate-900 leading-tight">{{ profile.full_name }}</h1>
+								{% if profile.headline %}
+									<p class="text-lg text-slate-600">{{ profile.headline }}</p>
+								{% endif %}
+								<div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+									{% if profile.industry %}
+										<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+											<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+											{{ profile.industry }}
+										</span>
+									{% endif %}
+									{% if profile.current_location %}
+										<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+											<svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none">
+												<path d="M12 12.75a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.5" />
+												<path d="M19.5 9.75c0 7.5-7.5 12-7.5 12s-7.5-4.5-7.5-12a7.5 7.5 0 1 1 15 0Z" stroke="currentColor" stroke-width="1.5" />
+											</svg>
+											{{ profile.current_location }}
+										</span>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<div class="flex flex-col gap-3 w-full md:w-auto">
+							{% if primary_contact %}
+								<a href="{% if 'mail' in primary_contact.contact_type|lower %}mailto:{{ primary_contact.contact_value }}{% else %}{{ primary_contact.contact_value }}{% endif %}"
+									class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition"
+									aria-label="Contact {{ profile.full_name }}"
+									tabindex="0">
+									<span>Contact</span>
+									<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+										<path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</a>
+							{% endif %}
+							<button
+								type="button"
+								id="copyShareLinkBtn"
+								data-share-url="{{ full_share_url }}"
+								class="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition"
+								aria-label="Copy shareable link"
+								tabindex="0">
+								<svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none">
+									<path d="M15 8h1a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+									<path d="M9 16H8a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+								<span id="shareLinkText">Copy link</span>
+							</button>
+							<p class="text-xs text-slate-500 text-center" id="shareFeedback" role="status"></p>
+						</div>
+					</div>
+
+					{% if profile.profile_summary %}
+						<section class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 sm:p-8 space-y-4">
+							<div class="text-sm font-semibold uppercase tracking-wider text-slate-500">About</div>
+							<div class="prose max-w-none text-slate-600 leading-relaxed" tabindex="0" aria-label="Profile summary">
+								{{ profile.profile_summary | safe }}
+							</div>
+						</section>
+					{% endif %}
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+						{% if profile.experience %}
+							<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Experience</p>
+										<h2 class="text-xl font-semibold text-slate-900">Professional Journey</h2>
+									</div>
+								</div>
+								<div class="space-y-5">
+									{% for job in profile.experience %}
+										<article class="rounded-2xl border border-slate-100 p-4 bg-slate-50/80" tabindex="0" aria-label="Experience item">
+											<p class="text-base font-semibold text-slate-900">{{ job.title }}</p>
+											<p class="text-sm text-slate-600">{{ job.company_name }} · {{ job.employment_type or 'Role' }}</p>
+											<p class="text-xs uppercase tracking-wider text-slate-400 mt-1">{{ job.start_date or 'Start' }} — {{ job.end_date or 'Present' }}</p>
+											{% if job.location %}
+												<p class="text-sm text-slate-500 mt-1">{{ job.location }}</p>
+											{% endif %}
+											{% if job.description %}
+												<p class="text-sm text-slate-600 mt-3 leading-relaxed">{{ job.description }}</p>
+											{% endif %}
+										</article>
+									{% endfor %}
+								</div>
+							</section>
+						{% endif %}
+
+						{% if profile.education %}
+							<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+								<div>
+									<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Education</p>
+									<h2 class="text-xl font-semibold text-slate-900">Academic Background</h2>
+								</div>
+								<div class="space-y-5">
+									{% for edu in profile.education %}
+										<article class="rounded-2xl border border-slate-100 p-4" tabindex="0" aria-label="Education item">
+											<p class="text-base font-semibold text-slate-900">{{ edu.institution_name }}</p>
+											<p class="text-sm text-slate-600">{{ edu.degree }} · {{ edu.field_of_study }}</p>
+											<p class="text-xs uppercase tracking-wider text-slate-400 mt-1">{{ edu.start_year or '?' }} — {{ edu.end_year or 'Present' }}</p>
+											{% if edu.grade %}
+												<p class="text-sm text-slate-500 mt-1">Grade: {{ edu.grade }}</p>
+											{% endif %}
+											{% if edu.description %}
+												<p class="text-sm text-slate-600 mt-3 leading-relaxed">{{ edu.description }}</p>
+											{% endif %}
+										</article>
+									{% endfor %}
+								</div>
+							</section>
+						{% endif %}
+					</div>
+
+					{% if profile.skills %}
+						<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7">
+							<div class="flex items-center justify-between flex-wrap gap-2">
+								<div>
+									<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Skills</p>
+									<h2 class="text-xl font-semibold text-slate-900">Areas of Expertise</h2>
+								</div>
+							</div>
+							<div class="mt-4 flex flex-wrap gap-3">
+								{% for skill in profile.skills %}
+									<span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 text-sm text-slate-700" tabindex="0" aria-label="Skill badge">
+										{{ skill.skill_name }}
+										{% if skill.endorsement_count %}
+											<span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{{ skill.endorsement_count }} endorsements</span>
+										{% endif %}
+									</span>
+								{% endfor %}
+							</div>
+						</section>
+					{% endif %}
+
+					{% if profile.certifications %}
+						<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+							<div>
+								<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Certifications</p>
+								<h2 class="text-xl font-semibold text-slate-900">Licenses & Credentials</h2>
+							</div>
+							<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+								{% for cert in profile.certifications %}
+									<article class="rounded-2xl border border-slate-100 p-4 bg-slate-50/60" tabindex="0" aria-label="Certification item">
+										<p class="text-base font-semibold text-slate-900">{{ cert.certification_name }}</p>
+										<p class="text-sm text-slate-600">{{ cert.issuing_organization }}</p>
+										<p class="text-xs uppercase tracking-wider text-slate-400 mt-1">{{ cert.issue_date or '?' }}{% if cert.expiration_date %} · Expires {{ cert.expiration_date }}{% endif %}</p>
+										{% if cert.credential_id %}
+											<p class="text-xs text-slate-500 mt-1">Credential ID: {{ cert.credential_id }}</p>
+										{% endif %}
+										{% if cert.credential_url %}
+											<a href="{{ cert.credential_url }}" class="mt-2 inline-flex items-center gap-1 text-sm text-slate-700 hover:text-slate-900" target="_blank" rel="noopener" aria-label="Open credential link">
+												View credential
+												<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+													<path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												</svg>
+											</a>
+										{% endif %}
+									</article>
+								{% endfor %}
+							</div>
+						</section>
+					{% endif %}
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+						{% if profile.volunteer_experience %}
+							<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+								<div>
+									<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Volunteer</p>
+									<h2 class="text-xl font-semibold text-slate-900">Community Impact</h2>
+								</div>
+								<div class="space-y-4">
+									{% for vol in profile.volunteer_experience %}
+										<article class="rounded-2xl border border-slate-100 p-4" tabindex="0" aria-label="Volunteer experience">
+											<p class="text-base font-semibold text-slate-900">{{ vol.role }} · {{ vol.organization }}</p>
+											<p class="text-sm text-slate-600">{{ vol.cause }}</p>
+											<p class="text-xs uppercase tracking-wider text-slate-400 mt-1">{{ vol.start_date or '?' }} — {{ vol.end_date or 'Present' }}</p>
+											{% if vol.description %}
+												<p class="text-sm text-slate-600 mt-2 leading-relaxed">{{ vol.description }}</p>
+											{% endif %}
+										</article>
+									{% endfor %}
+								</div>
+							</section>
+						{% endif %}
+
+						{% if profile.awards %}
+							<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+								<div>
+									<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Honors</p>
+									<h2 class="text-xl font-semibold text-slate-900">Awards</h2>
+								</div>
+								<div class="space-y-4">
+									{% for award in profile.awards %}
+										<article class="rounded-2xl border border-slate-100 p-4" tabindex="0" aria-label="Award item">
+											<p class="text-base font-semibold text-slate-900">{{ award.title }}</p>
+											<p class="text-sm text-slate-600">{{ award.issuer }}</p>
+											<p class="text-xs uppercase tracking-wider text-slate-400 mt-1">{{ award.issue_date or 'Year' }}</p>
+											{% if award.description %}
+												<p class="text-sm text-slate-600 mt-2 leading-relaxed">{{ award.description }}</p>
+											{% endif %}
+										</article>
+									{% endfor %}
+								</div>
+							</section>
+						{% endif %}
+					</div>
+
+					{% if profile.contact_info_details %}
+						<section class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 space-y-4">
+							<div>
+								<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Contact</p>
+								<h2 class="text-xl font-semibold text-slate-900">Connect with {{ profile.full_name }}</h2>
+							</div>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								{% for contact in profile.contact_info_details %}
+									<div class="rounded-2xl border border-slate-100 p-4 bg-slate-50/60" tabindex="0" aria-label="Contact method">
+										<p class="text-xs uppercase tracking-wider text-slate-400">{{ contact.contact_type }}</p>
+										<p class="text-sm font-medium text-slate-800 break-words mt-1">{{ contact.contact_value }}</p>
+									</div>
+								{% endfor %}
+							</div>
+						</section>
+					{% endif %}
+				</div>
+			</section>
+		</main>
+
+		<footer class="bg-slate-900 text-white">
+			<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between gap-3 text-sm text-slate-300">
+				<p>© {{ frappe.utils.now_datetime().year }} Networx</p>
+				<p>Profile link: {{ full_share_url }}</p>
+			</div>
+		</footer>
+	</div>
+
+	<script>
+		const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+		const shareFeedbackEl = document.getElementById('shareFeedback');
+		const shareLinkTextEl = document.getElementById('shareLinkText');
+
+		const handleCopyShareLink = async () => {
+			if (!copyShareLinkBtn) return;
+			const url = copyShareLinkBtn.dataset.shareUrl;
+			try {
+				await navigator.clipboard.writeText(url);
+				shareLinkTextEl.textContent = 'Link copied';
+				shareFeedbackEl.textContent = 'Anyone with the link can view this profile.';
+				shareFeedbackEl.className = 'text-xs text-emerald-600 text-center';
+				setTimeout(() => {
+					shareLinkTextEl.textContent = 'Copy link';
+					shareFeedbackEl.textContent = '';
+				}, 2400);
+			} catch (error) {
+				console.error('Failed to copy profile link', error);
+				shareFeedbackEl.textContent = 'Unable to copy link. Please copy manually.';
+				shareFeedbackEl.className = 'text-xs text-red-500 text-center';
+			}
+		};
+
+		if (copyShareLinkBtn) {
+			copyShareLinkBtn.addEventListener('click', handleCopyShareLink);
+			copyShareLinkBtn.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					handleCopyShareLink();
+				}
+			});
+		}
+	</script>
+</body>
+</html>
+
