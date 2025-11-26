@@ -15,6 +15,18 @@
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
 
+	<script>
+		(function () {
+			const savedTheme = localStorage.getItem('networx-theme');
+			const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+				document.documentElement.setAttribute('data-theme', 'dark');
+			} else {
+				document.documentElement.setAttribute('data-theme', 'light');
+			}
+		})();
+	</script>
+
 	<!-- CSRF Token -->
 	{% if csrf_token %}
 	<meta name="csrf-token" content="{{ csrf_token }}">
@@ -77,6 +89,7 @@
 			.quote-background {
 				padding-right: 1rem;
 			}
+
 			.quote-item {
 				font-size: 1.2rem;
 				max-width: 60%;
@@ -89,11 +102,26 @@
 			.quote-item {
 				font-size: 0.9rem;
 			}
-			.quote-item:nth-child(1) { font-size: 0.8rem; }
-			.quote-item:nth-child(2) { font-size: 0.9rem; }
-			.quote-item:nth-child(3) { font-size: 0.85rem; }
-			.quote-item:nth-child(4) { font-size: 0.75rem; }
-			.quote-item:nth-child(5) { font-size: 1rem; }
+
+			.quote-item:nth-child(1) {
+				font-size: 0.8rem;
+			}
+
+			.quote-item:nth-child(2) {
+				font-size: 0.9rem;
+			}
+
+			.quote-item:nth-child(3) {
+				font-size: 0.85rem;
+			}
+
+			.quote-item:nth-child(4) {
+				font-size: 0.75rem;
+			}
+
+			.quote-item:nth-child(5) {
+				font-size: 1rem;
+			}
 		}
 
 		/* Quill Editor Dark Mode Fixes */
@@ -171,31 +199,34 @@
 							<div class="flex-1">
 								<!-- View Mode -->
 								<div id="headerView">
-								<h1 class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="profileName">
-									Loading...</h1>
-								<p class="text-lg mb-4" style="color: var(--text-muted);" id="profileHeadline">
-									Loading...</p>
+									<h1 class="text-3xl font-bold mb-1" style="color: var(--text-main);"
+										id="profileName">
+										Loading...</h1>
+									<p class="text-lg mb-4" style="color: var(--text-muted);" id="profileHeadline">
+										Loading...</p>
 
-								<div class="flex flex-wrap gap-4 text-sm" style="color: var(--text-muted);">
-									<span class="flex items-center gap-1"><i class="ri-map-pin-line"></i> <span
-											id="profileLocation">Location</span></span>
-									<span class="flex items-center gap-1"><i class="ri-building-line"></i> <span
-											id="profileCollege">College</span></span>
-									<span class="flex items-center gap-1"><i class="ri-calendar-line"></i> Class of
-										<span id="profileGradYear">Year</span></span>
+									<div class="flex flex-wrap gap-4 text-sm" style="color: var(--text-muted);">
+										<span class="flex items-center gap-1"><i class="ri-map-pin-line"></i> <span
+												id="profileLocation">Location</span></span>
+										<span class="flex items-center gap-1"><i class="ri-building-line"></i> <span
+												id="profileCollege">College</span></span>
+										<span class="flex items-center gap-1"><i class="ri-calendar-line"></i> Class of
+											<span id="profileGradYear">Year</span></span>
 									</div>
 								</div>
 
 								<!-- Edit Mode -->
 								<div id="headerEdit" class="hidden space-y-3">
-									<input type="text" id="editFullName" class="w-full p-2 rounded-lg form-input text-3xl font-bold"
+									<input type="text" id="editFullName"
+										class="w-full p-2 rounded-lg form-input text-3xl font-bold"
 										placeholder="Full Name">
-									<input type="text" id="editHeadline" class="w-full p-2 rounded-lg form-input text-lg"
-										placeholder="Headline">
+									<input type="text" id="editHeadline"
+										class="w-full p-2 rounded-lg form-input text-lg" placeholder="Headline">
 									<input type="text" id="editLocation" class="w-full p-2 rounded-lg form-input"
 										placeholder="Current Location">
 									<div class="flex gap-2 mt-2">
-										<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm"
+										<button
+											class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm"
 											onclick="saveHeader()">Save</button>
 										<button class="px-4 py-2 rounded-lg border hover:bg-white/5 text-sm"
 											style="border-color: var(--border-color); color: var(--text-main);"
@@ -338,7 +369,8 @@
 								<div id="contactItemsEdit" class="space-y-3 mb-4">
 									<!-- Contact items will be added here -->
 								</div>
-								<button class="w-full py-2 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
+								<button
+									class="w-full py-2 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
 									style="border-color: var(--text-muted); color: var(--text-muted);"
 									onclick="addContactItem()">
 									+ Add Contact Info
@@ -404,7 +436,8 @@
 				<div>
 					<p class="text-sm uppercase tracking-wider text-purple-300 font-semibold">Share Portfolio</p>
 					<h3 class="text-2xl font-semibold mt-1">Control who can view your public profile</h3>
-					<p class="text-sm text-white/70 mt-1">Turn on the public link, customize your slug, and send the link
+					<p class="text-sm text-white/70 mt-1">Turn on the public link, customize your slug, and send the
+						link
 						to recruiters in seconds.</p>
 				</div>
 
@@ -427,10 +460,12 @@
 					<div>
 						<label for="shareSlugInput" class="text-sm font-medium text-white/80">Public slug</label>
 						<div class="mt-2 flex items-center gap-3">
-							<div class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-2">
+							<div
+								class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-2">
 								<span class="text-white/60 text-sm">profiles/</span>
-								<input type="text" id="shareSlugInput" class="bg-transparent flex-1 outline-none text-white"
-									placeholder="your-name" maxlength="60" aria-label="Public slug">
+								<input type="text" id="shareSlugInput"
+									class="bg-transparent flex-1 outline-none text-white" placeholder="your-name"
+									maxlength="60" aria-label="Public slug">
 							</div>
 							<button type="button" id="regenerateSlugBtn"
 								class="px-3 py-2 rounded-xl border border-white/10 text-sm text-white/80 hover:bg-white/10 transition">
@@ -478,7 +513,7 @@
 			if (window.frappe && window.frappe.csrf_token) {
 				return window.frappe.csrf_token;
 			}
-			
+
 			// Try meta tag
 			const metaTag = document.querySelector('meta[name="csrf-token"]');
 			if (metaTag) {
@@ -489,7 +524,7 @@
 					return token;
 				}
 			}
-			
+
 			// Try to get from cookies (Frappe stores it in session)
 			const cookies = document.cookie.split(';');
 			for (let cookie of cookies) {
@@ -501,7 +536,7 @@
 					return token;
 				}
 			}
-			
+
 			console.warn('CSRF token not found');
 			return null;
 		};
@@ -513,8 +548,8 @@
 			call: function (opts) {
 				// Determine if this is a write operation (update, create, delete)
 				const isWriteOperation = opts.method && (
-					opts.method.includes('update') || 
-					opts.method.includes('create') || 
+					opts.method.includes('update') ||
+					opts.method.includes('create') ||
 					opts.method.includes('delete') ||
 					opts.method.includes('insert') ||
 					opts.method.includes('save')
@@ -540,19 +575,19 @@
 							}
 						}
 					}
-					
+
 					const url = '/api/method/' + opts.method;
 					console.log('POST request to:', url);
 					console.log('POST data:', Array.from(params.entries()));
-					
+
 					// Get CSRF token
 					const csrfToken = getCSRFToken();
-					
-					const headers = { 
+
+					const headers = {
 						'Accept': 'application/json',
 						'Content-Type': 'application/x-www-form-urlencoded'
 					};
-					
+
 					// Add CSRF token if available (required for POST requests)
 					if (csrfToken) {
 						headers['X-Frappe-CSRF-Token'] = csrfToken;
@@ -560,7 +595,7 @@
 					} else {
 						console.error('CSRF token not found - request will fail');
 					}
-					
+
 					return fetch(url, {
 						method: 'POST',
 						body: params,
@@ -607,33 +642,33 @@
 						});
 				} else {
 					// GET request - send data as query parameters
-				const params = new URLSearchParams();
-				if (opts.args) {
-					for (const [key, value] of Object.entries(opts.args)) {
-						if (value === null || value === undefined) continue;
-						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
-						if (value === '') continue;
-						if (typeof value === 'object') {
-							params.append(key, JSON.stringify(value));
-						} else {
-							params.append(key, value);
+					const params = new URLSearchParams();
+					if (opts.args) {
+						for (const [key, value] of Object.entries(opts.args)) {
+							if (value === null || value === undefined) continue;
+							if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+							if (value === '') continue;
+							if (typeof value === 'object') {
+								params.append(key, JSON.stringify(value));
+							} else {
+								params.append(key, value);
+							}
 						}
 					}
-				}
-				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				return fetch(url, {
-					method: 'GET',
-					headers: { 'Accept': 'application/json' },
-					credentials: 'same-origin'
-				})
-					.then(response => {
-						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-						return response.json();
+					const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+					return fetch(url, {
+						method: 'GET',
+						headers: { 'Accept': 'application/json' },
+						credentials: 'same-origin'
 					})
-					.then(data => {
-						if (opts.callback) opts.callback(data);
-						return data;
-					});
+						.then(response => {
+							if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+							return response.json();
+						})
+						.then(data => {
+							if (opts.callback) opts.callback(data);
+							return data;
+						});
 				}
 			}
 		};
@@ -685,29 +720,29 @@
 		// Helper function to convert private file path to accessible URL
 		const getFileUrl = (filePath) => {
 			if (!filePath) return null;
-			
+
 			// If it's already a full URL, return as is
 			if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
 				return filePath;
 			}
-			
+
 			// If it's a private file, use Frappe's file serving endpoint
 			if (filePath.startsWith('/private/files/')) {
 				// Encode the file path for the API
 				const encodedPath = encodeURIComponent(filePath);
 				return `/api/method/frappe.handler.upload_file.get_file?file_url=${encodedPath}`;
 			}
-			
+
 			// If it's a public file, return as is
 			if (filePath.startsWith('/files/')) {
 				return filePath;
 			}
-			
+
 			// If it doesn't start with /, assume it's a filename in /files/
 			if (!filePath.startsWith('/')) {
 				return `/files/${filePath}`;
 			}
-			
+
 			// Default: return as is
 			return filePath;
 		};
@@ -744,18 +779,18 @@
 			// Header
 			document.getElementById('profileName').textContent = profileData.full_name || frappe.session.user_fullname || 'User';
 			document.getElementById('profileHeadline').textContent = profileData.headline || 'Student';
-			
+
 			// Location
 			const location = profileData.current_location || 'Not set';
 			document.getElementById('profileLocation').textContent = location;
-			
+
 			// College - get from education array
 			let college = 'Not set';
 			if (profileData.education && profileData.education.length > 0) {
 				college = profileData.education[0].institution_name || profileData.education[0].school || profileData.education[0].institution || 'Not set';
 			}
 			document.getElementById('profileCollege').textContent = college;
-			
+
 			// Graduation Year - get from education array
 			let gradYear = 'N/A';
 			if (profileData.education && profileData.education.length > 0) {
@@ -766,7 +801,7 @@
 			// Avatar - use profile_image from API response
 			const avatarContainer = document.getElementById('profileAvatarContainer');
 			const profileImage = profileData.profile_image;
-			
+
 			if (profileImage) {
 				const imageUrl = getFileUrl(profileImage);
 				avatarContainer.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover" alt="Profile Image" onerror="this.parentElement.innerHTML='<span style=\\'color: var(--primary);\\'>${(profileData.full_name || 'U').charAt(0).toUpperCase()}</span>'">`;
@@ -778,7 +813,7 @@
 			// Summary - use profile_summary from API response
 			const summary = profileData.profile_summary || '';
 			const summaryElement = document.getElementById('profileSummary');
-			
+
 			if (!summary || summary.trim() === '') {
 				summaryElement.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No summary added yet.</div>';
 			} else {
@@ -789,7 +824,7 @@
 					summaryElement.textContent = summary;
 				}
 			}
-			
+
 			// Set input value for editing
 			const summaryInput = document.getElementById('profileSummaryInput');
 			if (summaryInput) {
@@ -828,7 +863,7 @@
 				const endDate = item.end_date || item.end || (item.is_current ? 'Present' : '');
 				const description = item.description || item.summary || '';
 				const location = item.location || '';
-				
+
 				return `
                 <div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
 						<h3 class="font-bold text-lg" style="color: var(--text-main);">${title}</h3>
@@ -856,7 +891,7 @@
 				const startYear = item.start_year || '';
 				const endYear = item.end_year || '';
 				const grade = item.grade || '';
-				
+
 				return `
 					<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
 						<h3 class="font-bold text-lg" style="color: var(--text-main);">${institution}</h3>
@@ -880,7 +915,7 @@
 			list.innerHTML = items.map(item => {
 				const skillName = item.skill_name || item.name || item.skill || '';
 				if (!skillName) return '';
-				
+
 				return `
 					<span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20">
 						${skillName}
@@ -901,7 +936,7 @@
 			list.innerHTML = contactItems.map(item => {
 				const type = item.contact_type || item.type || '';
 				const value = item.contact_value || item.value || '';
-				
+
 				if (!value) return '';
 
 				let iconClass = '';
@@ -996,7 +1031,7 @@
 		window.editSection = (section) => {
 			const sectionElement = document.getElementById(`${section}Section`);
 			if (!sectionElement) return;
-			
+
 			sectionElement.querySelector('.view-content').classList.add('hidden');
 			const editForm = document.getElementById(`${section}Edit`);
 			if (editForm) {
@@ -1009,7 +1044,7 @@
 		window.cancelEdit = (section) => {
 			const sectionElement = document.getElementById(`${section}Section`);
 			if (!sectionElement) return;
-			
+
 			sectionElement.querySelector('.view-content').classList.remove('hidden');
 			const editForm = document.getElementById(`${section}Edit`);
 			if (editForm) {
@@ -1034,7 +1069,7 @@
 		const renderExperienceEdit = () => {
 			const container = document.getElementById('experienceItemsEdit');
 			const items = profileData.experience || [];
-			
+
 			container.innerHTML = items.map((item, index) => `
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
@@ -1081,7 +1116,7 @@
 		const renderEducationEdit = () => {
 			const container = document.getElementById('educationItemsEdit');
 			const items = profileData.education || [];
-			
+
 			container.innerHTML = items.map((item, index) => `
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
@@ -1119,7 +1154,7 @@
 		const renderSkillsEdit = () => {
 			const container = document.getElementById('skillsItemsEdit');
 			const items = profileData.skills || [];
-			
+
 			container.innerHTML = items.map((item, index) => `
 				<div class="flex items-center gap-2 p-2 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<input type="text" class="flex-1 p-2 rounded form-input" placeholder="Skill Name" 
@@ -1135,11 +1170,11 @@
 		const renderContactEdit = () => {
 			const container = document.getElementById('contactItemsEdit');
 			const items = profileData.contact_info_details || [];
-			
+
 			container.innerHTML = items.map((item, index) => {
 				const contactType = item.contact_type || item.type || '';
 				const contactValue = item.contact_value || item.value || '';
-				
+
 				return `
 				<div class="p-3 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-2">
@@ -1326,7 +1361,7 @@
 			try {
 				let updateData = {};
 
-			if (section === 'profileSummary') {
+				if (section === 'profileSummary') {
 					const summaryValue = document.getElementById('profileSummaryInput').value.trim();
 					updateData.profile_summary = summaryValue || ''; // Allow empty strings
 					console.log('Saving profile summary:', updateData);
@@ -1353,7 +1388,7 @@
 						item.querySelectorAll('[data-field]').forEach(input => {
 							const field = input.getAttribute('data-field');
 							let value = input.value.trim();
-							
+
 							// Convert numeric fields to integers
 							if (field === 'start_year' || field === 'end_year') {
 								value = value ? parseInt(value, 10) : null;
@@ -1364,13 +1399,13 @@
 								fields[field] = value;
 							}
 						});
-						
+
 						// Ensure institution_name is present (required field)
 						if (!fields.institution_name) {
 							console.warn('Education item missing required institution_name');
 							return null;
 						}
-						
+
 						return fields;
 					}).filter(item => item !== null && Object.keys(item).length > 0);
 					updateData.education = items;
@@ -1381,7 +1416,7 @@
 						return skillName ? { skill_name: skillName } : null;
 					}).filter(item => item !== null);
 					updateData.skills = items;
-			} else if (section === 'contact') {
+				} else if (section === 'contact') {
 					const container = document.getElementById('contactItemsEdit');
 					const items = Array.from(container.children).map(item => {
 						const fields = {};
@@ -1390,13 +1425,13 @@
 							const value = input.value.trim();
 							if (value) fields[field] = value;
 						});
-						
+
 						// Ensure required fields are present
 						if (!fields.contact_type || !fields.contact_value) {
 							console.warn('Contact item missing required fields');
 							return null;
 						}
-						
+
 						return fields;
 					}).filter(item => item !== null && Object.keys(item).length > 0);
 					updateData.contact_info_details = items;

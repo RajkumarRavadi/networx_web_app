@@ -14,6 +14,18 @@
 
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+
+	<script>
+		(function () {
+			const savedTheme = localStorage.getItem('networx-theme');
+			const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+				document.documentElement.setAttribute('data-theme', 'dark');
+			} else {
+				document.documentElement.setAttribute('data-theme', 'light');
+			}
+		})();
+	</script>
 </head>
 
 <body class="flex h-screen overflow-hidden">
