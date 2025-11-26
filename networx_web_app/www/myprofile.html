@@ -346,6 +346,97 @@
 							</div>
 						</div>
 
+						<!-- Volunteer Experience -->
+						<div class="glass-panel rounded-2xl p-6" id="volunteerSection">
+							<div class="flex justify-between items-center mb-6">
+								<h2 class="text-xl font-bold" style="color: var(--text-main);">Volunteer Experience</h2>
+								<button class="text-sm font-medium hover:underline flex items-center gap-1"
+									style="color: var(--primary);" onclick="editSection('volunteer')">
+									<i class="ri-add-line"></i> Add
+								</button>
+							</div>
+
+							<div class="view-content space-y-6" id="volunteerList"></div>
+
+							<div class="edit-form hidden" id="volunteerEdit">
+								<div id="volunteerItemsEdit" class="space-y-4 mb-4"></div>
+								<button
+									class="w-full py-3 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
+									style="border-color: var(--text-muted); color: var(--text-muted);"
+									onclick="addVolunteerItem()">
+									+ Add Volunteer
+								</button>
+								<div class="flex gap-2">
+									<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+										onclick="saveSection('volunteer')">Save</button>
+									<button class="px-4 py-2 rounded-lg border hover:bg-white/5"
+										style="border-color: var(--border-color); color: var(--text-main);"
+										onclick="cancelEdit('volunteer')">Cancel</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Certifications -->
+						<div class="glass-panel rounded-2xl p-6" id="certificationsSection">
+							<div class="flex justify-between items-center mb-6">
+								<h2 class="text-xl font-bold" style="color: var(--text-main);">Licenses & Certifications
+								</h2>
+								<button class="text-sm font-medium hover:underline flex items-center gap-1"
+									style="color: var(--primary);" onclick="editSection('certifications')">
+									<i class="ri-add-line"></i> Add
+								</button>
+							</div>
+
+							<div class="view-content space-y-6" id="certificationsList"></div>
+
+							<div class="edit-form hidden" id="certificationsEdit">
+								<div id="certificationsItemsEdit" class="space-y-4 mb-4"></div>
+								<button
+									class="w-full py-3 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
+									style="border-color: var(--text-muted); color: var(--text-muted);"
+									onclick="addCertificationItem()">
+									+ Add Certification
+								</button>
+								<div class="flex gap-2">
+									<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+										onclick="saveSection('certifications')">Save</button>
+									<button class="px-4 py-2 rounded-lg border hover:bg-white/5"
+										style="border-color: var(--border-color); color: var(--text-main);"
+										onclick="cancelEdit('certifications')">Cancel</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Awards -->
+						<div class="glass-panel rounded-2xl p-6" id="awardsSection">
+							<div class="flex justify-between items-center mb-6">
+								<h2 class="text-xl font-bold" style="color: var(--text-main);">Honors & Awards</h2>
+								<button class="text-sm font-medium hover:underline flex items-center gap-1"
+									style="color: var(--primary);" onclick="editSection('awards')">
+									<i class="ri-add-line"></i> Add
+								</button>
+							</div>
+
+							<div class="view-content space-y-6" id="awardsList"></div>
+
+							<div class="edit-form hidden" id="awardsEdit">
+								<div id="awardsItemsEdit" class="space-y-4 mb-4"></div>
+								<button
+									class="w-full py-3 rounded-lg border border-dashed mb-4 hover:bg-white/5 transition-colors"
+									style="border-color: var(--text-muted); color: var(--text-muted);"
+									onclick="addAwardItem()">
+									+ Add Award
+								</button>
+								<div class="flex gap-2">
+									<button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+										onclick="saveSection('awards')">Save</button>
+									<button class="px-4 py-2 rounded-lg border hover:bg-white/5"
+										style="border-color: var(--border-color); color: var(--text-main);"
+										onclick="cancelEdit('awards')">Cancel</button>
+								</div>
+							</div>
+						</div>
+
 					</div>
 
 					<!-- Right Column -->
@@ -839,6 +930,15 @@
 			// Education
 			renderEducation();
 
+			// Volunteer
+			renderVolunteer();
+
+			// Certifications
+			renderCertifications();
+
+			// Awards
+			renderAwards();
+
 			// Skills
 			renderSkills();
 
@@ -1058,6 +1158,12 @@
 				renderExperienceEdit();
 			} else if (section === 'education') {
 				renderEducationEdit();
+			} else if (section === 'volunteer') {
+				renderVolunteerEdit();
+			} else if (section === 'certifications') {
+				renderCertificationsEdit();
+			} else if (section === 'awards') {
+				renderAwardsEdit();
 			} else if (section === 'skills') {
 				renderSkillsEdit();
 			} else if (section === 'contact') {
@@ -1409,6 +1515,61 @@
 						return fields;
 					}).filter(item => item !== null && Object.keys(item).length > 0);
 					updateData.education = items;
+				} else if (section === 'volunteer') {
+					const container = document.getElementById('volunteerItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							const value = input.value.trim();
+							if (value) fields[field] = value;
+						});
+
+						// Ensure organization is present (required field)
+						if (!fields.organization) {
+							console.warn('Volunteer item missing required organization');
+							return null;
+						}
+
+						return fields;
+					}).filter(item => item !== null && Object.keys(item).length > 0);
+					updateData.volunteer_experience = items;
+				} else if (section === 'certifications') {
+					const container = document.getElementById('certificationsItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							const value = input.value.trim();
+							if (value) fields[field] = value;
+						});
+
+						// Ensure certification_name is present
+						if (!fields.certification_name) {
+							return null;
+						}
+
+						return fields;
+					}).filter(item => item !== null && Object.keys(item).length > 0);
+					updateData.certifications = items;
+				} else if (section === 'awards') {
+					const container = document.getElementById('awardsItemsEdit');
+					const items = Array.from(container.children).map(item => {
+						const fields = {};
+						item.querySelectorAll('[data-field]').forEach(input => {
+							const field = input.getAttribute('data-field');
+							const value = input.value.trim();
+							if (value) fields[field] = value;
+						});
+
+						// Ensure title is present
+						if (!fields.title) {
+							return null;
+						}
+
+						return fields;
+					}).filter(item => item !== null && Object.keys(item).length > 0);
+					updateData.awards = items;
 				} else if (section === 'skills') {
 					const container = document.getElementById('skillsItemsEdit');
 					const items = Array.from(container.children).map(item => {
@@ -1444,6 +1605,301 @@
 				console.error('Error saving:', error);
 				alert('Failed to save changes. Please try again.');
 			}
+		};
+
+		// Render Volunteer
+		const renderVolunteer = () => {
+			const list = document.getElementById('volunteerList');
+			const items = profileData.volunteer_experience || [];
+
+			if (items.length === 0) {
+				list.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No volunteer experience added yet.</div>';
+				return;
+			}
+
+			list.innerHTML = items.map(item => {
+				const organization = item.organization || 'Unknown Organization';
+				const role = item.role || '';
+				const cause = item.cause || '';
+				const startDate = item.start_date || '';
+				const endDate = item.end_date || 'Present';
+				const description = item.description || '';
+
+				return `
+                <div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+						<h3 class="font-bold text-lg" style="color: var(--text-main);">${role}</h3>
+						<div class="text-sm font-medium" style="color: var(--text-main);">${organization}${cause ? ` • ${cause}` : ''}</div>
+						<div class="text-xs mb-2" style="color: var(--text-muted);">${startDate}${endDate ? ` - ${endDate}` : ''}</div>
+						${description ? `<p class="text-sm mt-2" style="color: var(--text-main);">${description}</p>` : ''}
+                </div>
+				`;
+			}).join('');
+		};
+
+		const renderVolunteerEdit = () => {
+			const container = document.getElementById('volunteerItemsEdit');
+			const items = profileData.volunteer_experience || [];
+
+			container.innerHTML = items.map((item, index) => `
+				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-3">
+						<span class="text-sm font-medium" style="color: var(--text-main);">Volunteer ${index + 1}</span>
+						<button onclick="removeVolunteerItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<input type="text" class="p-2 rounded form-input" placeholder="Organization *" 
+							value="${(item.organization || '').replace(/"/g, '&quot;')}" 
+							data-field="organization" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Role" 
+							value="${(item.role || '').replace(/"/g, '&quot;')}" 
+							data-field="role">
+						<input type="text" class="p-2 rounded form-input" placeholder="Cause" 
+							value="${(item.cause || '').replace(/"/g, '&quot;')}" 
+							data-field="cause">
+						<input type="date" class="p-2 rounded form-input" placeholder="Start Date" 
+							value="${item.start_date || ''}" 
+							data-field="start_date">
+						<input type="date" class="p-2 rounded form-input" placeholder="End Date" 
+							value="${item.end_date || ''}" 
+							data-field="end_date">
+					</div>
+					<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description" 
+						data-field="description">${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+				</div>
+			`).join('');
+		};
+
+		// Render Certifications
+		const renderCertifications = () => {
+			const list = document.getElementById('certificationsList');
+			const items = profileData.certifications || [];
+
+			if (items.length === 0) {
+				list.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No certifications added yet.</div>';
+				return;
+			}
+
+			list.innerHTML = items.map(item => {
+				const name = item.certification_name || 'Unknown Certification';
+				const org = item.issuing_organization || '';
+				const issueDate = item.issue_date || '';
+				const expDate = item.expiration_date || '';
+				const credId = item.credential_id || '';
+				const credUrl = item.credential_url || '';
+
+				return `
+				<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+					<h3 class="font-bold text-lg" style="color: var(--text-main);">${name}</h3>
+					<div class="text-sm font-medium" style="color: var(--text-main);">${org}</div>
+					<div class="text-xs mb-2" style="color: var(--text-muted);">Issued ${issueDate}${expDate ? ` • Expires ${expDate}` : ''}</div>
+					${credId ? `<div class="text-xs" style="color: var(--text-muted);">Credential ID: ${credId}</div>` : ''}
+					${credUrl ? `<a href="${credUrl}" target="_blank" class="text-sm mt-2 inline-block hover:underline" style="color: var(--primary);">Show Credential <i class="ri-external-link-line"></i></a>` : ''}
+				</div>
+				`;
+			}).join('');
+		};
+
+		const renderCertificationsEdit = () => {
+			const container = document.getElementById('certificationsItemsEdit');
+			const items = profileData.certifications || [];
+
+			container.innerHTML = items.map((item, index) => `
+				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-3">
+						<span class="text-sm font-medium" style="color: var(--text-main);">Certification ${index + 1}</span>
+						<button onclick="removeCertificationItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<input type="text" class="p-2 rounded form-input" placeholder="Name *" 
+							value="${(item.certification_name || '').replace(/"/g, '&quot;')}" 
+							data-field="certification_name" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Issuing Organization *" 
+							value="${(item.issuing_organization || '').replace(/"/g, '&quot;')}" 
+							data-field="issuing_organization" required>
+						<input type="date" class="p-2 rounded form-input" placeholder="Issue Date" 
+							value="${item.issue_date || ''}" 
+							data-field="issue_date">
+						<input type="date" class="p-2 rounded form-input" placeholder="Expiration Date" 
+							value="${item.expiration_date || ''}" 
+							data-field="expiration_date">
+						<input type="text" class="p-2 rounded form-input" placeholder="Credential ID" 
+							value="${(item.credential_id || '').replace(/"/g, '&quot;')}" 
+							data-field="credential_id">
+						<input type="text" class="p-2 rounded form-input" placeholder="Credential URL" 
+							value="${(item.credential_url || '').replace(/"/g, '&quot;')}" 
+							data-field="credential_url">
+					</div>
+				</div>
+			`).join('');
+		};
+
+		// Render Awards
+		const renderAwards = () => {
+			const list = document.getElementById('awardsList');
+			const items = profileData.awards || [];
+
+			if (items.length === 0) {
+				list.innerHTML = '<div class="text-sm italic" style="color: var(--text-muted);">No awards added yet.</div>';
+				return;
+			}
+
+			list.innerHTML = items.map(item => {
+				const title = item.title || 'Untitled Award';
+				const issuer = item.issuer || '';
+				const date = item.issue_date || '';
+				const description = item.description || '';
+
+				return `
+				<div class="border-b pb-4 last:border-0 last:pb-0" style="border-color: var(--border-color);">
+					<h3 class="font-bold text-lg" style="color: var(--text-main);">${title}</h3>
+					<div class="text-sm font-medium" style="color: var(--text-main);">${issuer}</div>
+					<div class="text-xs mb-2" style="color: var(--text-muted);">${date}</div>
+					${description ? `<p class="text-sm mt-2" style="color: var(--text-main);">${description}</p>` : ''}
+				</div>
+				`;
+			}).join('');
+		};
+
+		const renderAwardsEdit = () => {
+			const container = document.getElementById('awardsItemsEdit');
+			const items = profileData.awards || [];
+
+			container.innerHTML = items.map((item, index) => `
+				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
+					<div class="flex justify-between items-center mb-3">
+						<span class="text-sm font-medium" style="color: var(--text-main);">Award ${index + 1}</span>
+						<button onclick="removeAwardItem(${index})" class="text-red-400 hover:text-red-300">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<input type="text" class="p-2 rounded form-input" placeholder="Title *" 
+							value="${(item.title || '').replace(/"/g, '&quot;')}" 
+							data-field="title" required>
+						<input type="text" class="p-2 rounded form-input" placeholder="Issuer" 
+							value="${(item.issuer || '').replace(/"/g, '&quot;')}" 
+							data-field="issuer">
+						<input type="date" class="p-2 rounded form-input" placeholder="Issue Date" 
+							value="${item.issue_date || ''}" 
+							data-field="issue_date">
+					</div>
+					<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description" 
+						data-field="description">${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+				</div>
+			`).join('');
+		};
+
+		window.addVolunteerItem = () => {
+			const container = document.getElementById('volunteerItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-4 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-3">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Volunteer</span>
+					<button onclick="removeVolunteerItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" class="p-2 rounded form-input" placeholder="Organization *" data-field="organization" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Role" data-field="role">
+					<input type="text" class="p-2 rounded form-input" placeholder="Cause" data-field="cause">
+					<input type="date" class="p-2 rounded form-input" placeholder="Start Date" data-field="start_date">
+					<input type="date" class="p-2 rounded form-input" placeholder="End Date" data-field="end_date">
+				</div>
+				<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description" data-field="description"></textarea>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.addCertificationItem = () => {
+			const container = document.getElementById('certificationsItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-4 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-3">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Certification</span>
+					<button onclick="removeCertificationItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" class="p-2 rounded form-input" placeholder="Name *" data-field="certification_name" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Issuing Organization *" data-field="issuing_organization" required>
+					<input type="date" class="p-2 rounded form-input" placeholder="Issue Date" data-field="issue_date">
+					<input type="date" class="p-2 rounded form-input" placeholder="Expiration Date" data-field="expiration_date">
+					<input type="text" class="p-2 rounded form-input" placeholder="Credential ID" data-field="credential_id">
+					<input type="text" class="p-2 rounded form-input" placeholder="Credential URL" data-field="credential_url">
+				</div>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.addAwardItem = () => {
+			const container = document.getElementById('awardsItemsEdit');
+			const newIndex = container.children.length;
+			const newItem = document.createElement('div');
+			newItem.className = 'p-4 rounded-lg border';
+			newItem.style.borderColor = 'var(--border-color)';
+			newItem.style.background = 'var(--bg-card)';
+			newItem.setAttribute('data-index', newIndex);
+			newItem.innerHTML = `
+				<div class="flex justify-between items-center mb-3">
+					<span class="text-sm font-medium" style="color: var(--text-main);">New Award</span>
+					<button onclick="removeAwardItem(${newIndex})" class="text-red-400 hover:text-red-300">
+						<i class="ri-delete-bin-line"></i>
+					</button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" class="p-2 rounded form-input" placeholder="Title *" data-field="title" required>
+					<input type="text" class="p-2 rounded form-input" placeholder="Issuer" data-field="issuer">
+					<input type="date" class="p-2 rounded form-input" placeholder="Issue Date" data-field="issue_date">
+				</div>
+				<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description" data-field="description"></textarea>
+			`;
+			container.appendChild(newItem);
+		};
+
+		window.removeVolunteerItem = (index) => {
+			const container = document.getElementById('volunteerItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeVolunteerItem(${i})`);
+			});
+		};
+
+		window.removeCertificationItem = (index) => {
+			const container = document.getElementById('certificationsItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeCertificationItem(${i})`);
+			});
+		};
+
+		window.removeAwardItem = (index) => {
+			const container = document.getElementById('awardsItemsEdit');
+			const item = container.querySelector(`[data-index="${index}"]`);
+			if (item) item.remove();
+			Array.from(container.children).forEach((child, i) => {
+				child.setAttribute('data-index', i);
+				child.querySelector('button').setAttribute('onclick', `removeAwardItem(${i})`);
+			});
 		};
 
 		// Motivational Quotes Array
