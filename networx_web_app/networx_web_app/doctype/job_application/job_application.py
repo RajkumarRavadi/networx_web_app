@@ -4,6 +4,10 @@
 import frappe
 from frappe.model.document import Document
 
+from networx_web_app.networx_web_app.doctype.applied_jobs.applied_jobs import (
+	upsert_from_job_application,
+)
+
 
 class JobApplication(Document):
 	def validate(self):
@@ -18,6 +22,12 @@ class JobApplication(Document):
 		)
 		if existing:
 			frappe.throw("You have already applied for this job")
+
+	def after_insert(self):
+		upsert_from_job_application(self)
+
+	def on_update(self):
+		upsert_from_job_application(self)
 
 
 

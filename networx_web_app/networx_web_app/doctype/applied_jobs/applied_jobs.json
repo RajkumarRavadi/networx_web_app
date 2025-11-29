@@ -1,0 +1,272 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "format:APPL-JOB-.#####",
+    "creation": "2025-11-27 00:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "user_profile",
+        "user_account",
+        "user_full_name",
+        "job_application",
+        "job_opening",
+        "job_title_snapshot",
+        "company_name_snapshot",
+        "employment_type",
+        "job_location",
+        "column_break_overview",
+        "application_date",
+        "current_stage",
+        "stage_updated_on",
+        "status_reason",
+        "application_source",
+        "source_details",
+        "channel_tags",
+        "application_medium",
+        "section_break_metrics",
+        "total_applications_by_user",
+        "rolling_30_day_applications",
+        "total_applications_for_job",
+        "is_repeat_application",
+        "is_duplicate_flagged",
+        "section_break_additional",
+        "expected_salary",
+        "salary_currency",
+        "resume_version",
+        "notes",
+        "section_break_history",
+        "status_history"
+    ],
+    "fields": [
+        {
+            "fieldname": "user_profile",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "User Profile",
+            "options": "Student Profile",
+            "reqd": 1
+        },
+        {
+            "fieldname": "user_account",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "User",
+            "options": "User",
+            "read_only": 1
+        },
+        {
+            "fieldname": "user_full_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "User Name",
+            "read_only": 1
+        },
+        {
+            "fieldname": "job_application",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Job Application",
+            "options": "Job Application",
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "fieldname": "job_opening",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Job Opening",
+            "options": "Job Opening",
+            "reqd": 1
+        },
+        {
+            "fieldname": "job_title_snapshot",
+            "fieldtype": "Data",
+            "label": "Job Title (Snapshot)",
+            "read_only": 1
+        },
+        {
+            "fieldname": "company_name_snapshot",
+            "fieldtype": "Data",
+            "label": "Company (Snapshot)",
+            "read_only": 1
+        },
+        {
+            "fieldname": "employment_type",
+            "fieldtype": "Select",
+            "label": "Employment Type",
+            "options": "\nInternship\nFull-time\nPart-time\nContract",
+            "read_only": 1
+        },
+        {
+            "fieldname": "job_location",
+            "fieldtype": "Data",
+            "label": "Job Location",
+            "read_only": 1
+        },
+        {
+            "fieldname": "column_break_overview",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "Today",
+            "fieldname": "application_date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "label": "Application Date"
+        },
+        {
+            "default": "Applied",
+            "fieldname": "current_stage",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Current Stage",
+            "options": "Applied\nScreening\nInterviewing\nOffer\nHired\nRejected\nWithdrawn\nOn Hold",
+            "reqd": 1
+        },
+        {
+            "fieldname": "stage_updated_on",
+            "fieldtype": "Datetime",
+            "label": "Stage Updated On",
+            "read_only": 1
+        },
+        {
+            "fieldname": "status_reason",
+            "fieldtype": "Small Text",
+            "label": "Status Reason/Notes"
+        },
+        {
+            "fieldname": "application_source",
+            "fieldtype": "Select",
+            "label": "Application Source",
+            "options": "\nPortal\nReferral\nCampus Event\nRecruiter\nExternal Job Board\nSocial Media\nOther"
+        },
+        {
+            "fieldname": "source_details",
+            "fieldtype": "Data",
+            "label": "Source Details"
+        },
+        {
+            "fieldname": "channel_tags",
+            "fieldtype": "MultiSelect",
+            "label": "Channel Tags",
+            "options": "Owned Portal\nCareer Fair\nEmail Campaign\nPartner College\nLinkedIn\nOther"
+        },
+        {
+            "fieldname": "application_medium",
+            "fieldtype": "Select",
+            "label": "Application Medium",
+            "options": "\nWeb\nMobile\nEmail\nOffline\nAPI"
+        },
+        {
+            "fieldname": "section_break_metrics",
+            "fieldtype": "Section Break",
+            "label": "Application Metrics"
+        },
+        {
+            "fieldname": "total_applications_by_user",
+            "fieldtype": "Int",
+            "in_list_view": 1,
+            "label": "All-time Applications (User)",
+            "read_only": 1
+        },
+        {
+            "fieldname": "rolling_30_day_applications",
+            "fieldtype": "Int",
+            "label": "Last 30 Days (User)",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_applications_for_job",
+            "fieldtype": "Int",
+            "label": "Applications for this Job",
+            "read_only": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "is_repeat_application",
+            "fieldtype": "Check",
+            "label": "Repeat Applicant",
+            "read_only": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "is_duplicate_flagged",
+            "fieldtype": "Check",
+            "label": "Duplicate Flag",
+            "read_only": 1
+        },
+        {
+            "fieldname": "section_break_additional",
+            "fieldtype": "Section Break",
+            "label": "Candidate Inputs"
+        },
+        {
+            "fieldname": "expected_salary",
+            "fieldtype": "Currency",
+            "label": "Expected Salary",
+            "options": "salary_currency"
+        },
+        {
+            "fieldname": "salary_currency",
+            "fieldtype": "Link",
+            "label": "Salary Currency",
+            "options": "Currency"
+        },
+        {
+            "fieldname": "resume_version",
+            "fieldtype": "Data",
+            "label": "Resume Version"
+        },
+        {
+            "fieldname": "notes",
+            "fieldtype": "Text Editor",
+            "label": "Internal Notes"
+        },
+        {
+            "fieldname": "section_break_history",
+            "fieldtype": "Section Break",
+            "label": "Status History"
+        },
+        {
+            "fieldname": "status_history",
+            "fieldtype": "Table",
+            "label": "Stage History",
+            "options": "Applied Job Status Log"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2025-11-27 00:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "Applied Jobs",
+    "naming_rule": "Expression",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Student"
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}
