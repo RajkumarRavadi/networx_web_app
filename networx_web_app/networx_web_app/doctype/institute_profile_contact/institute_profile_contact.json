@@ -1,0 +1,70 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "hash",
+    "creation": "2025-01-15 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "institute_contact",
+        "contact_name",
+        "designation",
+        "email",
+        "phone"
+    ],
+    "fields": [
+        {
+            "fieldname": "institute_contact",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Institute Contact",
+            "options": "Institute Contact",
+            "reqd": 1
+        },
+        {
+            "fieldname": "contact_name",
+            "fieldtype": "Data",
+            "fetch_from": "institute_contact.contact_name",
+            "in_list_view": 1,
+            "label": "Contact Name",
+            "read_only": 1
+        },
+        {
+            "fieldname": "designation",
+            "fieldtype": "Data",
+            "fetch_from": "institute_contact.designation",
+            "in_list_view": 1,
+            "label": "Designation",
+            "read_only": 1
+        },
+        {
+            "fieldname": "email",
+            "fieldtype": "Data",
+            "fetch_from": "institute_contact.email",
+            "label": "Email",
+            "read_only": 1
+        },
+        {
+            "fieldname": "phone",
+            "fieldtype": "Data",
+            "fetch_from": "institute_contact.phone",
+            "label": "Phone",
+            "read_only": 1
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "Institute Profile Contact",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "contact_name",
+    "sort_order": "ASC",
+    "states": [],
+    "track_changes": 1
+}
+

@@ -1,0 +1,65 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "hash",
+    "creation": "2025-01-15 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "department_name",
+        "branch",
+        "column_break_1",
+        "status",
+        "description"
+    ],
+    "fields": [
+        {
+            "fieldname": "department_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Department Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "branch",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Branch",
+            "options": "CSE\nECE\nME\nCE\nEE\nIT\nFinance\nMarketing\nHR\nOperations\nHospitality Management\nOther",
+            "reqd": 1
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Status",
+            "options": "Active\nInactive",
+            "reqd": 1,
+            "default": "Active"
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Small Text",
+            "label": "Description"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "Institute Department",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "department_name",
+    "sort_order": "ASC",
+    "states": [],
+    "track_changes": 1
+}
+
