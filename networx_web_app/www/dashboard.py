@@ -8,6 +8,7 @@ def get_context(context):
 	
 	context.no_cache = 1
 	context.show_sidebar = False
+	context.user_fullname = frappe.utils.get_fullname(frappe.session.user)
 	
 	return context
 

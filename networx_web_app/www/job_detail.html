@@ -252,15 +252,6 @@
 		let jobData = null;
 		let hasApplied = false;
 
-		// Logout
-		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-			e.preventDefault();
-			await frappe.call({
-				method: 'logout',
-				callback: () => window.location.href = '/login'
-			});
-		});
-
 		// Load Details
 		const loadJobDetails = async () => {
 			try {

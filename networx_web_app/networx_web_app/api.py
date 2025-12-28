@@ -428,3 +428,161 @@ def update_user_profile(data):
 	profile.save()
 	return profile.name
 
+
+@frappe.whitelist(allow_guest=True)
+def signup(full_name, email, password):
+	"""Create a new user and associated profiles"""
+	if frappe.db.exists("User", email):
+		frappe.throw(_("User with email {0} already exists").format(email))
+
+	# Create User with Administrator privileges
+	user = frappe.get_doc({
+		"doctype": "User",
+		"email": email,
+		"first_name": full_name,
+		"new_password": password,
+		"enabled": 1,
+		"send_welcome_email": 0,
+		"roles": [{"role": "Student"}]
+	})
+	user.flags.ignore_permissions = True
+	user.insert()
+
+	# Create Student Profile
+	student_profile = frappe.get_doc({
+		"doctype": "Student Profile",
+		"user": email,
+		"full_name": full_name
+	})
+	student_profile.flags.ignore_permissions = True
+	student_profile.insert()
+
+	# Create User Profile
+	user_profile = frappe.get_doc({
+		"doctype": "User Profile",
+		"user": email,
+		"full_name": full_name,
+		"headline": "Student"
+	})
+	user_profile.flags.ignore_permissions = True
+	user_profile.insert()
+
+	# Login the user
+	from frappe.auth import LoginManager
+	login_manager = LoginManager()
+	login_manager.authenticate(user=email, pwd=password)
+	login_manager.post_login()
+
+	return {
+		"success": True,
+		"message": _("User created and logged in successfully")
+	}
+
+
+
+
+
+import frappe
+
+TOTAL_POINTS = 100
+
+@frappe.whitelist()
+def get_profile_strength():
+	user = frappe.session.user
+
+	profile_name = frappe.db.get_value(
+		"User Profile",
+		{"user": user},
+		"name"
+	)
+
+	if not profile_name:
+		return _empty_response()
+
+	profile = frappe.get_doc("User Profile", profile_name)
+
+	points = 0
+	missing = []
+
+	# ---------- BASIC INFO (40) ----------
+	points += 5  # full_name always exists
+
+	if profile.profile_image:
+		points += 5
+	else:
+		missing.append("Add a profile photo")
+
+	if profile.headline:
+		points += 5
+	else:
+		missing.append("Add a headline")
+
+	if profile.industry:
+		points += 5
+	else:
+		missing.append("Add your industry")
+
+	if profile.current_location:
+		points += 5
+	else:
+		missing.append("Add your location")
+
+	if profile.profile_summary and len(profile.profile_summary) >= 50:
+		points += 15
+	else:
+		missing.append("Write a short profile summary (min 50 characters)")
+
+	# ---------- EXPERIENCE & EDUCATION (30) ----------
+	if profile.experience:
+		points += 15
+
+		if any(e.description and len(e.description) >= 50 for e in profile.experience):
+			points += 5
+	else:
+		missing.append("Add work experience")
+
+	if profile.education:
+		points += 10
+	else:
+		missing.append("Add education details")
+
+	# ---------- SKILLS (10) ----------
+	if profile.skills and len(profile.skills) >= 3:
+		points += 10
+	else:
+		missing.append("Add at least 3 skills")
+
+	# ---------- EXTRAS (10) ----------
+	if profile.contact_info_details:
+		points += 3
+	else:
+		missing.append("Add contact information")
+
+	if profile.volunteer_experience:
+		points += 3
+
+	if profile.awards:
+		points += 2
+
+	if profile.is_public:
+		points += 2
+
+	percentage = min(100, round((points / TOTAL_POINTS) * 100))
+
+	return {
+		"percentage": percentage,
+		"earned_points": points,
+		"total_points": TOTAL_POINTS,
+		"missing": missing
+	}
+
+
+def _empty_response():
+	return {
+		"percentage": 0,
+		"earned_points": 0,
+		"total_points": TOTAL_POINTS,
+		"missing": [
+			"Create your profile to get started"
+		]
+	}

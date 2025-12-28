@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Student Login - NETWORX</title>
+	<title>Student Signup - NETWORX</title>
 
 	<!-- Tailwind -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -26,10 +26,10 @@
 				<span class="text-3xl font-bold text-white">N</span>
 			</div>
 			<h1 class="text-3xl font-bold mb-1" style="color: var(--text-main);">NETWORX</h1>
-			<p style="color: var(--text-muted);">Student Portal Login</p>
+			<p style="color: var(--text-muted);">Create your Student Account</p>
 		</div>
 
-		<!-- Login Card -->
+		<!-- Signup Card -->
 		<div class="glass-panel rounded-2xl p-8 shadow-xl">
 			<div id="errorMessage"
 				class="hidden bg-red-500/10 text-red-500 p-3 rounded-lg mb-4 text-sm border border-red-500/20"></div>
@@ -37,15 +37,24 @@
 				class="hidden bg-emerald-500/10 text-emerald-500 p-3 rounded-lg mb-4 text-sm border border-emerald-500/20">
 			</div>
 
-			<form id="loginForm" class="space-y-6">
+			<form id="signupForm" class="space-y-5">
 				<div>
-					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Email or
-						Username</label>
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Full Name</label>
 					<div class="relative">
 						<i class="ri-user-line absolute left-3 top-3 text-gray-400"></i>
-						<input type="text" name="usr"
+						<input type="text" name="full_name"
 							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
-							placeholder="Enter your email" required autocomplete="username">
+							placeholder="Enter your full name" required>
+					</div>
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Email Address</label>
+					<div class="relative">
+						<i class="ri-mail-line absolute left-3 top-3 text-gray-400"></i>
+						<input type="email" name="email"
+							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
+							placeholder="Enter your email" required autocomplete="email">
 					</div>
 				</div>
 
@@ -53,25 +62,21 @@
 					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Password</label>
 					<div class="relative">
 						<i class="ri-lock-line absolute left-3 top-3 text-gray-400"></i>
-						<input type="password" name="pwd"
+						<input type="password" name="password"
 							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
-							placeholder="Enter your password" required autocomplete="current-password">
-					</div>
-					<div class="text-right mt-2">
-						<a href="/forgot-password" class="text-sm hover:underline" style="color: var(--primary);">Forgot
-							Password?</a>
+							placeholder="Create a password" required autocomplete="new-password" minlength="6">
 					</div>
 				</div>
 
 				<button type="submit"
 					class="w-full py-3 rounded-lg btn-primary font-bold text-lg shadow-lg shadow-violet-500/20">
-					Sign In
+					Sign Up
 				</button>
 			</form>
 
 			<div class="text-center mt-6 text-sm" style="color: var(--text-muted);">
-				Don't have an account? <a href="/signup" class="font-medium hover:underline"
-					style="color: var(--primary);">Sign Up</a>
+				Already have an account? <a href="/login" class="font-medium hover:underline"
+					style="color: var(--primary);">Sign In</a>
 			</div>
 		</div>
 
@@ -84,9 +89,10 @@
 	</div>
 
 	<!-- Scripts -->
+	<script src="/assets/networx_web_app/js/api.js"></script>
 	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
 	<script>
-		document.getElementById('loginForm').addEventListener('submit', async (e) => {
+		document.getElementById('signupForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
 
 			const errorDiv = document.getElementById('errorMessage');
@@ -99,54 +105,69 @@
 
 			// Get form data
 			const formData = new FormData(e.target);
-			const username = formData.get('usr');
-			const password = formData.get('pwd');
+			const fullName = formData.get('full_name');
+			const email = formData.get('email');
+			const password = formData.get('password');
+
+			// Basic validation
+			if (password.length < 6) {
+				errorDiv.textContent = 'Password must be at least 6 characters.';
+				errorDiv.classList.remove('hidden');
+				return;
+			}
 
 			// Disable button
 			submitBtn.disabled = true;
-			submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Signing In...';
+			submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Creating Account...';
 
 			try {
-				// Call Frappe login API
-				const response = await fetch('/api/method/login', {
+				// Call custom signup API directly using fetch
+				const response = await fetch('/api/method/networx_web_app.networx_web_app.api.signup', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						'Accept': 'application/json'
 					},
 					body: JSON.stringify({
-						usr: username,
-						pwd: password
+						full_name: fullName,
+						email: email,
+						password: password
 					})
 				});
 
 				const data = await response.json();
 
-				if (response.ok && (data.message === 'Logged In' || data.message === 'No App')) {
+				if (response.ok && data.message && (data.message.success || data.message === 'Logged In')) {
+					const result = data.message;
 					// Success
-					successDiv.textContent = 'Login successful! Redirecting...';
+					successDiv.textContent = (result.message || 'Account created!') + ' Redirecting...';
 					successDiv.classList.remove('hidden');
 
 					// Redirect to dashboard
 					setTimeout(() => {
 						window.location.href = '/dashboard';
-					}, 1000);
+					}, 1500);
 				} else {
 					// Error
-					errorDiv.textContent = data.message || 'Invalid credentials. Please try again.';
+					const errorMessage = data._server_messages ? 
+						JSON.parse(JSON.parse(data._server_messages)[0]).message : 
+						(data.message || 'Signup failed. Please try again.');
+					
+					errorDiv.textContent = errorMessage;
 					errorDiv.classList.remove('hidden');
 					submitBtn.disabled = false;
-					submitBtn.textContent = 'Sign In';
+					submitBtn.textContent = 'Sign Up';
 				}
 			} catch (error) {
-				console.error('Login error:', error);
-				errorDiv.textContent = 'An error occurred. Please try again.';
+				console.error('Signup error:', error);
+				errorDiv.textContent = 'An error occurred during signup. Please try again.';
 				errorDiv.classList.remove('hidden');
 				submitBtn.disabled = false;
-				submitBtn.textContent = 'Sign In';
+				submitBtn.textContent = 'Sign Up';
 			}
 		});
 	</script>
 </body>
 
 </html>
+

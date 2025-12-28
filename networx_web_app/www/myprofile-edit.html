@@ -700,12 +700,17 @@
 		// Logout handler
 		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
 			e.preventDefault();
-			await frappe.call({
-				method: 'logout',
-				callback: () => {
-					window.location.href = '/login';
-				}
-			});
+			try {
+				await frappe.call({
+					method: 'logout',
+					callback: () => {
+						window.location.href = '/login';
+					}
+				});
+			} catch (error) {
+				console.error('Logout failed:', error);
+				window.location.href = '/login';
+			}
 		});
 		
 		// ---- Helpers for building / reading child rows ----

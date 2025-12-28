@@ -19,397 +19,275 @@
 		(function () {
 			const savedTheme = localStorage.getItem('networx-theme');
 			const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-				document.documentElement.setAttribute('data-theme', 'dark');
-			} else {
-				document.documentElement.setAttribute('data-theme', 'light');
-			}
+			document.documentElement.setAttribute(
+				'data-theme',
+				savedTheme === 'dark' || (!savedTheme && systemDark) ? 'dark' : 'light'
+			);
 		})();
 	</script>
 </head>
 
 <body class="flex h-screen overflow-hidden">
 
-	<!-- Sidebar -->
 	{% set active_page = 'dashboard' %}
 	{% include "networx_web_app/templates/includes/sidebar.html" %}
 
-	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto relative">
-		<!-- Mobile Header -->
-		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
-			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
-			<button class="p-2" style="color: var(--text-main);">
-				<i class="ri-menu-line text-2xl"></i>
-			</button>
-		</header>
 
 		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
 
 			<!-- Top Bar -->
 			<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
 				<div>
-					<h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: var(--text-main);">
-						Welcome back, <span id="userName" class="text-gradient">Student</span>! 👋
+					<h1 class="text-3xl md:text-4xl font-bold mb-2">
+						Welcome back, <span id="userName" class="text-gradient">Student</span> 👋
 					</h1>
-					<p class="text-lg" style="color: var(--text-muted);">Ready to crush your career goals today?</p>
+					<p class="text-lg text-muted">Ready to crush your career goals today?</p>
 				</div>
-
-				<div class="flex items-center gap-4">
-					<div class="hidden md:block text-right">
-						<div class="text-sm" style="color: var(--text-muted);" id="currentDate">Loading date...</div>
-						<div class="text-xs text-emerald-400 font-medium">● Online</div>
-					</div>
-					<button
-						class="w-12 h-12 rounded-full glass-panel flex items-center justify-center transition-colors relative"
-						style="color: var(--text-muted);">
-						<i class="ri-notification-3-line text-xl"></i>
-						<span class="absolute top-3 right-3 w-2 h-2 bg-pink-500 rounded-full"></span>
-					</button>
-					<a href="/myprofile"
-						class="w-12 h-12 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 p-0.5">
-						<div class="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
-							style="background: var(--bg-body);">
-							<i class="ri-user-line text-xl" style="color: var(--text-main);"></i>
-						</div>
-					</a>
+				<div class="hidden md:block text-right">
+					<div id="currentDate" class="text-sm text-muted"></div>
+					<div class="text-xs text-emerald-400 font-medium">● Online</div>
 				</div>
 			</div>
 
 			<!-- Stats Grid -->
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
 				<!-- Stat 1 -->
-				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-						<i class="ri-briefcase-4-fill text-6xl text-violet-500"></i>
-					</div>
-					<div class="relative z-10">
-						<div
-							class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-4 text-violet-400">
-							<i class="ri-briefcase-4-line text-2xl"></i>
+				<a href="/jobs" class="block group">
+					<div
+						class="glass-card rounded-2xl p-6 relative overflow-hidden transition-transform group-hover:scale-[1.02] cursor-pointer">
+
+						<!-- Background Icon -->
+						<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+							<i class="ri-briefcase-4-fill text-6xl text-violet-500"></i>
 						</div>
-						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="totalJobs">-</div>
-						<div class="text-sm font-medium" style="color: var(--text-muted);">Open Job Positions</div>
+
+						<div class="relative z-10">
+							<!-- Icon Badge -->
+							<div
+								class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-4 text-violet-400">
+								<i class="ri-briefcase-4-line text-2xl"></i>
+							</div>
+
+							<div class="text-3xl font-bold mb-1" id="totalJobs">-</div>
+							<div class="text-sm font-medium">Open Job Positions</div>
+						</div>
 					</div>
-				</div>
+				</a>
 
 				<!-- Stat 2 -->
 				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
 					</div>
+
 					<div class="relative z-10">
 						<div
 							class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
 							<i class="ri-calendar-event-line text-2xl"></i>
 						</div>
-						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="upcomingEvents">-
-						</div>
-						<div class="text-sm font-medium" style="color: var(--text-muted);">Upcoming Events</div>
+
+						<div class="text-3xl font-bold mb-1" id="upcomingEvents">-</div>
+						<div class="text-sm font-medium">Upcoming Events</div>
 					</div>
 				</div>
 
 				<!-- Stat 3 -->
 				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-file-paper-2-fill text-6xl text-amber-500"></i>
 					</div>
+
 					<div class="relative z-10">
 						<div
 							class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
 							<i class="ri-file-paper-2-line text-2xl"></i>
 						</div>
-						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="myApplications">-
-						</div>
-						<div class="text-sm font-medium" style="color: var(--text-muted);">My Applications</div>
+
+						<div class="text-3xl font-bold mb-1" id="myApplications">-</div>
+						<div class="text-sm font-medium">My Applications</div>
 					</div>
 				</div>
 
 				<!-- Stat 4 -->
 				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-shield-star-fill text-6xl text-pink-500"></i>
 					</div>
+
 					<div class="relative z-10">
 						<div
 							class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4 text-pink-400">
 							<i class="ri-shield-star-line text-2xl"></i>
 						</div>
-						<div class="text-3xl font-bold mb-1" style="color: var(--text-main);" id="pendingReviews">-
-						</div>
-						<div class="text-sm font-medium" style="color: var(--text-muted);">Resume Reviews</div>
+
+						<div class="text-3xl font-bold mb-1" id="pendingReviews">-</div>
+						<div class="text-sm font-medium">Resume Reviews</div>
 					</div>
 				</div>
+
 			</div>
+
 
 			<!-- Content Grid -->
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-				<!-- Left Column (Main) -->
+				<!-- Left -->
 				<div class="lg:col-span-2 space-y-8">
-
-					<!-- Quick Actions -->
-					<div class="glass-panel rounded-2xl p-6">
-						<h3 class="text-xl font-bold mb-4" style="color: var(--text-main);">Quick Actions</h3>
-						<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-							<a href="/jobs"
-								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
-								style="background: var(--bg-card);">
-								<div
-									class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-									<i class="ri-search-line text-xl"></i>
-								</div>
-								<span class="text-sm font-medium" style="color: var(--text-muted);">Find Jobs</span>
-							</a>
-							<a href="/myprofile"
-								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
-								style="background: var(--bg-card);">
-								<div
-									class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-									<i class="ri-user-edit-line text-xl"></i>
-								</div>
-								<span class="text-sm font-medium" style="color: var(--text-muted);">Update
-									Profile</span>
-							</a>
-							<a href="#"
-								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
-								style="background: var(--bg-card);">
-								<div
-									class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-									<i class="ri-team-line text-xl"></i>
-								</div>
-								<span class="text-sm font-medium" style="color: var(--text-muted);">Mentorship</span>
-							</a>
-							<a href="#"
-								class="p-4 rounded-xl transition-colors flex flex-col items-center gap-3 text-center group"
-								style="background: var(--bg-card);">
-								<div
-									class="w-10 h-10 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-									<i class="ri-rocket-line text-xl"></i>
-								</div>
-								<span class="text-sm font-medium" style="color: var(--text-muted);">Hackathons</span>
-							</a>
+					<div class="glass-panel p-6 rounded-2xl">
+						<h3 class="text-xl font-bold mb-4">Recent Applications</h3>
+						<div id="recentApplicationsList">
+							<div class="loader mx-auto"></div>
 						</div>
 					</div>
-
-					<!-- Recent Applications -->
-					<div class="glass-panel rounded-2xl p-6">
-						<div class="flex items-center justify-between mb-6">
-							<h3 class="text-xl font-bold" style="color: var(--text-main);">Recent Applications</h3>
-							<a href="#" class="text-sm text-violet-400 hover:text-violet-300 font-medium">View All</a>
-						</div>
-
-						<div id="recentApplicationsList" class="space-y-4">
-							<!-- Loading State -->
-							<div class="flex justify-center py-8">
-								<div class="loader"></div>
-							</div>
-						</div>
-					</div>
-
 				</div>
 
-				<!-- Right Column (Sidebar) -->
+				<!-- Right -->
 				<div class="space-y-8">
 
 					<!-- Profile Strength -->
-					<div class="glass-card rounded-2xl p-6 text-center">
-						<h3 class="text-lg font-bold mb-6" style="color: var(--text-main);">Profile Strength</h3>
+					<div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
+
+						<!-- Background Icon -->
+						<div class="absolute -top-10 -right-10 opacity-10">
+							<i class="ri-user-star-fill text-[120px] text-violet-500"></i>
+						</div>
+
+						<h3 class="text-lg font-bold mb-6 relative z-10">
+							Profile Strength
+						</h3>
+
 						<div class="relative w-32 h-32 mx-auto mb-4 flex items-center justify-center">
 							<svg class="w-full h-full transform -rotate-90">
 								<circle cx="64" cy="64" r="56" stroke="var(--border-color)" stroke-width="8"
-									fill="none"></circle>
-								<circle cx="64" cy="64" r="56" stroke="#8b5cf6" stroke-width="8" fill="none"
-									stroke-dasharray="351.86" stroke-dashoffset="70" stroke-linecap="round"></circle>
+									fill="none" />
+								<circle id="profileStrengthRing" cx="64" cy="64" r="56" stroke="#8b5cf6"
+									stroke-width="8" fill="none" stroke-dasharray="351.86" stroke-dashoffset="351.86"
+									stroke-linecap="round" />
 							</svg>
-							<div class="absolute inset-0 flex flex-col items-center justify-center">
-								<span class="text-3xl font-bold" style="color: var(--text-main);">80%</span>
+
+							<div class="absolute inset-0 flex items-center justify-center">
+								<span id="profileStrengthValue" class="text-3xl font-bold">0%</span>
 							</div>
 						</div>
-						<p class="text-sm mb-4" style="color: var(--text-muted);">You're doing great! Add a project to
-							reach 100%.</p>
-						<button class="w-full py-2 rounded-lg text-sm font-medium transition-colors border"
-							style="background: var(--bg-card); color: var(--text-main); border-color: var(--border-color);">
+
+						<p id="profileStrengthHint" class="text-sm mb-4" style="color: var(--text-muted);">
+							Complete your profile to improve visibility.
+						</p>
+
+						<a href="/myprofile" class="w-full block py-2 rounded-lg text-sm font-medium border"
+							style="background: var(--bg-card); border-color: var(--border-color);">
 							Improve Profile
-						</button>
+						</a>
 					</div>
 
 					<!-- Upcoming Events -->
-					<div class="glass-panel rounded-2xl p-6">
-						<div class="flex items-center justify-between mb-6">
-							<h3 class="text-lg font-bold" style="color: var(--text-main);">Upcoming Events</h3>
-							<button style="color: var(--text-muted);"><i class="ri-more-fill"></i></button>
-						</div>
-
-						<div id="upcomingEventsList" class="space-y-4">
-							<!-- Loading State -->
-							<div class="flex justify-center py-4">
-								<div class="loader"></div>
-							</div>
+					<div class="glass-panel p-6 rounded-2xl">
+						<h3 class="text-lg font-bold mb-4">Upcoming Events</h3>
+						<div id="upcomingEventsList">
+							<div class="loader mx-auto"></div>
 						</div>
 					</div>
 
 				</div>
-			</div>
-
-		</div>
 	</main>
 
-	<!-- Scripts -->
+	<!-- Frappe Call Shim -->
 	<script>
-		// Simple frappe.call implementation using GET
 		window.frappe = {
-			session: { user: 'Guest', user_fullname: 'Guest' },
-			call: function (opts) {
-				const params = new URLSearchParams();
-				if (opts.args) {
-					for (const [key, value] of Object.entries(opts.args)) {
-						if (value === null || value === undefined) continue;
-						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
-						if (value === '') continue;
-						if (typeof value === 'object') {
-							params.append(key, JSON.stringify(value));
-						} else {
-							params.append(key, value);
-						}
-					}
-				}
-				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				return fetch(url, {
+			session: {
+				user: '{{ frappe.session.user }}',
+				user_fullname: '{{ user_fullname }}'
+			},
+			call(opts) {
+				return fetch(`/api/method/${opts.method}`, {
 					method: 'GET',
-					headers: { 'Accept': 'application/json' },
 					credentials: 'same-origin'
 				})
-					.then(response => {
-						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-						return response.json();
-					})
-					.then(data => {
-						if (opts.callback) opts.callback(data);
-						return data;
-					});
+					.then(r => r.json())
+					.then(d => opts.callback ? opts.callback(d) : d);
 			}
 		};
 	</script>
-	<script src="/assets/networx_web_app/js/utils.js"></script>
-	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
-	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+
+	<script src="/assets/networx_web_app/js/api.js"></script>
 
 	<script>
-		// Set Date
-		const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-		document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', dateOptions);
-
-		// Set User Name
-		document.getElementById('userName').textContent = frappe.session.user_fullname || 'Student';
-
-		// Logout
-		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-			e.preventDefault();
-			await frappe.call({
-				method: 'logout',
-				callback: () => window.location.href = '/login'
+		document.getElementById('currentDate').textContent =
+			new Date().toLocaleDateString('en-US', {
+				weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
 			});
-		});
 
-		// Format Date Helper
-		const formatDate = (dateString) => {
-			const options = { month: 'short', day: 'numeric' };
-			return new Date(dateString).toLocaleDateString('en-US', options);
+		document.getElementById('userName').textContent =
+			frappe.session.user_fullname || 'Student';
+
+		const setText = (id, value) => {
+			const el = document.getElementById(id);
+			if (el) el.textContent = value;
 		};
 
-		// Load Data
 		const loadDashboardData = async () => {
 			try {
-				// 1. Stats
 				const stats = await NetworkxAPI.getDashboardStats();
-				document.getElementById('totalJobs').textContent = stats.total_jobs || 0;
-				document.getElementById('upcomingEvents').textContent = stats.upcoming_events || 0;
-				document.getElementById('myApplications').textContent = stats.my_applications || 0;
-				document.getElementById('pendingReviews').textContent = stats.pending_reviews || 0;
+				console.log('Stats:', stats);
 
-				// 2. Recent Applications
-				const applications = await NetworkxAPI.getRecentApplications(3);
-				const appList = document.getElementById('recentApplicationsList');
-				appList.innerHTML = '';
+				setText('totalJobs', stats.total_jobs || 0);
+				setText('upcomingEvents', stats.upcoming_events || 0);
+				setText('myApplications', stats.my_applications || 0);
+				setText('pendingReviews', stats.pending_reviews || 0);
 
-				if (applications && applications.length > 0) {
-					applications.forEach(app => {
-						const statusColors = {
-							'Applied': 'bg-blue-500/20 text-blue-400',
-							'Interview': 'bg-yellow-500/20 text-yellow-400',
-							'Rejected': 'bg-red-500/20 text-red-400',
-							'Hired': 'bg-green-500/20 text-green-400'
-						};
-						const statusClass = statusColors[app.status] || 'bg-slate-500/20 text-slate-400';
-
-						appList.innerHTML += `
-                            <div class="flex items-center justify-between p-4 rounded-xl transition-colors group" style="background: var(--bg-card);">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--bg-body); color: var(--text-muted);">
-                                        <i class="ri-briefcase-line"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold transition-colors group-hover:text-violet-400" style="color: var(--text-main);">${app.job_title || 'Unknown Job'}</h4>
-                                        <p class="text-xs" style="color: var(--text-muted);">${app.company_name || 'Unknown Company'} • Applied ${formatDate(app.creation)}</p>
-                                    </div>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
-                                    ${app.status}
-                                </span>
-                            </div>
-                        `;
-					});
-				} else {
-					appList.innerHTML = `
-                        <div class="text-center py-6" style="color: var(--text-muted);">
-                            <i class="ri-file-search-line text-3xl mb-2 opacity-50"></i>
-                            <p>No applications yet.</p>
-                            <a href="/jobs" class="text-violet-400 text-sm hover:underline mt-2 inline-block">Find a job</a>
-                        </div>
-                    `;
-				}
-
-				// 3. Upcoming Events
-				const events = await NetworkxAPI.getRecentEvents(3);
-				const eventList = document.getElementById('upcomingEventsList');
-				eventList.innerHTML = '';
-
-				if (events && events.length > 0) {
-					events.forEach(event => {
-						const date = new Date(event.event_date);
-						const day = date.getDate();
-						const month = date.toLocaleString('default', { month: 'short' });
-
-						eventList.innerHTML += `
-                            <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
-                                <div class="flex-shrink-0 w-12 h-12 rounded-xl border flex flex-col items-center justify-center text-center" style="background: var(--bg-card); border-color: var(--border-color);">
-                                    <span class="text-xs uppercase font-bold" style="color: var(--text-muted);">${month}</span>
-                                    <span class="text-lg font-bold leading-none" style="color: var(--text-main);">${day}</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm line-clamp-1" style="color: var(--text-main);">${event.event_name}</h4>
-                                    <p class="text-xs mt-0.5" style="color: var(--text-muted);"><i class="ri-map-pin-line align-bottom"></i> ${event.location || 'Online'}</p>
-                                </div>
-                            </div>
-                        `;
-					});
-				} else {
-					eventList.innerHTML = `
-                        <div class="text-center py-4" style="color: var(--text-muted);">
-                            <p>No upcoming events.</p>
-                        </div>
-                    `;
-				}
-
-			} catch (error) {
-				console.error('Error loading dashboard:', error);
+			} catch (e) {
+				console.error('Dashboard error:', e);
 			}
 		};
 
-		// Initialize
-		document.addEventListener('DOMContentLoaded', loadDashboardData);
+		const updateProfileStrength = (percentage) => {
+			const ring = document.getElementById('profileStrengthRing');
+			const valueEl = document.getElementById('profileStrengthValue');
+
+			if (!ring || !valueEl) return;
+
+			const radius = 56;
+			const circumference = 2 * Math.PI * radius;
+			const offset = circumference - (percentage / 100) * circumference;
+
+			ring.style.transition = 'stroke-dashoffset 1s ease';
+			ring.style.strokeDashoffset = offset;
+
+			valueEl.textContent = `${percentage}%`;
+		};
+
+		const loadProfileStrength = async () => {
+			try {
+				const res = await frappe.call({
+					method: "networx_web_app.networx_web_app.api.get_profile_strength"
+				});
+
+				if (res.message) {
+					updateProfileStrength(res.message.percentage);
+
+					const hint = document.getElementById('profileStrengthHint');
+					if (hint && res.message.missing?.length) {
+						hint.textContent = res.message.missing[0];
+					}
+				}
+			} catch (e) {
+				console.error('Profile strength error:', e);
+			}
+		};
+
+
+
+		document.addEventListener('DOMContentLoaded', () => {
+			loadDashboardData();
+			loadProfileStrength();
+		});
 	</script>
+
 </body>
 
 </html>

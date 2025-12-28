@@ -164,16 +164,8 @@
 		let currentFilters = {};
 		let currentSearchTerm = null;
 
-		// Logout handler
-		document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-			e.preventDefault();
-			await frappe.call({
-				method: 'logout',
-				callback: () => {
-					window.location.href = '/login';
-				}
-			});
-		});
+		// Logout logic handled in sidebar.html
+
 
 		// Load jobs
 		const loadJobs = async (page = 0) => {
