@@ -30,19 +30,39 @@
 
 <body class="flex h-screen overflow-hidden">
 
-	<!-- Sidebar -->
+	<!-- Sidebar (Only for logged in users) -->
+	{% if not is_guest %}
 	{% set active_page = 'jobs' %}
 	{% include "networx_web_app/templates/includes/sidebar.html" %}
+	{% endif %}
 
 	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto relative">
+		<!-- Header (For non-logged in users on desktop) -->
+		{% if is_guest %}
+		<header class="hidden md:flex glass-panel sticky top-0 z-30 w-full px-6 py-4 items-center justify-between border-b border-white/10">
+			<a href="/" class="font-bold text-xl flex-shrink-0" style="color: var(--text-main);">NETWORX</a>
+			<div class="flex items-center gap-4 flex-shrink-0">
+				<a href="/login" class="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:bg-violet-500/10 whitespace-nowrap" style="color: var(--text-main);">Login</a>
+				<a href="/signup" class="px-4 py-2 rounded-lg btn-primary text-sm font-medium whitespace-nowrap">Sign Up</a>
+			</div>
+		</header>
+		{% endif %}
+		
 		<!-- Mobile Header -->
-		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
-			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
-			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+		<header class="md:hidden glass-panel sticky top-0 z-30 w-full px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<a href="/" class="font-bold text-xl flex-shrink-0" style="color: var(--text-main);">NETWORX</a>
+			{% if not is_guest %}
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
 				style="color: var(--text-main);">
 				<i class="ri-menu-line text-2xl"></i>
 			</button>
+			{% else %}
+			<div class="flex items-center gap-2 flex-shrink-0">
+				<a href="/login" class="px-3 py-1.5 rounded-lg font-medium text-xs transition-all hover:bg-violet-500/10 whitespace-nowrap" style="color: var(--text-main);">Login</a>
+				<a href="/signup" class="px-3 py-1.5 rounded-lg btn-primary text-xs font-medium whitespace-nowrap">Sign Up</a>
+			</div>
+			{% endif %}
 		</header>
 
 		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
@@ -53,7 +73,8 @@
 				<p class="text-lg" style="color: var(--text-muted);">Find your dream job from top companies</p>
 			</div>
 
-			<!-- Search & Quick Filters -->
+			<!-- Search & Quick Filters (Only for logged in users) -->
+			{% if not is_guest %}
 			<div class="mb-8">
 				<!-- Minimal Search -->
 				<div class="relative max-w-2xl mx-auto mb-6">
@@ -98,6 +119,20 @@
 					</button>
 				</div>
 			</div>
+			{% else %}
+			<!-- Login Prompt for Guests -->
+			<div class="mb-8 glass-panel rounded-2xl p-6 text-center border border-violet-500/20">
+				<div class="max-w-md mx-auto">
+					<i class="ri-lock-line text-4xl text-violet-500 mb-4"></i>
+					<h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">Unlock Advanced Features</h3>
+					<p class="text-sm mb-4" style="color: var(--text-muted);">Sign in to search, filter, and to get job match score based on your profile by leveraging our AI powered job matching engine.</p>
+					<div class="flex gap-3 justify-center">
+						<a href="/login" class="px-6 py-2.5 rounded-xl btn-primary font-medium text-sm">Sign In</a>
+						<a href="/signup" class="px-6 py-2.5 rounded-xl glass-panel border border-violet-500/30 font-medium text-sm hover:bg-violet-500/10 transition-all" style="color: var(--text-main);">Sign Up</a>
+					</div>
+				</div>
+			</div>
+			{% endif %}
 
 			<!-- Results Info -->
 			<div class="mb-6 text-sm" style="color: var(--text-muted);">
@@ -120,9 +155,20 @@
 
 	<!-- Scripts -->
 	<script>
-		// Simple frappe.call implementation
-		window.frappe = {
-			call: function (opts) {
+		// Initialize frappe object FIRST before any other scripts
+		(function() {
+			if (!window.frappe) {
+				window.frappe = {};
+			}
+			if (!window.frappe.session) {
+			window.frappe.session = {
+				user: '{{ user if user else "Guest" }}',
+				user_fullname: '{{ frappe.session.user_fullname if not is_guest and frappe.session.user_fullname else "Guest" }}'
+			};
+			}
+			
+			// Simple frappe.call implementation
+			window.frappe.call = function (opts) {
 				const params = new URLSearchParams();
 				if (opts.args) {
 					for (const [key, value] of Object.entries(opts.args)) {
@@ -150,8 +196,8 @@
 						if (opts.callback) opts.callback(data);
 						return data;
 					});
-			}
-		};
+			};
+		})();
 	</script>
 	<script src="/assets/networx_web_app/js/utils.js"></script>
 	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
@@ -224,10 +270,20 @@
 				return;
 			}
 
+			const isLoggedIn = (window.frappe && window.frappe.session && window.frappe.session.user && window.frappe.session.user !== 'Guest');
+			
 			jobsGrid.innerHTML = jobs.map(job => {
 				const logoHtml = job.company_logo ?
 					`<img src="${job.company_logo}" alt="${job.company_name}" class="w-12 h-12 rounded-lg object-cover bg-white">` :
 					`<div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold" style="background: var(--bg-body); color: var(--primary);">${job.company_name.charAt(0)}</div>`;
+
+				const viewDetailsLink = isLoggedIn 
+					? `<a href="/job_detail?id=${job.name}" class="text-sm font-bold hover:underline" style="color: var(--primary);">
+							View Details <i class="ri-arrow-right-line ml-1"></i>
+					   </a>`
+					: `<a href="/login" class="text-sm font-bold hover:underline" style="color: var(--primary);">
+							Sign In to View <i class="ri-lock-line ml-1"></i>
+					   </a>`;
 
 				return `
                 <div class="glass-card rounded-xl p-6 relative overflow-hidden flex flex-col">
@@ -257,9 +313,7 @@
                         <span class="text-xs font-medium" style="color: var(--text-muted);">
                             Posted ${NetworkxUtils.formatDate(job.posted_date)}
                         </span>
-                        <a href="/job_detail?id=${job.name}" class="text-sm font-bold hover:underline" style="color: var(--primary);">
-                            View Details <i class="ri-arrow-right-line ml-1"></i>
-                        </a>
+                        ${viewDetailsLink}
                     </div>
                 </div>
                 `;
@@ -281,26 +335,26 @@
 			// Previous button
 			if (currentPage > 0) {
 				paginationHTML += `
-			< button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style = "border-color: var(--border-color); color: var(--text-main);" onclick = "loadJobs(${currentPage - 1})" >
-				Previous
-                    </button >
-			`;
+					<button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style="border-color: var(--border-color); color: var(--text-main);" onclick="loadJobs(${currentPage - 1})">
+						Previous
+					</button>
+				`;
 			}
 
 			// Page info
 			paginationHTML += `
-			< span class="px-4 py-2" style = "color: var(--text-muted);" >
-				Page ${currentPage + 1} of ${totalPages}
-                </span >
+				<span class="px-4 py-2" style="color: var(--text-muted);">
+					Page ${currentPage + 1} of ${totalPages}
+				</span>
 			`;
 
 			// Next button
 			if (currentPage < totalPages - 1) {
 				paginationHTML += `
-			< button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style = "border-color: var(--border-color); color: var(--text-main);" onclick = "loadJobs(${currentPage + 1})" >
-				Next
-                    </button >
-                `;
+					<button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style="border-color: var(--border-color); color: var(--text-main);" onclick="loadJobs(${currentPage + 1})">
+						Next
+					</button>
+				`;
 			}
 
 			paginationContainer.innerHTML = paginationHTML;
@@ -333,39 +387,50 @@
 			loadJobs(0);
 		};
 
-		// Event listeners
-		document.getElementById('searchBtn').addEventListener('click', applyFilters);
-		document.getElementById('searchInput').addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') applyFilters();
-		});
-
-		// Quick Filter Buttons
-		document.querySelectorAll('.quick-filter-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				// Toggle active class
-				const wasActive = e.target.classList.contains('active');
-
-				// Remove active from all
-				document.querySelectorAll('.quick-filter-btn').forEach(b => {
-					b.classList.remove('active');
-					b.style.borderColor = 'var(--border-color)';
-					b.style.color = 'var(--text-main)';
-					b.style.backgroundColor = 'transparent';
-					b.style.borderWidth = '1px';
+		// Event listeners (Only for logged in users)
+		const isLoggedIn = (window.frappe && window.frappe.session && window.frappe.session.user && window.frappe.session.user !== 'Guest');
+		
+		if (isLoggedIn) {
+			const searchBtn = document.getElementById('searchBtn');
+			const searchInput = document.getElementById('searchInput');
+			
+			if (searchBtn) {
+				searchBtn.addEventListener('click', applyFilters);
+			}
+			if (searchInput) {
+				searchInput.addEventListener('keypress', (e) => {
+					if (e.key === 'Enter') applyFilters();
 				});
+			}
 
-				if (!wasActive) {
-					e.target.classList.add('active');
-					// Active state: solid background with good contrast
-					e.target.style.backgroundColor = 'var(--primary)';
-					e.target.style.color = 'white';
-					e.target.style.borderColor = 'var(--primary)';
-					e.target.style.borderWidth = '1px';
-				}
+			// Quick Filter Buttons
+			document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					// Toggle active class
+					const wasActive = e.target.classList.contains('active');
 
-				applyFilters();
+					// Remove active from all
+					document.querySelectorAll('.quick-filter-btn').forEach(b => {
+						b.classList.remove('active');
+						b.style.borderColor = 'var(--border-color)';
+						b.style.color = 'var(--text-main)';
+						b.style.backgroundColor = 'transparent';
+						b.style.borderWidth = '1px';
+					});
+
+					if (!wasActive) {
+						e.target.classList.add('active');
+						// Active state: solid background with good contrast
+						e.target.style.backgroundColor = 'var(--primary)';
+						e.target.style.color = 'white';
+						e.target.style.borderColor = 'var(--primary)';
+						e.target.style.borderWidth = '1px';
+					}
+
+					applyFilters();
+				});
 			});
-		});
+		}
 
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
