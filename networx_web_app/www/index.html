@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETWORX – The AI-First Career Platform.</title>
+    <meta name="description" content="NETWORX is an AI-powered career platform that helps students learn, build resumes, and get matched with jobs using artificial intelligence.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        violet: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- Custom Theme -->
+    <link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+
+    <style>
+        /* Additional Custom Styles for Landing Page if needed */
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animation Keyframes */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+        @keyframes width-fill {
+            from { width: 0; opacity: 0; }
+            to { width: var(--final-width, 100%); opacity: 1; }
+        }
+        @keyframes pop-in {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slide-up {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes connect-line {
+            0% { width: 0; opacity: 0; }
+            100% { width: 100px; opacity: 1; }
+        }
+
+        /* Animation Classes */
+        .animate-float-delayed { animation: float 6s ease-in-out infinite; animation-delay: 1s; }
+        .animate-pulse-slow { animation: pulse-slow 8s infinite ease-in-out; }
+        .animate-pulse-subtle { animation: pulse-slow 4s infinite ease-in-out; }
+        .animate-width-fill { animation: width-fill 1s ease-out forwards; }
+        .animate-pop-in { animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+        .animate-slide-up { animation: slide-up 0.8s ease-out forwards; opacity: 0; }
+        
+        .perspective-1000 { perspective: 1000px; }
+        .card-float { transform-style: preserve-3d; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-bold tracking-tight" style="color: var(--text-main);">NETWORX</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#how-it-works" class="text-sm font-medium hover:text-violet-500 transition-colors" style="color: var(--text-muted);">How it Works</a>
+                <a href="#features" class="text-sm font-medium hover:text-violet-500 transition-colors" style="color: var(--text-muted);">Features</a>
+                <a href="#vision" class="text-sm font-medium hover:text-violet-500 transition-colors" style="color: var(--text-muted);">Vision</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="/login" class="px-5 py-2 rounded-lg font-medium text-sm transition-all hover:bg-violet-500/10" style="color: var(--text-main);">Login</a>
+                <a href="/signup" class="px-5 py-2 rounded-lg btn-primary font-medium text-sm shadow-lg shadow-violet-500/20">Sign Up</a>
+                
+                <!-- Theme Toggle -->
+                <button id="themeToggleBtn" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center transition-transform hover:scale-105 ml-2" style="color: var(--text-main);">
+                    <i class="ri-moon-line text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION -->
+    <section class="pt-32 pb-20 px-6 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full hero-gradient pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side -->
+            <div class="space-y-8 relative z-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 text-sm font-medium">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                    </span>
+                    The AI-First Career Platform
+                </div>
+                
+                <h1 class="text-5xl lg:text-7xl font-bold leading-tight tracking-tight" style="color: var(--text-main);">
+                    Your Career <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-violet-500 dark:to-indigo-500">Accelerated by AI.</span>
+                </h1>
+                
+                <p class="text-lg lg:text-xl max-w-xl leading-relaxed" style="color: var(--text-muted);">
+                NETWORX is an AI-native career platform built on Google Cloud’s AI ecosystem — turning skills and projects into real career momentum.
+                </p>
+
+                <ul class="space-y-3">
+                    <li class="flex items-center gap-3 text-base" style="color: var(--text-main);">
+                        <i class="ri-checkbox-circle-fill text-violet-500 text-xl"></i> Showcase proof of work
+                    </li>
+                    <li class="flex items-center gap-3 text-base" style="color: var(--text-main);">
+                        <i class="ri-checkbox-circle-fill text-violet-500 text-xl"></i> Discover jobs, internships & opportunities
+                    </li>
+                    <li class="flex items-center gap-3 text-base" style="color: var(--text-main);">
+                        <i class="ri-checkbox-circle-fill text-violet-500 text-xl"></i> Build a shareable professional profile
+                    </li>
+                    <li class="flex items-center gap-3 text-base" style="color: var(--text-main);">
+                        <i class="ri-sparkling-fill text-violet-500 text-xl"></i> Accelerated by AI Tools
+                    </li>
+                </ul>
+
+                <div class="flex flex-wrap items-center gap-4 pt-4">
+                    <a href="/signup" class="px-8 py-4 rounded-xl btn-primary font-bold text-lg shadow-xl shadow-violet-500/30 hover:shadow-violet-500/40 transition-all transform hover:-translate-y-1">
+                        Build Your Profile
+                    </a>
+                    <a href="/jobs" class="px-8 py-4 rounded-xl glass-panel border border-violet-500/30 font-bold text-lg hover:bg-violet-500/10 transition-all transform hover:-translate-y-1" style="color: var(--text-main);">
+                        Explore Jobs
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side (Visual) -->
+            <div class="relative z-10 lg:pl-10">
+                <!-- Custom Animated Profile Builder -->
+                <div class="relative w-full aspect-square max-w-[500px] mx-auto perspective-1000">
+                    <!-- Abstract Background Elements -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-violet-500/20 to-transparent rounded-full blur-3xl animate-pulse-slow dark:from-violet-500/10"></div>
+                    
+                    <!-- The Profile Card -->
+                    <div class="absolute inset-4 sm:inset-10 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-3xl p-6 shadow-[0_20px_50px_rgba(139,92,246,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col gap-5 transform transition-all duration-700 hover:rotate-y-2 card-float animate-float">
+                        <!-- Header -->
+                        <div class="flex items-center gap-4 border-b border-gray-100 dark:border-white/5 pb-5">
+                            <div class="relative w-16 h-16">
+                                <div class="absolute inset-0 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-full blur opacity-50"></div>
+                                <div class="relative w-full h-full rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg border-2 border-white/20 animate-pulse-subtle">RK</div>
+                            </div>
+                            <div class="space-y-3 flex-1">
+                                <div class="h-4 w-1/2 bg-gray-200 dark:bg-white/10 rounded-full animate-width-fill" style="animation-delay: 0.5s"></div>
+                                <div class="h-3 w-1/3 bg-gray-100 dark:bg-white/5 rounded-full animate-width-fill" style="animation-delay: 0.8s"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skills Section -->
+                        <div class="space-y-3">
+                            <div class="h-3 w-1/4 bg-gray-100 dark:bg-white/5 rounded-full"></div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-200 text-xs font-bold border border-violet-200 dark:border-violet-500/20 shadow-sm animate-pop-in" style="animation-delay: 1.2s">ReactJS</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-200 text-xs font-bold border border-blue-200 dark:border-blue-500/20 shadow-sm animate-pop-in" style="animation-delay: 1.4s">Design</span>
+                                <span class="px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 text-xs font-bold border border-emerald-200 dark:border-emerald-500/20 shadow-sm animate-pop-in" style="animation-delay: 1.6s">Python</span>
+                                <span class="px-3 py-1.5 rounded-full bg-pink-100 dark:bg-pink-500/20 text-pink-700 dark:text-pink-200 text-xs font-bold border border-pink-200 dark:border-pink-500/20 shadow-sm animate-pop-in" style="animation-delay: 1.8s">Leadership</span>
+                            </div>
+                        </div>
+
+                        <!-- Projects Section -->
+                        <div class="space-y-3 mt-2 flex-1">
+                            <div class="h-3 w-1/4 bg-gray-100 dark:bg-white/5 rounded-full"></div>
+                            <div class="grid grid-cols-2 gap-3 h-full">
+                                <div class="group bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 rounded-xl border border-gray-100 dark:border-white/5 p-3 transition-colors animate-slide-up cursor-pointer shadow-sm" style="animation-delay: 2s">
+                                    <div class="w-10 h-10 rounded-lg bg-pink-50 dark:bg-pink-500/20 mb-3 flex items-center justify-center group-hover:scale-110 transition-transform"><i class="ri-dribbble-line text-pink-500 dark:text-pink-400 text-xl"></i></div>
+                                    <div class="h-2 w-full bg-gray-200 dark:bg-white/10 rounded-full mb-2"></div>
+                                    <div class="h-2 w-2/3 bg-gray-100 dark:bg-white/5 rounded-full"></div>
+                                </div>
+                                 <div class="group bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 rounded-xl border border-gray-100 dark:border-white/5 p-3 transition-colors animate-slide-up cursor-pointer shadow-sm" style="animation-delay: 2.3s">
+                                    <div class="w-10 h-10 rounded-lg bg-orange-50 dark:bg-orange-500/20 mb-3 flex items-center justify-center group-hover:scale-110 transition-transform"><i class="ri-behance-line text-orange-500 dark:text-orange-400 text-xl"></i></div>
+                                    <div class="h-2 w-full bg-gray-200 dark:bg-white/10 rounded-full mb-2"></div>
+                                    <div class="h-2 w-2/3 bg-gray-100 dark:bg-white/5 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Job Match Card -->
+                    <div class="absolute -right-4 top-[20%] bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-xl dark:shadow-2xl border border-gray-100 dark:border-gray-700 animate-float-delayed z-20 w-56 animate-pop-in" style="animation-delay: 3s; opacity: 0;">
+                        <div class="flex items-center gap-3 mb-3">
+                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shadow-lg shadow-green-500/20"><i class="ri-briefcase-4-fill"></i></div>
+                             <div>
+                                 <div class="text-xs font-bold text-gray-800 dark:text-white mb-0.5">Job Match Found</div>
+                                 <div class="text-[10px] text-green-700 dark:text-green-300 font-bold bg-green-100 dark:bg-green-500/20 px-2 py-0.5 rounded-full inline-block">98% Skill Fit</div>
+                             </div>
+                        </div>
+                        <div class="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-emerald-500 to-green-400 w-[98%] animate-width-fill shadow-[0_0_10px_rgba(16,185,129,0.5)]" style="--final-width: 98%; animation-delay: 3.5s"></div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Verified Badge -->
+                     <div class="absolute -left-6 bottom-[20%] bg-white dark:bg-gray-800 px-5 py-3 rounded-full shadow-xl dark:shadow-2xl border border-gray-100 dark:border-gray-700 animate-float z-20 animate-pop-in flex items-center gap-3" style="animation-delay: 2.8s; animation-duration: 4s; opacity: 0;">
+                        <div class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i class="ri-verified-badge-fill text-violet-500 text-lg"></i>
+                            <span class="text-xs font-bold text-gray-900 dark:text-white tracking-wide">VERIFIED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. TRUST / SOCIAL PROOF STRIP -->
+    <section class="py-10 border-y border-white/5 bg-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-sm font-medium uppercase tracking-wider mb-8" style="color: var(--text-muted);">Built for students, freshers & early professionals from</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Placeholders using Text for now as specific logos weren't provided -->
+                <span class="text-xl font-bold" style="color: var(--text-main);">Top Colleges</span>
+                <span class="text-xl font-bold" style="color: var(--text-main);">Tech Startups</span>
+                <span class="text-xl font-bold" style="color: var(--text-main);">Industry Mentors</span>
+                <span class="text-xl font-bold" style="color: var(--text-main);">Global Communities</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. PROBLEM STATEMENT -->
+    <section class="py-24 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-6" style="color: var(--text-main);">The Problem With Traditional Job Platforms</h2>
+                <p class="text-lg" style="color: var(--text-muted);">The old way of hiring is broken. It focuses on keywords, not capabilities.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="p-6 rounded-2xl glass-card border border-red-500/10 hover:border-red-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                        <i class="ri-file-list-3-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Static Resumes</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Resumes don't show real skills or potential, just a list of claims.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="p-6 rounded-2xl glass-card border border-red-500/10 hover:border-red-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                        <i class="ri-spam-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Blind Applications</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Students apply blindly to 100s of jobs with zero feedback.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="p-6 rounded-2xl glass-card border border-red-500/10 hover:border-red-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                        <i class="ri-eye-off-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">No Visibility</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--text-muted);">No idea how strong your profile is compared to what industry needs.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="p-6 rounded-2xl glass-card border border-red-500/10 hover:border-red-500/30 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                        <i class="ri-links-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Fragmented Growth</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Learning, networking, and hiring are scattered across different apps.</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <span class="inline-block px-6 py-2 rounded-full bg-violet-500/10 text-violet-500 font-bold">NETWORX uses AI to fix this.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. SOLUTION -->
+    <section id="features" class="py-24 px-6 bg-gradient-to-b from-transparent to-violet-900/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-6" style="color: var(--text-main);">Built for the Future of Work</h2>
+                <p class="text-lg" style="color: var(--text-muted);">A complete career ecosystem powered by advanced AI to help you grow faster.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 1. Proof-Based Profiles (Original) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/30">
+                        <i class="ri-folder-shield-2-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Proof-Based Profiles</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Showcase projects, skills, and achievements with evidence. Don't just tell employers what you can do—show them.</p>
+                    </div>
+                </div>
+
+                <!-- 2. AI Profile Strength (Merged) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
+                        <i class="ri-bar-chart-box-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">AI Profile Strength Score</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Our AI calculates exactly how hire-ready your profile is and gives actionable suggestions to improve your match score.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Smart Job Discovery (Original + AI) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/30">
+                        <i class="ri-search-eye-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Smart Job Discovery</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Stop scrolling. AI curates opportunities, internships, and events that match your verified skills and career goals instantly.</p>
+                    </div>
+                </div>
+
+                <!-- 4. AI Learning Copilot (New) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30">
+                        <i class="ri-brain-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">AI Learning Copilot</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Not qualified yet? AI analyzes skill gaps and suggests personalized learning paths and projects to bridge them.</p>
+                    </div>
+                </div>
+
+                <!-- 5. AI Resume Builder (New) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-rose-500/30">
+                        <i class="ri-file-edit-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">AI Resume Builder</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Create a world-class resume in seconds. AI helps you draft bullet points and tailor your profile to beat ATS systems.</p>
+                    </div>
+                </div>
+
+                <!-- 6. Career Community (Original) -->
+                <div class="p-8 rounded-3xl glass-card flex gap-6 items-start hover:bg-white/5 transition-colors">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/30">
+                        <i class="ri-group-fill text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-main);">Career Community</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--text-muted);">Learn, connect, and grow with peers, mentors, and industry professionals in a single, supportive ecosystem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. KEY METRICS -->
+    <section class="py-20 px-6 border-y border-white/5 bg-white/5 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div class="space-y-2">
+                <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-500">1K+</div>
+                <div class="font-medium" style="color: var(--text-muted);">Users Building Careers</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500">100+</div>
+                <div class="font-medium" style="color: var(--text-muted);">Job Opportunities</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">5K+</div>
+                <div class="font-medium" style="color: var(--text-muted);">Profile Views</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">
+                    <i class="ri-rocket-line"></i>
+                </div>
+                <div class="font-medium" style="color: var(--text-muted);">Growing Every Week</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. HOW IT WORKS -->
+    <section id="how-it-works" class="py-24 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-16" style="color: var(--text-main);">Start Your Journey in 3 Steps</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Connecting Line (Desktop) -->
+                <div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-violet-500/30 to-transparent z-0"></div>
+
+                <!-- Step 1 -->
+                <div class="relative z-10 text-center space-y-6">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-white glass-panel flex items-center justify-center border-4 border-violet-500/20 shadow-xl">
+                        <span class="text-3xl font-bold text-violet-500">1</span>
+                    </div>
+                    <h3 class="text-2xl font-bold" style="color: var(--text-main);">AI Builds Your Profile</h3>
+                    <p class="text-base px-4" style="color: var(--text-muted);">Import your data or let our AI guide you to build a standout, verified profile.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative z-10 text-center space-y-6">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-white glass-panel flex items-center justify-center border-4 border-blue-500/20 shadow-xl">
+                        <span class="text-3xl font-bold text-blue-500">2</span>
+                    </div>
+                    <h3 class="text-2xl font-bold" style="color: var(--text-main);">AI Finds the Match</h3>
+                    <p class="text-base px-4" style="color: var(--text-muted);">Our algorithms match your skills to the perfect jobs, internships, and learning paths.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative z-10 text-center space-y-6">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-white glass-panel flex items-center justify-center border-4 border-emerald-500/20 shadow-xl">
+                        <span class="text-3xl font-bold text-emerald-500">3</span>
+                    </div>
+                    <h3 class="text-2xl font-bold" style="color: var(--text-main);">Get Hired Faster</h3>
+                    <p class="text-base px-4" style="color: var(--text-muted);">Apply with one click and let your proven skills do the talking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. VISION & MISSION -->
+    <section id="vision" class="py-24 px-6 bg-gradient-to-r from-violet-900/90 to-indigo-900/90 text-white relative overflow-hidden rounded-3xl mx-4 lg:mx-12 my-12">
+        <div class="absolute top-0 left-0 w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10 space-y-12">
+            <div>
+                <h3 class="text-violet-300 font-bold uppercase tracking-widest mb-4">Our Vision</h3>
+                <h2 class="text-3xl md:text-5xl font-bold leading-tight">
+                    To become the go-to career ecosystem where talent is discovered by skills, not just credentials.
+                </h2>
+            </div>
+            
+            <div class="h-px w-32 bg-white/20 mx-auto"></div>
+
+            <div>
+                <h3 class="text-violet-300 font-bold uppercase tracking-widest mb-6">Our Mission</h3>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">Empower students with real career visibility</div>
+                    <div class="px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">Bridge the gap between education & industry</div>
+                    <div class="px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">Create a skill-first professional network</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. WHO IS NETWORX FOR? -->
+    <section class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-16" style="color: var(--text-main);">Who is NETWORX For?</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="p-8 rounded-2xl glass-card text-center hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-4">🎓</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">Students & Freshers</h3>
+                    <p class="text-sm" style="color: var(--text-muted);">Start your career with the right tools.</p>
+                </div>
+                <div class="p-8 rounded-2xl glass-card text-center hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-4">👨‍💻</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">Early Professionals</h3>
+                    <p class="text-sm" style="color: var(--text-muted);">Accelerate your growth and find better roles.</p>
+                </div>
+                <div class="p-8 rounded-2xl glass-card text-center hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-4">🏢</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">Recruiters & Startups</h3>
+                    <p class="text-sm" style="color: var(--text-muted);">Hire talent that actually delivers.</p>
+                </div>
+                <div class="p-8 rounded-2xl glass-card text-center hover:-translate-y-2 transition-transform">
+                    <div class="text-5xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">Learners & Builders</h3>
+                    <p class="text-sm" style="color: var(--text-muted);">Turn your learning into earning.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FEATURE HIGHLIGHTS (Grid) -->
+    <section class="py-16 px-6 bg-violet-50/5">
+        <div class="max-w-7xl mx-auto">
+             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                 <div class="flex items-center gap-4 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                     <i class="ri-share-forward-line text-2xl text-violet-500"></i>
+                     <span class="font-medium" style="color: var(--text-main);">Public Shareable Profile</span>
+                 </div>
+                 <div class="flex items-center gap-4 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                     <i class="ri-filter-3-line text-2xl text-violet-500"></i>
+                     <span class="font-medium" style="color: var(--text-main);">Smart Job Filters</span>
+                 </div>
+                 <div class="flex items-center gap-4 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                     <i class="ri-verified-badge-line text-2xl text-violet-500"></i>
+                     <span class="font-medium" style="color: var(--text-main);">Verified Postings</span>
+                 </div>
+                 <div class="flex items-center gap-4 p-4 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                     <i class="ri-dashboard-line text-2xl text-violet-500"></i>
+                     <span class="font-medium" style="color: var(--text-main);">Career Dashboard</span>
+                 </div>
+             </div>
+        </div>
+    </section>
+
+    <!-- 10. FINAL CTA -->
+    <section class="py-24 px-6 text-center">
+        <div class="max-w-4xl mx-auto space-y-8">
+            <h2 class="text-4xl md:text-6xl font-bold" style="color: var(--text-main);">Your Career Journey Starts Here.</h2>
+            <p class="text-xl" style="color: var(--text-muted);">Join NETWORX today and stop being just another resume in the pile.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <a href="/signup" class="w-full sm:w-auto px-8 py-4 rounded-xl btn-primary font-bold text-lg shadow-xl shadow-violet-500/30 hover:shadow-violet-500/40 transition-all">
+                    Create Free Account
+                </a>
+                <a href="/jobs" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel border border-violet-500/30 font-bold text-lg hover:bg-violet-500/10 transition-all" style="color: var(--text-main);">
+                    Explore NETWORX
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. FOOTER -->
+    <footer class="py-12 px-6 border-t border-white/10 glass-panel">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <!--<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
+                            <span class="text-white font-bold">N</span>
+                        </div>-->
+                        <span class="text-xl font-bold" style="color: var(--text-main);">NETWORX</span>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-6" style="color: var(--text-muted);">
+                        NETWORX is a skill-first career platform empowering students to showcase work, discover jobs, and grow.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://www.linkedin.com/company/networx-app" target="_blank" class="text-gray-400 hover:text-violet-500 transition-colors"><i class="ri-linkedin-fill text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-violet-500 transition-colors"><i class="ri-twitter-x-line text-xl"></i></a>
+                        <a href="https://www.instagram.com/networx.live/" target="_blank" class="text-gray-400 hover:text-violet-500 transition-colors"><i class="ri-instagram-line text-xl"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6" style="color: var(--text-main);">Platform</h4>
+                    <ul class="space-y-4 text-sm" style="color: var(--text-muted);">
+                        <li><a href="/jobs" class="hover:text-violet-500 transition-colors">Find Jobs</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Browse Companies</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Student Profiles</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Mentorship</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6" style="color: var(--text-main);">Company</h4>
+                    <ul class="space-y-4 text-sm" style="color: var(--text-muted);">
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-violet-500 transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6" style="color: var(--text-main);">Contact</h4>
+                    <ul class="space-y-4 text-sm" style="color: var(--text-muted);">
+                        <li class="flex items-start gap-3">
+                            <i class="ri-mail-line mt-1 text-violet-500"></i>
+                            <span>rajkumar@thenetworx.in</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="ri-map-pin-line mt-1 text-violet-500"></i>
+                            <span>India</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm" style="color: var(--text-muted);">
+                <p>&copy; 2026 NETWORX. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-violet-500 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-violet-500 transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Script -->
+    <script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+    <script>
+        // Optional: Simple animation for stats or entry
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for theme or default to dark for this page specifically if desired
+            // But theme_toggle.js likely handles it based on localStorage
+            
+            // Add custom animations if needed
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                });
+            });
+
+            document.querySelectorAll('section > div').forEach((el) => {
+                el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
