@@ -33,8 +33,16 @@
 	{% include "networx_web_app/templates/includes/sidebar.html" %}
 
 	<main class="flex-1 overflow-y-auto relative">
+		<!-- Mobile Header -->
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+				style="color: var(--text-main);">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+		</header>
 
-		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
 
 			<!-- Top Bar -->
 			<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
@@ -51,12 +59,12 @@
 			</div>
 
 			<!-- Stats Grid -->
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+			<div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-10">
 
 				<!-- Stat 1 -->
 				<a href="/jobs" class="block group">
 					<div
-						class="glass-card rounded-2xl p-6 relative overflow-hidden transition-transform group-hover:scale-[1.02] cursor-pointer">
+						class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden transition-transform group-hover:scale-[1.02] cursor-pointer">
 
 						<!-- Background Icon -->
 						<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -66,18 +74,18 @@
 						<div class="relative z-10">
 							<!-- Icon Badge -->
 							<div
-								class="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-4 text-violet-400">
-								<i class="ri-briefcase-4-line text-2xl"></i>
+								class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-violet-500/20 flex items-center justify-center mb-2 md:mb-4 text-violet-400">
+								<i class="ri-briefcase-4-line text-xl md:text-2xl"></i>
 							</div>
 
-							<div class="text-3xl font-bold mb-1" id="totalJobs">-</div>
-							<div class="text-sm font-medium">Open Job Positions</div>
+							<div class="text-2xl md:text-3xl font-bold mb-1" id="totalJobs">-</div>
+							<div class="text-xs md:text-sm font-medium">Open Job Positions</div>
 						</div>
 					</div>
 				</a>
 
 				<!-- Stat 2 -->
-				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+				<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group">
 
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
@@ -85,17 +93,17 @@
 
 					<div class="relative z-10">
 						<div
-							class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
-							<i class="ri-calendar-event-line text-2xl"></i>
+							class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-500/20 flex items-center justify-center mb-2 md:mb-4 text-emerald-400">
+							<i class="ri-calendar-event-line text-xl md:text-2xl"></i>
 						</div>
 
-						<div class="text-3xl font-bold mb-1" id="upcomingEvents">-</div>
-						<div class="text-sm font-medium">Upcoming Events</div>
+						<div class="text-2xl md:text-3xl font-bold mb-1" id="upcomingEvents">-</div>
+						<div class="text-xs md:text-sm font-medium">Upcoming Events</div>
 					</div>
 				</div>
 
 				<!-- Stat 3 -->
-				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+				<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group">
 
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-file-paper-2-fill text-6xl text-amber-500"></i>
@@ -103,17 +111,17 @@
 
 					<div class="relative z-10">
 						<div
-							class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
-							<i class="ri-file-paper-2-line text-2xl"></i>
+							class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-amber-500/20 flex items-center justify-center mb-2 md:mb-4 text-amber-400">
+							<i class="ri-file-paper-2-line text-xl md:text-2xl"></i>
 						</div>
 
-						<div class="text-3xl font-bold mb-1" id="myApplications">-</div>
-						<div class="text-sm font-medium">My Applications</div>
+						<div class="text-2xl md:text-3xl font-bold mb-1" id="myApplications">-</div>
+						<div class="text-xs md:text-sm font-medium">My Applications</div>
 					</div>
 				</div>
 
 				<!-- Stat 4 -->
-				<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+				<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group">
 
 					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 						<i class="ri-shield-star-fill text-6xl text-pink-500"></i>
@@ -121,12 +129,12 @@
 
 					<div class="relative z-10">
 						<div
-							class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4 text-pink-400">
-							<i class="ri-shield-star-line text-2xl"></i>
+							class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-pink-500/20 flex items-center justify-center mb-2 md:mb-4 text-pink-400">
+							<i class="ri-shield-star-line text-xl md:text-2xl"></i>
 						</div>
 
-						<div class="text-3xl font-bold mb-1" id="pendingReviews">-</div>
-						<div class="text-sm font-medium">Resume Reviews</div>
+						<div class="text-2xl md:text-3xl font-bold mb-1" id="pendingReviews">-</div>
+						<div class="text-xs md:text-sm font-medium">Resume Reviews</div>
 					</div>
 				</div>
 

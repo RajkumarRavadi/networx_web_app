@@ -25,14 +25,15 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto relative">
 		<!-- Mobile Header -->
-		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
-			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
-			<button class="p-2" style="color: var(--text-main);">
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+				style="color: var(--text-main);">
 				<i class="ri-menu-line text-2xl"></i>
 			</button>
 		</header>
 
-		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
 
 			<!-- Back Button -->
 			<a href="/jobs" class="inline-flex items-center gap-2 mb-6 text-sm font-medium hover:underline"
@@ -49,26 +50,26 @@
 			<div id="jobContent" class="hidden">
 
 				<!-- Header Card -->
-				<div class="glass-panel rounded-2xl p-8 mb-8 relative overflow-hidden">
+				<div class="glass-panel rounded-xl md:rounded-2xl p-4 md:p-8 mb-6 md:mb-8 relative overflow-hidden">
 					<div class="absolute top-0 right-0 p-8 opacity-5">
 						<i class="ri-briefcase-4-fill text-9xl" style="color: var(--primary);"></i>
 					</div>
 
-					<div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+					<div class="relative z-10 flex flex-col md:flex-row gap-4 md:gap-6 items-start">
 						<!-- Logo -->
 						<div id="jobLogoContainer"
-							class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl font-bold shadow-lg flex-shrink-0"
+							class="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg flex-shrink-0"
 							style="background: var(--bg-body); color: var(--primary);">
 							<!-- Logo or Initial -->
 						</div>
 
-						<div class="flex-1">
-							<h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: var(--text-main);"
+						<div class="flex-1 w-full">
+							<h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2" style="color: var(--text-main);"
 								id="jobTitle">Loading...</h1>
-							<div class="text-xl mb-4 font-medium" style="color: var(--text-muted);" id="companyName">
+							<div class="text-lg md:text-xl mb-3 md:mb-4 font-medium" style="color: var(--text-muted);" id="companyName">
 								Loading...</div>
 
-							<div class="flex flex-wrap gap-4 text-sm mb-6">
+							<div class="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm mb-4 md:mb-6">
 								<span
 									class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
 									style="color: var(--text-main);">
@@ -93,14 +94,14 @@
 								</span>
 							</div>
 
-							<div id="actionButtons" class="flex gap-4">
+							<div id="actionButtons" class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
 								<!-- Buttons injected by JS -->
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
 					<!-- Main Info -->
 					<div class="lg:col-span-2 space-y-8">
@@ -167,7 +168,7 @@
 	<!-- Application Modal -->
 	<div id="applicationModal"
 		class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-		<div class="glass-panel w-full max-w-lg rounded-2xl p-6 shadow-2xl transform transition-all scale-95 opacity-0"
+		<div class="glass-panel w-full max-w-lg rounded-xl md:rounded-2xl p-4 md:p-6 shadow-2xl transform transition-all scale-95 opacity-0 max-h-[90vh] overflow-y-auto"
 			id="modalContent">
 			<div class="flex justify-between items-center mb-6">
 				<h3 class="text-xl font-bold" style="color: var(--text-main);">Apply for this Job</h3>
@@ -184,14 +185,14 @@
 						placeholder="Tell us why you're a great fit for this role..." required></textarea>
 				</div>
 
-				<div class="flex justify-end gap-3">
+				<div class="flex flex-col sm:flex-row justify-end gap-3">
 					<button type="button" onclick="closeApplicationModal()"
-						class="px-6 py-2.5 rounded-xl border font-medium hover:bg-white/5 transition-colors"
+						class="w-full sm:w-auto px-6 py-2.5 rounded-xl border font-medium hover:bg-white/5 transition-colors text-sm md:text-base"
 						style="border-color: var(--border-color); color: var(--text-main);">
 						Cancel
 					</button>
 					<button type="submit"
-						class="px-6 py-2.5 rounded-xl btn-primary font-medium shadow-lg shadow-violet-500/20">
+						class="w-full sm:w-auto px-6 py-2.5 rounded-xl btn-primary font-medium text-sm md:text-base shadow-lg shadow-violet-500/20">
 						Submit Application
 					</button>
 				</div>
@@ -307,19 +308,19 @@
 			const btnContainer = document.getElementById('actionButtons');
 			if (jobData.is_external_listing) {
 				btnContainer.innerHTML = `
-                    <a href="${jobData.source_url || '#'}" target="_blank" class="px-8 py-3 rounded-xl btn-primary font-bold shadow-lg shadow-violet-500/20 inline-flex items-center gap-2">
+                    <a href="${jobData.source_url || '#'}" target="_blank" class="w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 rounded-xl btn-primary font-bold text-sm md:text-base shadow-lg shadow-violet-500/20 inline-flex items-center justify-center gap-2">
                         Apply on External Site <i class="ri-external-link-line"></i>
                     </a>
                 `;
 			} else if (hasApplied) {
 				btnContainer.innerHTML = `
-                    <button disabled class="px-8 py-3 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/20 cursor-not-allowed flex items-center gap-2">
+                    <button disabled class="w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-sm md:text-base border border-emerald-500/20 cursor-not-allowed flex items-center justify-center gap-2">
                         <i class="ri-check-line"></i> Applied
                     </button>
                 `;
 			} else {
 				btnContainer.innerHTML = `
-                    <button onclick="openApplicationModal()" class="px-8 py-3 rounded-xl btn-primary font-bold shadow-lg shadow-violet-500/20 hover:scale-105 transition-transform">
+                    <button onclick="openApplicationModal()" class="w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 rounded-xl btn-primary font-bold text-sm md:text-base shadow-lg shadow-violet-500/20 hover:scale-105 transition-transform">
                         Apply Now
                     </button>
                 `;

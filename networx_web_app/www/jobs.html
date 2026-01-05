@@ -37,14 +37,15 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto relative">
 		<!-- Mobile Header -->
-		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
-			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
-			<button class="p-2" style="color: var(--text-main);">
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+				style="color: var(--text-main);">
 				<i class="ri-menu-line text-2xl"></i>
 			</button>
 		</header>
 
-		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
 
 			<!-- Header -->
 			<div class="mb-8">
@@ -56,13 +57,13 @@
 			<div class="mb-8">
 				<!-- Minimal Search -->
 				<div class="relative max-w-2xl mx-auto mb-6">
-					<div class="glass-panel rounded-full p-2 flex items-center">
+					<div class="glass-panel rounded-full p-2 flex items-center border border-white/20 dark:border-white/10">
 						<i class="ri-search-line ml-4 text-xl" style="color: var(--text-muted);"></i>
 						<input type="text" id="searchInput"
-							class="w-full bg-transparent border-none focus:ring-0 px-4 py-2 text-lg"
+							class="w-full bg-transparent border-none focus:ring-0 px-4 py-2 text-lg placeholder-gray-400 dark:placeholder-gray-500"
 							style="color: var(--text-main);" placeholder="Search for jobs, companies, or keywords...">
 						<button id="searchBtn"
-							class="p-2 rounded-full bg-primary text-white hover:opacity-90 transition-opacity">
+							class="p-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/20">
 							<i class="ri-arrow-right-line text-xl"></i>
 						</button>
 					</div>
@@ -71,28 +72,28 @@
 				<!-- Quick Filters -->
 				<div class="flex flex-wrap justify-center gap-3">
 					<button
-						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-white/10"
-						data-filter="suggested" style="border-color: var(--border-color); color: var(--text-muted);">
+						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-violet-500/10 dark:hover:bg-white/10"
+						data-filter="suggested" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
 						✨ Suggested For You
 					</button>
 					<button
-						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-white/10"
-						data-filter="internship" style="border-color: var(--border-color); color: var(--text-muted);">
+						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-violet-500/10 dark:hover:bg-white/10"
+						data-filter="internship" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
 						🎓 Internships
 					</button>
 					<button
-						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-white/10"
-						data-filter="entry_level" style="border-color: var(--border-color); color: var(--text-muted);">
+						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-violet-500/10 dark:hover:bg-white/10"
+						data-filter="entry_level" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
 						🚀 Entry Level
 					</button>
 					<button
-						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-white/10"
-						data-filter="fresher" style="border-color: var(--border-color); color: var(--text-muted);">
+						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-violet-500/10 dark:hover:bg-white/10"
+						data-filter="fresher" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
 						🌱 Freshers
 					</button>
 					<button
-						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-white/10"
-						data-filter="govt" style="border-color: var(--border-color); color: var(--text-muted);">
+						class="quick-filter-btn px-4 py-2 rounded-full border transition-all text-sm font-medium hover:bg-violet-500/10 dark:hover:bg-white/10"
+						data-filter="govt" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
 						🏛️ Govt Jobs
 					</button>
 				</div>
@@ -346,17 +347,20 @@
 
 				// Remove active from all
 				document.querySelectorAll('.quick-filter-btn').forEach(b => {
-					b.classList.remove('active', 'bg-primary', 'text-white');
-					b.classList.add('border', 'text-muted');
+					b.classList.remove('active');
 					b.style.borderColor = 'var(--border-color)';
-					b.style.color = 'var(--text-muted)';
+					b.style.color = 'var(--text-main)';
+					b.style.backgroundColor = 'transparent';
+					b.style.borderWidth = '1px';
 				});
 
 				if (!wasActive) {
-					e.target.classList.add('active', 'bg-primary', 'text-white');
-					e.target.classList.remove('border', 'text-muted');
-					e.target.style.borderColor = 'transparent';
+					e.target.classList.add('active');
+					// Active state: solid background with good contrast
+					e.target.style.backgroundColor = 'var(--primary)';
 					e.target.style.color = 'white';
+					e.target.style.borderColor = 'var(--primary)';
+					e.target.style.borderWidth = '1px';
 				}
 
 				applyFilters();

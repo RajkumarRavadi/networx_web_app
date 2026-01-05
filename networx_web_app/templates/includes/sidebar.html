@@ -1,17 +1,26 @@
+<!-- Mobile Backdrop -->
+<div id="sidebarBackdrop" 
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"
+    onclick="toggleMobileSidebar()">
+</div>
+
 <aside id="mainSidebar"
-    class="w-64 glass-panel flex-shrink-0 hidden md:flex flex-col h-full z-20 relative border-r border-white/10 transition-all duration-300 ease-in-out">
+    class="fixed inset-y-0 left-0 z-50 w-64 glass-panel flex flex-col h-full border-r border-white/10 transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 md:static shadow-xl md:shadow-none">
     <div class="p-6 flex items-center justify-between">
         <a href="/dashboard" class="flex items-center gap-3 group overflow-hidden whitespace-nowrap">
-            <div
-                class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-all flex-shrink-0">
-                <span class="text-xl font-bold text-white">N</span>
-            </div>
             <span class="text-xl font-bold tracking-tight sidebar-text transition-opacity duration-300"
                 style="color: var(--text-main);">NETWORX</span>
         </a>
+        
+        <!-- Desktop Toggle -->
         <button id="sidebarToggle"
-            class="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors absolute -right-3 top-8 bg-[#0f172a] border border-white/10 shadow-lg z-50">
+            class="hidden md:block p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors absolute -right-3 top-8 bg-[#0f172a] border border-white/10 shadow-lg z-50">
             <i class="ri-arrow-left-s-line text-lg transition-transform duration-300" id="sidebarToggleIcon"></i>
+        </button>
+
+        <!-- Mobile Close Button -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 hover:text-white">
+            <i class="ri-close-line text-2xl"></i>
         </button>
     </div>
 
@@ -101,6 +110,35 @@
 </aside>
 
 <script>
+    // Global function for mobile toggle
+    window.toggleMobileSidebar = () => {
+        const sidebar = document.getElementById('mainSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const body = document.body;
+        
+        if (!sidebar || !backdrop) return;
+        
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+        
+        if (isOpen) {
+            // Close
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('opacity-0');
+            body.style.overflow = '';
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+            }, 300);
+        } else {
+            // Open
+            backdrop.classList.remove('hidden');
+            backdrop.classList.remove('opacity-0');
+            body.style.overflow = 'hidden';
+            setTimeout(() => {
+                sidebar.classList.remove('-translate-x-full');
+            }, 10);
+        }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         const sidebar = document.getElementById('mainSidebar');
         const toggleBtn = document.getElementById('sidebarToggle');
@@ -108,9 +146,9 @@
         const sidebarTexts = document.querySelectorAll('.sidebar-text');
         const tooltips = document.querySelectorAll('.collapsed-tooltip');
 
-        // Load state
+        // Load desktop state
         const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
-        if (isCollapsed) {
+        if (isCollapsed && window.innerWidth >= 768) { // Only collapse on desktop
             setCollapsed(true);
         }
 
@@ -118,6 +156,7 @@
             const collapsed = sidebar.classList.contains('w-20');
             setCollapsed(!collapsed);
         });
+
 
         // Logout
         const logoutBtn = document.getElementById('logoutBtn');

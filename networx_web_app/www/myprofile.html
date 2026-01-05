@@ -162,14 +162,15 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-y-auto relative">
 		<!-- Mobile Header -->
-		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
-			<a href="/dashboard" class="font-bold text-xl" style="color: var(--text-main);">NETWORX</a>
-			<button class="p-2" style="color: var(--text-main);">
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+				style="color: var(--text-main);">
 				<i class="ri-menu-line text-2xl"></i>
 			</button>
 		</header>
 
-		<div class="p-6 md:p-10 max-w-7xl mx-auto pb-20">
+		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
 
 			<!-- Loading State -->
 			<div id="loadingState" class="flex justify-center py-20">
