@@ -1,0 +1,114 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "format:OTP-{#####}",
+    "creation": "2025-01-20 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "email",
+        "otp_code",
+        "created_at",
+        "expires_at",
+        "is_used",
+        "column_break_1",
+        "ip_address",
+        "user_agent",
+        "failed_attempts"
+    ],
+    "fields": [
+        {
+            "fieldname": "email",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Email",
+            "reqd": 1
+        },
+        {
+            "fieldname": "otp_code",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "OTP Code",
+            "reqd": 1
+        },
+        {
+            "default": "Now",
+            "fieldname": "created_at",
+            "fieldtype": "Datetime",
+            "in_list_view": 1,
+            "label": "Created At",
+            "read_only": 1
+        },
+        {
+            "fieldname": "expires_at",
+            "fieldtype": "Datetime",
+            "in_list_view": 1,
+            "label": "Expires At",
+            "reqd": 1
+        },
+        {
+            "default": "0",
+            "fieldname": "is_used",
+            "fieldtype": "Check",
+            "in_list_view": 1,
+            "label": "Is Used"
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "ip_address",
+            "fieldtype": "Data",
+            "label": "IP Address"
+        },
+        {
+            "fieldname": "user_agent",
+            "fieldtype": "Text",
+            "label": "User Agent"
+        },
+        {
+            "default": "0",
+            "fieldname": "failed_attempts",
+            "fieldtype": "Int",
+            "label": "Failed Attempts"
+        }
+    ],
+    "index_web_pages_for_search": 0,
+    "links": [],
+    "modified": "2025-01-20 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "User OTP",
+    "naming_rule": "Expression",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Student",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 0
+}

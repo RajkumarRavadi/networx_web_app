@@ -14,6 +14,15 @@
 
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+	<style>
+		.login-mode-btn {
+			transition: all 0.3s ease;
+		}
+		.login-mode-btn.active {
+			background-color: var(--primary) !important;
+			color: white !important;
+		}
+	</style>
 </head>
 
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -37,13 +46,30 @@
 				class="hidden bg-emerald-500/10 text-emerald-500 p-3 rounded-lg mb-4 text-sm border border-emerald-500/20">
 			</div>
 
-			<form id="loginForm" class="space-y-6">
+			<!-- Login Mode Toggle -->
+			<div class="mb-6">
+				<div class="flex items-center justify-center gap-4 p-1 glass-panel rounded-lg border border-white/10">
+					<button type="button" id="passwordModeBtn"
+						class="flex-1 py-2 px-4 rounded-md font-medium text-sm transition-all login-mode-btn active"
+						data-mode="password">
+						<i class="ri-lock-password-line mr-2"></i>Password
+					</button>
+					<button type="button" id="otpModeBtn"
+						class="flex-1 py-2 px-4 rounded-md font-medium text-sm transition-all login-mode-btn"
+						data-mode="otp">
+						<i class="ri-mail-line mr-2"></i>OTP
+					</button>
+				</div>
+			</div>
+
+			<!-- Password Login Form -->
+			<form id="loginForm" class="space-y-6 login-mode-form" data-mode="password">
 				<div>
 					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Email or
 						Username</label>
 					<div class="relative">
 						<i class="ri-user-line absolute left-3 top-3 text-gray-400"></i>
-						<input type="text" name="usr"
+						<input type="text" name="usr" id="passwordEmail"
 							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
 							placeholder="Enter your email" required autocomplete="username">
 					</div>
@@ -69,6 +95,48 @@
 				</button>
 			</form>
 
+			<!-- OTP Login Form -->
+			<form id="otpLoginForm" class="space-y-6 login-mode-form hidden" data-mode="otp">
+				<div>
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Email</label>
+					<div class="relative">
+						<i class="ri-mail-line absolute left-3 top-3 text-gray-400"></i>
+						<input type="email" id="otpEmail" name="email"
+							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all"
+							placeholder="Enter your email" required autocomplete="email">
+					</div>
+				</div>
+
+				<div id="otpInputSection" class="hidden">
+					<label class="block text-sm font-medium mb-2" style="color: var(--text-main);">Enter OTP</label>
+					<div class="relative">
+						<i class="ri-shield-keyhole-line absolute left-3 top-3 text-gray-400"></i>
+						<input type="text" id="otpCode" name="otp_code"
+							class="w-full pl-10 pr-4 py-3 rounded-lg form-input transition-all text-center text-2xl tracking-widest font-mono"
+							placeholder="000000" maxlength="6" autocomplete="one-time-code">
+					</div>
+					<p class="text-xs mt-2" style="color: var(--text-muted);">
+						Enter the 6-digit code sent to your email
+					</p>
+				</div>
+
+				<div id="otpActions" class="space-y-3">
+					<button type="button" id="sendOTPBtn"
+						class="w-full py-3 rounded-lg btn-primary font-bold text-lg shadow-lg shadow-violet-500/20">
+						<i class="ri-mail-send-line mr-2"></i>Send OTP
+					</button>
+					<button type="button" id="resendOTPBtn"
+						class="w-full py-3 rounded-lg glass-panel border border-white/20 font-medium text-sm transition-all hidden"
+						style="color: var(--text-main);" disabled>
+						Resend OTP (<span id="resendCountdown">60</span>s)
+					</button>
+					<button type="button" id="verifyOTPBtn"
+						class="w-full py-3 rounded-lg btn-primary font-bold text-lg shadow-lg shadow-violet-500/20 hidden">
+						<i class="ri-check-line mr-2"></i>Verify & Login
+					</button>
+				</div>
+			</form>
+
 			<div class="text-center mt-6 text-sm" style="color: var(--text-muted);">
 				Don't have an account? <a href="/signup" class="font-medium hover:underline"
 					style="color: var(--primary);">Sign Up</a>
@@ -85,8 +153,165 @@
 
 	<!-- Scripts -->
 	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+	<script src="/assets/networx_web_app/js/otp_auth.js"></script>
 	<script>
-		document.getElementById('loginForm').addEventListener('submit', async (e) => {
+		// Wait for DOM and scripts to be fully loaded
+		function initializeLoginPage() {
+			// Check if OTPAuthManager is available
+			if (typeof OTPAuthManager === 'undefined') {
+				console.error('OTPAuthManager is not defined. Retrying...');
+				setTimeout(initializeLoginPage, 100);
+				return;
+			}
+			// Initialize frappe object if not already initialized
+			(function() {
+				if (!window.frappe) {
+					window.frappe = {};
+				}
+				if (!window.frappe.call) {
+					window.frappe.call = function (opts) {
+						// Determine HTTP method - use POST for write operations
+						const isWriteOperation = opts.method && (
+							opts.method.includes('generate') ||
+							opts.method.includes('send') ||
+							opts.method.includes('verify') ||
+							opts.method.includes('resend') ||
+							opts.method.includes('update') ||
+							opts.method.includes('create') ||
+							opts.method.includes('delete')
+						);
+						
+						const httpMethod = isWriteOperation ? 'POST' : 'GET';
+						const params = new URLSearchParams();
+						
+						if (opts.args) {
+							for (const [key, value] of Object.entries(opts.args)) {
+								if (value === null || value === undefined) continue;
+								if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+								if (value === '') continue;
+								if (typeof value === 'object') {
+									params.append(key, JSON.stringify(value));
+								} else {
+									params.append(key, value);
+								}
+							}
+						}
+						
+						const url = '/api/method/' + opts.method;
+						
+						if (httpMethod === 'POST') {
+							// POST request - send data in body
+							return fetch(url, {
+								method: 'POST',
+								headers: { 
+									'Accept': 'application/json',
+									'Content-Type': 'application/x-www-form-urlencoded'
+								},
+								body: params,
+								credentials: 'same-origin'
+							})
+								.then(response => {
+									if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+									return response.json();
+								})
+								.then(data => {
+									if (opts.callback) opts.callback(data);
+									return data;
+								});
+						} else {
+							// GET request - append params to URL
+							const urlWithParams = url + (params.toString() ? '?' + params.toString() : '');
+							return fetch(urlWithParams, {
+								method: 'GET',
+								headers: { 'Accept': 'application/json' },
+								credentials: 'same-origin'
+							})
+								.then(response => {
+									if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+									return response.json();
+								})
+								.then(data => {
+									if (opts.callback) opts.callback(data);
+									return data;
+								});
+						}
+					};
+				}
+			})();
+
+			// Initialize OTP Auth Manager
+			const otpManager = new OTPAuthManager();
+			let currentLoginMode = 'password';
+
+			// Login mode toggle
+			const passwordModeBtn = document.getElementById('passwordModeBtn');
+			const otpModeBtn = document.getElementById('otpModeBtn');
+			const loginForm = document.getElementById('loginForm');
+			const otpLoginForm = document.getElementById('otpLoginForm');
+
+			// Check if elements exist
+			if (!passwordModeBtn || !otpModeBtn || !loginForm || !otpLoginForm) {
+				console.error('Required elements not found:', {
+					passwordModeBtn: !!passwordModeBtn,
+					otpModeBtn: !!otpModeBtn,
+					loginForm: !!loginForm,
+					otpLoginForm: !!otpLoginForm
+				});
+				return;
+			}
+
+			console.log('OTP login mode toggle initialized');
+
+			function switchLoginMode(mode) {
+				console.log('Switching to mode:', mode);
+				currentLoginMode = mode;
+				
+				// Update button states
+				document.querySelectorAll('.login-mode-btn').forEach(btn => {
+					if (btn.dataset.mode === mode) {
+						btn.classList.add('active');
+						btn.style.backgroundColor = 'var(--primary)';
+						btn.style.color = 'white';
+					} else {
+						btn.classList.remove('active');
+						btn.style.backgroundColor = 'transparent';
+						btn.style.color = 'var(--text-main)';
+					}
+				});
+
+				// Show/hide forms
+				if (mode === 'password') {
+					loginForm.classList.remove('hidden');
+					otpLoginForm.classList.add('hidden');
+				} else {
+					loginForm.classList.add('hidden');
+					otpLoginForm.classList.remove('hidden');
+				}
+
+				// Clear messages
+				const errorMsg = document.getElementById('errorMessage');
+				const successMsg = document.getElementById('successMessage');
+				if (errorMsg) errorMsg.classList.add('hidden');
+				if (successMsg) successMsg.classList.add('hidden');
+			}
+
+			// Attach event listeners
+			passwordModeBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				console.log('Password mode button clicked');
+				switchLoginMode('password');
+			});
+			
+			otpModeBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				console.log('OTP mode button clicked');
+				switchLoginMode('otp');
+			});
+			
+			console.log('Event listeners attached to mode toggle buttons');
+
+			// Password login form handler
+			loginForm.addEventListener('submit', async (e) => {
 			e.preventDefault();
 
 			const errorDiv = document.getElementById('errorMessage');
@@ -145,7 +370,197 @@
 				submitBtn.disabled = false;
 				submitBtn.textContent = 'Sign In';
 			}
-		});
+			});
+
+			// OTP login handlers
+			const otpEmailInput = document.getElementById('otpEmail');
+			const otpCodeInput = document.getElementById('otpCode');
+			const sendOTPBtn = document.getElementById('sendOTPBtn');
+			const resendOTPBtn = document.getElementById('resendOTPBtn');
+			const verifyOTPBtn = document.getElementById('verifyOTPBtn');
+			const otpInputSection = document.getElementById('otpInputSection');
+			const errorDiv = document.getElementById('errorMessage');
+			const successDiv = document.getElementById('successMessage');
+
+			// Send OTP handler
+			sendOTPBtn.addEventListener('click', async () => {
+			const email = otpEmailInput.value.trim();
+			
+			errorDiv.classList.add('hidden');
+			successDiv.classList.add('hidden');
+
+			if (!email) {
+				errorDiv.textContent = 'Please enter your email address';
+				errorDiv.classList.remove('hidden');
+				return;
+			}
+
+			sendOTPBtn.disabled = true;
+			sendOTPBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Sending...';
+
+			const result = await otpManager.handleSendOTP(email);
+
+			if (result.success) {
+				// Check if in development mode (email not configured)
+				if (result.dev_mode && result.otp_code) {
+					successDiv.innerHTML = `
+						<div class="mb-2">
+							<strong>Development Mode:</strong> Email not configured. Your OTP is: 
+							<code class="bg-white/10 px-2 py-1 rounded font-mono text-lg font-bold">${result.otp_code}</code>
+						</div>
+						<div class="text-xs opacity-75">
+							Configure email in Frappe Desk > Email Account to send OTPs via email.
+						</div>
+					`;
+					successDiv.classList.remove('hidden');
+				} else {
+					successDiv.textContent = result.message || 'OTP sent successfully! Check your email.';
+					successDiv.classList.remove('hidden');
+				}
+				
+				// Show OTP input section
+				otpInputSection.classList.remove('hidden');
+				sendOTPBtn.classList.add('hidden');
+				verifyOTPBtn.classList.remove('hidden');
+				otpCodeInput.focus();
+
+				// Start resend countdown
+				otpManager.startResendCountdown(60, (seconds) => {
+					if (seconds > 0) {
+						resendOTPBtn.disabled = true;
+						resendOTPBtn.querySelector('#resendCountdown').textContent = seconds;
+						resendOTPBtn.classList.remove('hidden');
+					} else {
+						resendOTPBtn.disabled = false;
+						resendOTPBtn.querySelector('#resendCountdown').textContent = '';
+						resendOTPBtn.innerHTML = 'Resend OTP';
+					}
+				});
+
+				// Setup auto-submit
+				otpManager.autoSubmitOTP(otpCodeInput, email, handleVerifyOTP);
+			} else {
+				errorDiv.textContent = result.message || 'Failed to send OTP. Please try again.';
+				errorDiv.classList.remove('hidden');
+				sendOTPBtn.disabled = false;
+				sendOTPBtn.innerHTML = '<i class="ri-mail-send-line mr-2"></i>Send OTP';
+			}
+			});
+
+			// Resend OTP handler
+			resendOTPBtn.addEventListener('click', async () => {
+			const email = otpEmailInput.value.trim();
+			
+			errorDiv.classList.add('hidden');
+			successDiv.classList.add('hidden');
+
+			resendOTPBtn.disabled = true;
+			resendOTPBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Resending...';
+
+			const result = await otpManager.handleResendOTP(email);
+
+			if (result.success) {
+				// Check if in development mode (email not configured)
+				if (result.dev_mode && result.otp_code) {
+					successDiv.innerHTML = `
+						<div class="mb-2">
+							<strong>Development Mode:</strong> Email not configured. Your OTP is: 
+							<code class="bg-white/10 px-2 py-1 rounded font-mono text-lg font-bold">${result.otp_code}</code>
+						</div>
+						<div class="text-xs opacity-75">
+							Configure email in Frappe Desk > Email Account to send OTPs via email.
+						</div>
+					`;
+					successDiv.classList.remove('hidden');
+				} else {
+					successDiv.textContent = result.message || 'OTP resent successfully!';
+					successDiv.classList.remove('hidden');
+				}
+				
+				// Reset countdown
+				otpManager.startResendCountdown(60, (seconds) => {
+					if (seconds > 0) {
+						resendOTPBtn.disabled = true;
+						resendOTPBtn.querySelector('#resendCountdown').textContent = seconds;
+					} else {
+						resendOTPBtn.disabled = false;
+						resendOTPBtn.querySelector('#resendCountdown').textContent = '';
+						resendOTPBtn.innerHTML = 'Resend OTP';
+					}
+				});
+
+				// Clear and focus OTP input
+				otpCodeInput.value = '';
+				otpCodeInput.focus();
+			} else {
+				errorDiv.textContent = result.message || 'Failed to resend OTP. Please try again.';
+				errorDiv.classList.remove('hidden');
+				resendOTPBtn.disabled = false;
+				resendOTPBtn.innerHTML = 'Resend OTP';
+			}
+			});
+
+			// Verify OTP handler
+			const handleVerifyOTP = async (email, otpCode) => {
+			if (!email) {
+				email = otpEmailInput.value.trim();
+			}
+			if (!otpCode) {
+				otpCode = otpCodeInput.value.trim();
+			}
+
+			errorDiv.classList.add('hidden');
+			successDiv.classList.add('hidden');
+
+			verifyOTPBtn.disabled = true;
+			verifyOTPBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Verifying...';
+
+			const result = await otpManager.handleVerifyOTP(email, otpCode);
+
+			if (result.success) {
+				successDiv.textContent = result.message || 'Login successful! Redirecting...';
+				successDiv.classList.remove('hidden');
+
+				// Store user data in localStorage if provided
+				if (result.user) {
+					localStorage.setItem('networx_user', JSON.stringify(result.user));
+				}
+
+				// Redirect to dashboard
+				setTimeout(() => {
+					window.location.href = '/dashboard';
+				}, 1000);
+			} else {
+				errorDiv.textContent = result.message || 'Invalid OTP. Please try again.';
+				errorDiv.classList.remove('hidden');
+				verifyOTPBtn.disabled = false;
+				verifyOTPBtn.innerHTML = '<i class="ri-check-line mr-2"></i>Verify & Login';
+				
+				// Clear OTP input
+				otpCodeInput.value = '';
+				otpCodeInput.focus();
+			}
+			};
+
+			verifyOTPBtn.addEventListener('click', () => {
+				handleVerifyOTP();
+			});
+
+			// Allow Enter key to submit OTP
+			otpCodeInput.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter' && otpCodeInput.value.length === 6) {
+					handleVerifyOTP();
+				}
+			});
+		} // End of initializeLoginPage
+
+		// Start initialization when DOM is ready
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initializeLoginPage);
+		} else {
+			// DOM is already loaded
+			initializeLoginPage();
+		}
 	</script>
 </body>
 
