@@ -57,15 +57,20 @@ app_license = "mit"
 # ----------
 
 # application home page (will override Website Settings)
+# This sets the landing page for the root URL (/) - applies to all users first
 home_page = "index"
 
 # website user home page (by Role)
+# These redirect logged-in users when they visit root URL to dashboard
+# Note: role_home_page takes precedence over home_page for logged-in users
 role_home_page = {
 	"Student": "dashboard",
     "Website User": "dashboard"
 }
 
-website_user_home_page = "dashboard"
+# Commented out to allow home_page = "index" to work for guests
+# website_user_home_page applies to ALL users (including guests) before home_page is checked
+# website_user_home_page = "dashboard"
 
 # Generators
 # ----------
