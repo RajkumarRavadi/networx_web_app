@@ -589,6 +589,7 @@
 	</script>
 	<script src="/assets/networx_web_app/js/utils.js"></script>
 	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script src="/assets/networx_web_app/js/institute_autocomplete.js"></script>
 	<script>
 		NetworkxUtils.setPageTitle('Edit Profile');
 		
@@ -828,7 +829,11 @@
 				<div class="form-grid-2">
 					<div class="form-group">
 						<label class="form-label">Institution</label>
-						<input type="text" class="form-control js-edu-inst" placeholder="e.g., SRM AP" />
+						<input type="text" class="form-control js-edu-inst" placeholder="Search and select institute..." autocomplete="off" />
+						<input type="hidden" class="js-edu-institute-link" />
+						<small class="form-text" style="color: var(--text-muted); margin-top: 4px; display: block;">
+							Start typing to search from available institutes, or enter manually if not found
+						</small>
 					</div>
 					<div class="form-group">
 						<label class="form-label">Degree</label>
@@ -1170,7 +1175,10 @@
 
 			const education = [];
 			document.querySelectorAll('#educationList .child-row').forEach((row) => {
-				const inst = row.querySelector('.js-edu-inst').value.trim();
+				const instInput = row.querySelector('.js-edu-inst');
+				const instLinkInput = row.querySelector('.js-edu-institute-link');
+				const inst = instInput ? instInput.value.trim() : '';
+				const institute = instLinkInput ? instLinkInput.value.trim() : null;
 				const degree = row.querySelector('.js-edu-degree').value.trim();
 				const field = row.querySelector('.js-edu-field').value.trim();
 				const startYear = row.querySelector('.js-edu-start').value;
@@ -1178,8 +1186,9 @@
 				const grade = row.querySelector('.js-edu-grade').value.trim();
 				const activities = row.querySelector('.js-edu-activities').value.trim();
 				const description = row.querySelector('.js-edu-description').value.trim();
-				if (inst || degree || field || startYear || endYear || description) {
+				if (inst || degree || field || startYear || endYear || description || institute) {
 					education.push({
+						institute: institute || null,
 						institution_name: inst,
 						degree,
 						field_of_study: field,

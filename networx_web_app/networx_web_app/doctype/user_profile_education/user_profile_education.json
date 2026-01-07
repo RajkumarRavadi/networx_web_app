@@ -6,6 +6,7 @@
     "doctype": "DocType",
     "engine": "InnoDB",
     "field_order": [
+        "institute",
         "institution_name",
         "degree",
         "field_of_study",
@@ -18,11 +19,21 @@
     ],
     "fields": [
         {
+            "fieldname": "institute",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Institute",
+            "options": "Institute Profile",
+            "reqd": 0
+        },
+        {
             "fieldname": "institution_name",
             "fieldtype": "Data",
             "in_list_view": 1,
             "label": "Institution Name",
-            "reqd": 1
+            "reqd": 0,
+            "depends_on": "eval:!doc.institute",
+            "description": "Enter manually if institute not found in list"
         },
         {
             "fieldname": "degree",

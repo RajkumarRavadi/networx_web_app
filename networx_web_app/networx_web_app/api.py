@@ -995,3 +995,119 @@ def resend_otp(email):
 	
 	# Generate and send new OTP
 	return generate_and_send_otp(email)
+
+
+# ===============================
+# INSTITUTE SEARCH APIs
+# ===============================
+
+@frappe.whitelist(allow_guest=True)
+def search_institutes(query, limit=20):
+	"""Search institutes by name, slug, or alternate names"""
+	try:
+		# Parse and validate limit
+		try:
+			limit = int(limit) if limit else 20
+			if limit > 50:
+				limit = 50  # Max limit for performance
+		except (ValueError, TypeError):
+			limit = 20
+		
+		if not query or len(query.strip()) < 2:
+			return {
+				"success": True,
+				"institutes": [],
+				"count": 0
+			}
+		
+		search_term = f"%{query.strip()}%"
+		
+		# Search across institute_name, institute_slug, and alternate_names
+		# Only return active institutes
+		institutes = frappe.db.sql("""
+			SELECT 
+				name,
+				institute_name,
+				institute_slug,
+				institute_type,
+				city,
+				state,
+				country
+			FROM `tabInstitute Profile`
+			WHERE institute_status = 'Active'
+				AND (
+					institute_name LIKE %(search)s
+					OR institute_slug LIKE %(search)s
+					OR alternate_names LIKE %(search)s
+				)
+			ORDER BY 
+				CASE 
+					WHEN institute_name LIKE %(exact)s THEN 1
+					WHEN institute_name LIKE %(search)s THEN 2
+					WHEN institute_slug LIKE %(search)s THEN 3
+					ELSE 4
+				END,
+				institute_name ASC
+			LIMIT %(limit)s
+		""", {
+			"search": search_term,
+			"exact": f"{query.strip()}%",
+			"limit": limit
+		}, as_dict=True)
+		
+		return {
+			"success": True,
+			"institutes": institutes,
+			"count": len(institutes)
+		}
+	except Exception as e:
+		frappe.log_error(f"Error searching institutes: {str(e)}")
+		return {
+			"success": False,
+			"message": "An error occurred while searching institutes",
+			"institutes": [],
+			"count": 0
+		}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_institute_details(institute_id):
+	"""Get full details of a specific institute"""
+	try:
+		if not institute_id:
+			return {
+				"success": False,
+				"message": "Institute ID is required"
+			}
+		
+		if not frappe.db.exists("Institute Profile", institute_id):
+			return {
+				"success": False,
+				"message": "Institute not found"
+			}
+		
+		institute = frappe.get_doc("Institute Profile", institute_id)
+		
+		return {
+			"success": True,
+			"institute": {
+				"name": institute.name,
+				"institute_name": institute.institute_name,
+				"institute_slug": institute.institute_slug,
+				"institute_type": institute.institute_type,
+				"institute_status": institute.institute_status,
+				"city": institute.city,
+				"state": institute.state,
+				"country": institute.country,
+				"website": institute.website,
+				"email": institute.email,
+				"phone": institute.phone
+			}
+		}
+		
+	except Exception as e:
+		frappe.log_error(f"Error getting institute details: {str(e)}")
+		return {
+			"success": False,
+			"message": "An error occurred while fetching institute details"
+		}

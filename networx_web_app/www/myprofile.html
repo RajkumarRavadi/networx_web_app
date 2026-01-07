@@ -767,6 +767,7 @@
 	</script>
 	<script src="/assets/networx_web_app/js/utils.js"></script>
 	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
+	<script src="/assets/networx_web_app/js/institute_autocomplete.js"></script>
 	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
 
 	<script>
@@ -1227,9 +1228,15 @@
 						</button>
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-						<input type="text" class="p-2 rounded form-input" placeholder="Institution Name *" 
-							value="${(item.institution_name || item.school || item.institution || item.university || '').replace(/"/g, '&quot;')}" 
-							data-field="institution_name" required>
+						<div>
+							<input type="text" class="p-2 rounded form-input institute-autocomplete-input" placeholder="Search and select institute..." 
+								value="${(item.institution_name || item.school || item.institution || item.university || '').replace(/"/g, '&quot;')}" 
+								data-field="institution_name" data-institute-id="${(item.institute || '').replace(/"/g, '&quot;')}" autocomplete="off">
+							<input type="hidden" class="institute-link-input" data-field="institute" value="${(item.institute || '').replace(/"/g, '&quot;')}">
+							<small class="text-xs opacity-75" style="color: var(--text-muted); display: block; margin-top: 4px;">
+								Start typing to search from available institutes, or enter manually if not found
+							</small>
+						</div>
 						<input type="text" class="p-2 rounded form-input" placeholder="Degree" 
 							value="${(item.degree || '').replace(/"/g, '&quot;')}" 
 							data-field="degree">
@@ -1250,6 +1257,19 @@
 						data-field="description">${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
 				</div>
 			`).join('');
+			
+			// Initialize autocomplete for all education items
+			if (typeof InstituteAutocomplete !== 'undefined') {
+				setTimeout(() => {
+					container.querySelectorAll('.institute-autocomplete-input').forEach((input) => {
+						const hiddenInput = input.parentElement.querySelector('.institute-link-input');
+						if (hiddenInput && !input.dataset.autocompleteInitialized) {
+							new InstituteAutocomplete(input, hiddenInput);
+							input.dataset.autocompleteInitialized = 'true';
+						}
+					});
+				}, 100);
+			}
 		};
 
 		const renderSkillsEdit = () => {
@@ -1357,7 +1377,13 @@
 					</button>
 				</div>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-					<input type="text" class="p-2 rounded form-input" placeholder="Institution Name *" data-field="institution_name" required>
+					<div>
+						<input type="text" class="p-2 rounded form-input institute-autocomplete-input" placeholder="Search and select institute..." data-field="institution_name" autocomplete="off">
+						<input type="hidden" class="institute-link-input" data-field="institute">
+						<small class="text-xs opacity-75" style="color: var(--text-muted); display: block; margin-top: 4px;">
+							Start typing to search from available institutes
+						</small>
+					</div>
 					<input type="text" class="p-2 rounded form-input" placeholder="Degree" data-field="degree">
 					<input type="text" class="p-2 rounded form-input" placeholder="Field of Study" data-field="field_of_study">
 					<input type="number" class="p-2 rounded form-input" placeholder="Start Year" data-field="start_year">
@@ -1367,6 +1393,13 @@
 				<textarea class="w-full p-2 rounded form-input mt-3" rows="2" placeholder="Description (Optional)" data-field="description"></textarea>
 			`;
 			container.appendChild(newItem);
+			
+			// Initialize autocomplete for new item
+			const instInput = newItem.querySelector('.institute-autocomplete-input');
+			const instLinkInput = newItem.querySelector('.institute-link-input');
+			if (instInput && instLinkInput && typeof InstituteAutocomplete !== 'undefined') {
+				new InstituteAutocomplete(instInput, instLinkInput);
+			}
 		};
 
 		window.addSkillItem = () => {

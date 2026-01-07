@@ -11,6 +11,7 @@
         "institute_type",
         "institute_slug",
         "institute_status",
+        "alternate_names",
         "column_break_1",
         "email",
         "phone",
@@ -69,6 +70,12 @@
             "options": "Active\nInactive",
             "reqd": 1,
             "default": "Active"
+        },
+        {
+            "fieldname": "alternate_names",
+            "fieldtype": "Small Text",
+            "label": "Alternate Names",
+            "description": "Common variations, abbreviations, or alternate spellings (comma-separated). Used for search matching."
         },
         {
             "fieldname": "column_break_1",
