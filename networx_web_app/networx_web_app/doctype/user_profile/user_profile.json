@@ -30,7 +30,9 @@
         "section_break_volunteer",
         "volunteer_experience",
         "section_break_awards",
-        "awards"
+        "awards",
+        "section_break_projects",
+        "projects"
     ],
     "fields": [
         {
@@ -177,6 +179,17 @@
             "fieldtype": "Table",
             "label": "Awards",
             "options": "User Profile Award"
+        },
+        {
+            "fieldname": "section_break_projects",
+            "fieldtype": "Section Break",
+            "label": "Projects"
+        },
+        {
+            "fieldname": "projects",
+            "fieldtype": "Table",
+            "label": "Projects",
+            "options": "User Profile Project"
         }
     ],
     "index_web_pages_for_search": 1,

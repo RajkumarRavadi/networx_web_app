@@ -24,7 +24,8 @@ def update_user_profile(data=None, user=None):
         "skills": [ { ... }, ... ],
         "certifications": [ { ... }, ... ],
         "volunteer_experience": [ { ... }, ... ],
-        "awards": [ { ... }, ... ]
+        "awards": [ { ... }, ... ],
+        "projects": [ { ... }, ... ]
     }
     """
 
@@ -105,6 +106,7 @@ def update_user_profile(data=None, user=None):
         "certifications",
         "volunteer_experience",
         "awards",
+        "projects",
     ]
 
     for table_field in child_tables:
@@ -116,6 +118,16 @@ def update_user_profile(data=None, user=None):
             for row in rows:
                 cleaned = clean_child_row(row)
                 if cleaned:
+                    # Special handling for projects: validate institute link
+                    if table_field == "projects" and cleaned.get("institute"):
+                        institute_value = cleaned.get("institute")
+                        # Check if it's a valid link to Institute Profile
+                        if not frappe.db.exists("Institute Profile", institute_value):
+                            # Invalid link - move to institute_name and clear institute
+                            if not cleaned.get("institute_name"):
+                                cleaned["institute_name"] = institute_value
+                            cleaned["institute"] = None
+                    
                     profile.append(table_field, cleaned)
 
     # Save document

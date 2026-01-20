@@ -1,0 +1,202 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "hash",
+    "creation": "2025-01-15 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "title",
+        "project_type",
+        "role",
+        "column_break_1",
+        "start_date",
+        "end_date",
+        "is_ongoing",
+        "section_break_links",
+        "repo_url",
+        "demo_url",
+        "video_url",
+        "case_study_url",
+        "column_break_2",
+        "tech_stack",
+        "highlights",
+        "impact_metrics",
+        "section_break_context",
+        "institute",
+        "institute_name",
+        "course_or_program",
+        "team_size",
+        "collaboration",
+        "column_break_3",
+        "description",
+        "attachment"
+    ],
+    "fields": [
+        {
+            "fieldname": "title",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Project Title",
+            "reqd": 1
+        },
+        {
+            "fieldname": "project_type",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Project Type",
+            "options": "Personal\nAcademic\nHackathon\nInternship\nFreelance\nOpen Source\nResearch",
+            "reqd": 1
+        },
+        {
+            "fieldname": "role",
+            "fieldtype": "Data",
+            "label": "Your Role",
+            "description": "e.g., Frontend Developer, Team Lead, Full Stack Developer"
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "start_date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "label": "Start Date"
+        },
+        {
+            "fieldname": "end_date",
+            "fieldtype": "Date",
+            "label": "End Date"
+        },
+        {
+            "fieldname": "is_ongoing",
+            "default": "0",
+            "fieldtype": "Check",
+            "label": "Ongoing Project"
+        },
+        {
+            "fieldname": "section_break_links",
+            "fieldtype": "Section Break",
+            "label": "Project Links & Proof"
+        },
+        {
+            "fieldname": "repo_url",
+            "fieldtype": "Data",
+            "label": "Repository URL",
+            "options": "URL",
+            "description": "GitHub, GitLab, or other repository link"
+        },
+        {
+            "fieldname": "demo_url",
+            "fieldtype": "Data",
+            "label": "Demo/Live URL",
+            "options": "URL",
+            "description": "Live demo or deployed application link"
+        },
+        {
+            "fieldname": "video_url",
+            "fieldtype": "Data",
+            "label": "Video URL",
+            "options": "URL",
+            "description": "Demo video, presentation, or walkthrough"
+        },
+        {
+            "fieldname": "case_study_url",
+            "fieldtype": "Data",
+            "label": "Case Study URL",
+            "options": "URL",
+            "description": "Blog post, article, or detailed case study"
+        },
+        {
+            "fieldname": "column_break_2",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "tech_stack",
+            "fieldtype": "Small Text",
+            "label": "Tech Stack",
+            "description": "Technologies, frameworks, and tools used (comma-separated or line-separated)"
+        },
+        {
+            "fieldname": "highlights",
+            "fieldtype": "Small Text",
+            "label": "Key Highlights",
+            "description": "2-5 bullet points of key achievements or features"
+        },
+        {
+            "fieldname": "impact_metrics",
+            "fieldtype": "Small Text",
+            "label": "Impact & Metrics",
+            "description": "Measurable results: users served, performance improvements, revenue, awards, etc."
+        },
+        {
+            "fieldname": "section_break_context",
+            "fieldtype": "Section Break",
+            "label": "Context & Collaboration"
+        },
+        {
+            "fieldname": "institute",
+            "fieldtype": "Link",
+            "label": "Institute",
+            "options": "Institute Profile",
+            "description": "If this project was part of coursework or institute program"
+        },
+        {
+            "fieldname": "institute_name",
+            "fieldtype": "Data",
+            "label": "Institute Name",
+            "depends_on": "eval:!doc.institute",
+            "description": "Enter manually if institute not found in list"
+        },
+        {
+            "fieldname": "course_or_program",
+            "fieldtype": "Data",
+            "label": "Course or Program",
+            "description": "Course name, program, or academic context"
+        },
+        {
+            "fieldname": "team_size",
+            "fieldtype": "Int",
+            "label": "Team Size",
+            "description": "Number of team members (1 for solo projects)"
+        },
+        {
+            "fieldname": "collaboration",
+            "fieldtype": "Small Text",
+            "label": "Collaborators",
+            "description": "Names and roles of team members or collaborators"
+        },
+        {
+            "fieldname": "column_break_3",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Text Editor",
+            "label": "Description",
+            "description": "Detailed description of the project, your contributions, and outcomes"
+        },
+        {
+            "fieldname": "attachment",
+            "fieldtype": "Attach",
+            "label": "Attachment",
+            "description": "PDF report, poster, documentation, or other supporting files"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "User Profile Project",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "start_date",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}
+

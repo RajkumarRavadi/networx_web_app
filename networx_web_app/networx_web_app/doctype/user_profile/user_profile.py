@@ -117,6 +117,28 @@ PUBLIC_CHILD_FIELD_MAP: Dict[str, List[str]] = {
 		"description",
 	],
 	"awards": ["title", "issuer", "issue_date", "description"],
+	"projects": [
+		"title",
+		"project_type",
+		"role",
+		"start_date",
+		"end_date",
+		"is_ongoing",
+		"repo_url",
+		"demo_url",
+		"video_url",
+		"case_study_url",
+		"tech_stack",
+		"highlights",
+		"impact_metrics",
+		"institute",
+		"institute_name",
+		"course_or_program",
+		"team_size",
+		"collaboration",
+		"description",
+		"attachment",
+	],
 }
 
 
