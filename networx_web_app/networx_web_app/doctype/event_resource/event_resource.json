@@ -1,0 +1,86 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "hash",
+    "creation": "2025-01-15 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "resource_name",
+        "resource_type",
+        "column_break_1",
+        "available_after_event",
+        "release_date",
+        "section_break_file",
+        "resource_file",
+        "resource_url"
+    ],
+    "fields": [
+        {
+            "fieldname": "resource_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Resource Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "resource_type",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Resource Type",
+            "options": "Slides\nRecording\nDocument\nLink\nVideo",
+            "reqd": 1
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "0",
+            "fieldname": "available_after_event",
+            "fieldtype": "Check",
+            "label": "Available After Event",
+            "description": "Release this resource only after event ends"
+        },
+        {
+            "fieldname": "release_date",
+            "fieldtype": "Datetime",
+            "label": "Release Date",
+            "description": "Specific date/time to release this resource"
+        },
+        {
+            "fieldname": "section_break_file",
+            "fieldtype": "Section Break",
+            "label": "Resource File or Link"
+        },
+        {
+            "fieldname": "resource_file",
+            "fieldtype": "Attach",
+            "label": "Resource File",
+            "description": "Upload file (PDF, slides, video, etc.)",
+            "depends_on": "eval:doc.resource_type != 'Link'"
+        },
+        {
+            "fieldname": "resource_url",
+            "fieldtype": "Data",
+            "label": "Resource URL",
+            "options": "URL",
+            "description": "External link to resource",
+            "depends_on": "eval:doc.resource_type == 'Link' || doc.resource_type == 'Video'"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "Event Resource",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "release_date",
+    "sort_order": "ASC",
+    "states": [],
+    "track_changes": 1
+}

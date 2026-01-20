@@ -1,114 +1,379 @@
 {
- "actions": [],
- "allow_rename": 1,
- "autoname": "format:EVT-{#####}",
- "creation": "2025-10-11 12:00:00.000000",
- "doctype": "DocType",
- "engine": "InnoDB",
- "field_order": [
-  "event_name",
-  "event_type",
-  "event_date",
-  "column_break_1",
-  "location",
-  "registration_link",
-  "section_break_2",
-  "description",
-  "section_break_3",
-  "event_banner"
- ],
- "fields": [
-  {
-   "fieldname": "event_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Event Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "event_type",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Event Type",
-   "options": "Hackathon\nWorkshop\nWebinar\nCareer Fair"
-  },
-  {
-   "fieldname": "event_date",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "Event Date"
-  },
-  {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "location",
-   "fieldtype": "Data",
-   "label": "Location"
-  },
-  {
-   "fieldname": "registration_link",
-   "fieldtype": "Data",
-   "label": "Registration Link"
-  },
-  {
-   "fieldname": "section_break_2",
-   "fieldtype": "Section Break",
-   "label": "Event Details"
-  },
-  {
-   "fieldname": "description",
-   "fieldtype": "Text Editor",
-   "label": "Description"
-  },
-  {
-   "fieldname": "section_break_3",
-   "fieldtype": "Section Break",
-   "label": "Banner"
-  },
-  {
-   "fieldname": "event_banner",
-   "fieldtype": "Attach Image",
-   "label": "Event Banner"
-  }
- ],
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-10-11 12:00:00.000000",
- "modified_by": "Administrator",
- "module": "Networx Web App",
- "name": "Networx Event",
- "naming_rule": "Expression",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Student",
-   "share": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "format:EVT-{#####}",
+    "creation": "2025-01-14 12:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "event_name",
+        "event_type",
+        "event_status",
+        "is_featured",
+        "event_date",
+        "end_date",
+        "timezone",
+        "column_break_1",
+        "location_type",
+        "location",
+        "venue_address",
+        "online_meeting_link",
+        "section_break_registration",
+        "registration_enabled",
+        "registration_type",
+        "registration_deadline",
+        "max_capacity",
+        "waitlist_enabled",
+        "waitlist_capacity",
+        "column_break_registration",
+        "require_approval",
+        "auto_confirm",
+        "registration_link",
+        "section_break_organizer",
+        "organizer_name",
+        "organizer_email",
+        "organizer_phone",
+        "column_break_organizer",
+        "target_audience",
+        "institute",
+        "tags",
+        "section_break_pricing",
+        "is_free",
+        "registration_fee",
+        "currency",
+        "section_break_2",
+        "description",
+        "section_break_resources",
+        "resources",
+        "section_break_3",
+        "event_banner",
+        "section_break_analytics",
+        "total_registrations",
+        "total_attendees",
+        "total_waitlist"
+    ],
+    "fields": [
+        {
+            "fieldname": "event_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Event Name",
+            "reqd": 1
+        },
+        {
+            "fieldname": "event_type",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Event Type",
+            "options": "Hackathon\nWorkshop\nWebinar\nCareer Fair\nNetworking\nConference\nSeminar\nCompetition\nMeetup\nTraining"
+        },
+        {
+            "default": "Published",
+            "fieldname": "event_status",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Event Status",
+            "options": "Draft\nPublished\nCancelled\nCompleted"
+        },
+        {
+            "default": "0",
+            "fieldname": "is_featured",
+            "fieldtype": "Check",
+            "label": "Featured Event"
+        },
+        {
+            "fieldname": "event_date",
+            "fieldtype": "Datetime",
+            "in_list_view": 1,
+            "label": "Event Start Date",
+            "reqd": 1
+        },
+        {
+            "fieldname": "end_date",
+            "fieldtype": "Datetime",
+            "label": "Event End Date",
+            "description": "Leave empty for single-day events"
+        },
+        {
+            "fieldname": "timezone",
+            "fieldtype": "Data",
+            "label": "Timezone",
+            "default": "UTC",
+            "description": "e.g., Asia/Kolkata, America/New_York"
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "location_type",
+            "fieldtype": "Select",
+            "label": "Location Type",
+            "options": "Physical\nOnline\nHybrid",
+            "default": "Physical"
+        },
+        {
+            "fieldname": "location",
+            "fieldtype": "Data",
+            "label": "Location",
+            "description": "City, venue name, or 'Online'"
+        },
+        {
+            "fieldname": "venue_address",
+            "fieldtype": "Small Text",
+            "label": "Venue Address",
+            "depends_on": "eval:doc.location_type == 'Physical' || doc.location_type == 'Hybrid'"
+        },
+        {
+            "fieldname": "online_meeting_link",
+            "fieldtype": "Data",
+            "label": "Online Meeting Link",
+            "options": "URL",
+            "depends_on": "eval:doc.location_type == 'Online' || doc.location_type == 'Hybrid'",
+            "description": "Zoom, Google Meet, or other meeting link"
+        },
+        {
+            "fieldname": "section_break_registration",
+            "fieldtype": "Section Break",
+            "label": "Registration & Capacity"
+        },
+        {
+            "default": "1",
+            "fieldname": "registration_enabled",
+            "fieldtype": "Check",
+            "label": "Enable Registration"
+        },
+        {
+            "default": "Internal",
+            "fieldname": "registration_type",
+            "fieldtype": "Select",
+            "label": "Registration Type",
+            "options": "Internal\nExternal Link\nBoth",
+            "depends_on": "eval:doc.registration_enabled"
+        },
+        {
+            "fieldname": "registration_deadline",
+            "fieldtype": "Datetime",
+            "label": "Registration Deadline",
+            "depends_on": "eval:doc.registration_enabled"
+        },
+        {
+            "default": "0",
+            "fieldname": "max_capacity",
+            "fieldtype": "Int",
+            "label": "Maximum Capacity",
+            "description": "0 = unlimited",
+            "depends_on": "eval:doc.registration_enabled"
+        },
+        {
+            "default": "0",
+            "fieldname": "waitlist_enabled",
+            "fieldtype": "Check",
+            "label": "Enable Waitlist",
+            "depends_on": "eval:doc.registration_enabled && doc.max_capacity > 0"
+        },
+        {
+            "default": "0",
+            "fieldname": "waitlist_capacity",
+            "fieldtype": "Int",
+            "label": "Waitlist Capacity",
+            "description": "0 = unlimited waitlist",
+            "depends_on": "eval:doc.waitlist_enabled"
+        },
+        {
+            "fieldname": "column_break_registration",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "0",
+            "fieldname": "require_approval",
+            "fieldtype": "Check",
+            "label": "Require Approval",
+            "description": "Manual approval for registrations",
+            "depends_on": "eval:doc.registration_enabled"
+        },
+        {
+            "default": "1",
+            "fieldname": "auto_confirm",
+            "fieldtype": "Check",
+            "label": "Auto Confirm",
+            "description": "Automatically confirm registrations (if not requiring approval)",
+            "depends_on": "eval:doc.registration_enabled && !doc.require_approval"
+        },
+        {
+            "fieldname": "registration_link",
+            "fieldtype": "Data",
+            "label": "External Registration Link",
+            "options": "URL",
+            "depends_on": "eval:doc.registration_type == 'External Link' || doc.registration_type == 'Both'",
+            "description": "External registration URL (Eventbrite, etc.)"
+        },
+        {
+            "fieldname": "section_break_organizer",
+            "fieldtype": "Section Break",
+            "label": "Organizer Information"
+        },
+        {
+            "fieldname": "organizer_name",
+            "fieldtype": "Data",
+            "label": "Organizer Name"
+        },
+        {
+            "fieldname": "organizer_email",
+            "fieldtype": "Data",
+            "label": "Organizer Email",
+            "options": "Email"
+        },
+        {
+            "fieldname": "organizer_phone",
+            "fieldtype": "Data",
+            "label": "Organizer Phone"
+        },
+        {
+            "fieldname": "column_break_organizer",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "All Students",
+            "fieldname": "target_audience",
+            "fieldtype": "Select",
+            "label": "Target Audience",
+            "options": "All Students\nGraduates\nSpecific Year\nSpecific Institute"
+        },
+        {
+            "fieldname": "institute",
+            "fieldtype": "Link",
+            "label": "Institute",
+            "options": "Institute Profile",
+            "depends_on": "eval:doc.target_audience == 'Specific Institute'"
+        },
+        {
+            "fieldname": "tags",
+            "fieldtype": "Small Text",
+            "label": "Tags",
+            "description": "Comma-separated tags for filtering (e.g., tech, career, networking)"
+        },
+        {
+            "fieldname": "section_break_pricing",
+            "fieldtype": "Section Break",
+            "label": "Pricing"
+        },
+        {
+            "default": "1",
+            "fieldname": "is_free",
+            "fieldtype": "Check",
+            "label": "Free Event"
+        },
+        {
+            "fieldname": "registration_fee",
+            "fieldtype": "Currency",
+            "label": "Registration Fee",
+            "depends_on": "eval:!doc.is_free"
+        },
+        {
+            "default": "USD",
+            "fieldname": "currency",
+            "fieldtype": "Select",
+            "label": "Currency",
+            "options": "USD\nINR\nEUR\nGBP",
+            "depends_on": "eval:!doc.is_free"
+        },
+        {
+            "fieldname": "section_break_2",
+            "fieldtype": "Section Break",
+            "label": "Event Details"
+        },
+        {
+            "fieldname": "description",
+            "fieldtype": "Text Editor",
+            "label": "Description"
+        },
+        {
+            "fieldname": "section_break_resources",
+            "fieldtype": "Section Break",
+            "label": "Event Resources"
+        },
+        {
+            "fieldname": "resources",
+            "fieldtype": "Table",
+            "label": "Resources",
+            "options": "Event Resource"
+        },
+        {
+            "fieldname": "section_break_3",
+            "fieldtype": "Section Break",
+            "label": "Banner"
+        },
+        {
+            "fieldname": "event_banner",
+            "fieldtype": "Attach Image",
+            "label": "Event Banner"
+        },
+        {
+            "fieldname": "section_break_analytics",
+            "fieldtype": "Section Break",
+            "label": "Analytics (Read-only)"
+        },
+        {
+            "fieldname": "total_registrations",
+            "fieldtype": "Int",
+            "label": "Total Registrations",
+            "read_only": 1,
+            "description": "Automatically calculated"
+        },
+        {
+            "fieldname": "total_attendees",
+            "fieldtype": "Int",
+            "label": "Total Attendees",
+            "read_only": 1,
+            "description": "Automatically calculated"
+        },
+        {
+            "fieldname": "total_waitlist",
+            "fieldtype": "Int",
+            "label": "Total Waitlist",
+            "read_only": 1,
+            "description": "Automatically calculated"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [
+        {
+            "link_doctype": "Event Registration",
+            "link_fieldname": "event"
+        }
+    ],
+    "modified": "2025-01-15 12:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Networx Web App",
+    "name": "Networx Event",
+    "naming_rule": "Expression",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Student",
+            "share": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
 }
-
-
-

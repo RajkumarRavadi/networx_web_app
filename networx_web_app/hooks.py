@@ -79,6 +79,9 @@ role_home_page = {
 # website_generators = ["Web Page"]
 website_route_rules = [
 	{"from_route": "/profiles/<slug>", "to_route": "public_profile"},
+	{"from_route": "/events", "to_route": "events"},
+	{"from_route": "/events/<event_id>", "to_route": "event_detail"},
+	{"from_route": "/my-events", "to_route": "my_events"},
 ]
 
 # Jinja

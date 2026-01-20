@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Events - NETWORX</title>
+
+	<!-- Tailwind -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Icons -->
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+	<!-- Custom Theme -->
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+
+	<script>
+		(function () {
+			const savedTheme = localStorage.getItem('networx-theme');
+			const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+				document.documentElement.setAttribute('data-theme', 'dark');
+			} else {
+				document.documentElement.setAttribute('data-theme', 'light');
+			}
+		})();
+	</script>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+	<!-- Sidebar (Only for logged in users) -->
+	{% if not is_guest %}
+	{% set active_page = 'events' %}
+	{% include "networx_web_app/templates/includes/sidebar.html" %}
+	{% endif %}
+
+	<!-- Main Content -->
+	<main class="flex-1 overflow-y-auto relative">
+		<!-- Header (For non-logged in users on desktop) -->
+		{% if is_guest %}
+		<header class="hidden md:flex glass-panel sticky top-0 z-30 w-full px-6 py-4 items-center justify-between border-b border-white/10">
+			<a href="/" class="font-bold text-xl flex-shrink-0" style="color: var(--text-main);">NETWORX</a>
+			<div class="flex items-center gap-4 flex-shrink-0">
+				<a href="/login" class="px-4 py-2 rounded-lg font-medium text-sm transition-all hover:bg-violet-500/10 whitespace-nowrap" style="color: var(--text-main);">Login</a>
+				<a href="/signup" class="px-4 py-2 rounded-lg btn-primary text-sm font-medium whitespace-nowrap">Sign Up</a>
+			</div>
+		</header>
+		{% endif %}
+		
+		<!-- Mobile Header -->
+		<header class="md:hidden glass-panel sticky top-0 z-30 w-full px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<a href="/" class="font-bold text-xl flex-shrink-0" style="color: var(--text-main);">NETWORX</a>
+			{% if not is_guest %}
+			<button onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
+				style="color: var(--text-main);">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+			{% else %}
+			<div class="flex items-center gap-2 flex-shrink-0">
+				<a href="/login" class="px-3 py-1.5 rounded-lg font-medium text-xs transition-all hover:bg-violet-500/10 whitespace-nowrap" style="color: var(--text-main);">Login</a>
+				<a href="/signup" class="px-3 py-1.5 rounded-lg btn-primary text-xs font-medium whitespace-nowrap">Sign Up</a>
+			</div>
+			{% endif %}
+		</header>
+
+		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
+
+			<!-- Header -->
+			<div class="mb-8">
+				<h1 class="text-3xl font-bold mb-2" style="color: var(--text-main);">Events</h1>
+				<p class="text-lg" style="color: var(--text-muted);">Discover workshops, hackathons, webinars, and more</p>
+			</div>
+
+			<!-- Search & Filters -->
+			<div class="mb-8">
+				<!-- Search -->
+				<div class="relative max-w-2xl mx-auto mb-6">
+					<div class="glass-panel rounded-full p-2 flex items-center border border-white/20 dark:border-white/10">
+						<i class="ri-search-line ml-4 text-xl" style="color: var(--text-muted);"></i>
+						<input type="text" id="searchInput"
+							class="w-full bg-transparent border-none focus:ring-0 px-4 py-2 text-lg placeholder-gray-400 dark:placeholder-gray-500"
+							style="color: var(--text-main);" placeholder="Search events...">
+						<button id="searchBtn"
+							class="p-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/20">
+							<i class="ri-arrow-right-line text-xl"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- View Toggle & Filters -->
+				<div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+					<div class="flex items-center gap-3">
+						<button id="viewGrid" class="p-2 rounded-lg border transition-colors active" style="border-color: var(--border-color); color: var(--text-main);">
+							<i class="ri-grid-line text-xl"></i>
+						</button>
+						<button id="viewList" class="p-2 rounded-lg border transition-colors" style="border-color: var(--border-color); color: var(--text-muted);">
+							<i class="ri-list-check text-xl"></i>
+						</button>
+					</div>
+					<div class="flex flex-wrap gap-3">
+						<select id="filterType" class="px-4 py-2 rounded-lg border text-sm" style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+							<option value="">All Types</option>
+							<option value="Hackathon">Hackathon</option>
+							<option value="Workshop">Workshop</option>
+							<option value="Webinar">Webinar</option>
+							<option value="Career Fair">Career Fair</option>
+							<option value="Networking">Networking</option>
+							<option value="Conference">Conference</option>
+							<option value="Seminar">Seminar</option>
+							<option value="Competition">Competition</option>
+							<option value="Meetup">Meetup</option>
+							<option value="Training">Training</option>
+						</select>
+						<select id="filterLocation" class="px-4 py-2 rounded-lg border text-sm" style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+							<option value="">All Locations</option>
+							<option value="Physical">Physical</option>
+							<option value="Online">Online</option>
+							<option value="Hybrid">Hybrid</option>
+						</select>
+						<select id="filterView" class="px-4 py-2 rounded-lg border text-sm" style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+							<option value="upcoming">Upcoming</option>
+							<option value="past">Past Events</option>
+							<option value="all">All Events</option>
+							{% if not is_guest %}
+							<option value="my_registrations">My Events</option>
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<!-- Results Info -->
+			<div class="mb-6 text-sm" style="color: var(--text-muted);">
+				<span id="resultsInfo">Loading events...</span>
+			</div>
+
+			<!-- Events Grid/List -->
+			<div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<!-- Loading State -->
+				<div class="col-span-full flex justify-center py-12">
+					<div class="loader"></div>
+				</div>
+			</div>
+
+			<!-- Pagination -->
+			<div id="paginationContainer" class="flex justify-center mt-10 gap-2"></div>
+
+		</div>
+	</main>
+
+	<!-- Scripts -->
+	<script>
+		// Initialize frappe object FIRST before any other scripts
+		(function() {
+			if (!window.frappe) {
+				window.frappe = {};
+			}
+			if (!window.frappe.session) {
+			window.frappe.session = {
+				user: '{{ user if user else "Guest" }}',
+				user_fullname: '{{ frappe.session.user_fullname if not is_guest and frappe.session.user_fullname else "Guest" }}'
+			};
+			}
+			
+			// Simple frappe.call implementation
+			window.frappe.call = function (opts) {
+				const params = new URLSearchParams();
+				if (opts.args) {
+					for (const [key, value] of Object.entries(opts.args)) {
+						if (value === null || value === undefined) continue;
+						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+						if (value === '') continue;
+						if (typeof value === 'object') {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, value);
+						}
+					}
+				}
+				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
+				return fetch(url, {
+					method: 'GET',
+					headers: { 'Accept': 'application/json' },
+					credentials: 'same-origin'
+				})
+					.then(response => {
+						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+						return response.json();
+					})
+					.then(data => {
+						if (opts.callback) opts.callback(data);
+						return data;
+					});
+			};
+		})();
+	</script>
+	<script src="/assets/networx_web_app/js/api.js?v=4"></script>
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+
+	<script>
+		// State
+		let currentPage = 0;
+		const eventsPerPage = 12;
+		let totalEvents = 0;
+		let currentFilters = {};
+		let currentSearchTerm = null;
+		let currentViewType = 'upcoming';
+		let currentViewMode = 'grid';
+
+		// Load events
+		const loadEvents = async (page = 0) => {
+			try {
+				currentPage = page;
+				const offset = page * eventsPerPage;
+
+				const result = await NetworkxAPI.getEvents(
+					currentFilters,
+					eventsPerPage,
+					offset,
+					currentSearchTerm,
+					currentViewType
+				);
+
+				totalEvents = result.total_count;
+
+				// Update results info
+				const start = offset + 1;
+				const end = Math.min(offset + eventsPerPage, totalEvents);
+				document.getElementById('resultsInfo').textContent =
+					`Showing ${start}-${end} of ${totalEvents} events`;
+
+				// Render events
+				renderEvents(result.events);
+
+				// Render pagination
+				renderPagination();
+			} catch (error) {
+				console.error('Error loading events:', error);
+				document.getElementById('eventsContainer').innerHTML = `
+					<div class="col-span-full text-center text-red-400 py-12">
+						<i class="ri-error-warning-line text-4xl mb-2"></i>
+						<p>Error loading events.</p>
+						<p class="text-sm opacity-75 mt-1">${error.message || 'Unknown error'}</p>
+						<button onclick="location.reload()" class="mt-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm">
+							Try Again
+						</button>
+					</div>
+				`;
+			}
+		};
+
+		// Render events
+		const renderEvents = (events) => {
+			const container = document.getElementById('eventsContainer');
+			const isLoggedIn = (window.frappe && window.frappe.session && window.frappe.session.user && window.frappe.session.user !== 'Guest');
+
+			if (events.length === 0) {
+				container.innerHTML = `
+					<div class="col-span-full glass-panel rounded-2xl p-12 text-center">
+						<div class="text-6xl mb-4">📅</div>
+						<h3 class="text-xl font-bold mb-2" style="color: var(--text-main);">No events found</h3>
+						<p style="color: var(--text-muted);">Try adjusting your search or filters</p>
+					</div>
+				`;
+				return;
+			}
+
+			if (currentViewMode === 'grid') {
+				container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+			} else {
+				container.className = 'grid grid-cols-1 gap-6';
+			}
+
+			container.innerHTML = events.map(event => {
+				const eventDate = new Date(event.event_date);
+				const formattedDate = eventDate.toLocaleDateString('en-US', {
+					month: 'short',
+					day: 'numeric',
+					year: 'numeric'
+				});
+				const formattedTime = eventDate.toLocaleTimeString('en-US', {
+					hour: 'numeric',
+					minute: '2-digit'
+				});
+
+				// Registration status
+				let regStatus = '';
+				let regButton = '';
+				if (event.user_registration) {
+					if (event.user_registration.status === 'Confirmed') {
+						regStatus = '<span class="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">Registered</span>';
+						regButton = '<button onclick="cancelRegistration(\'' + event.user_registration.registration_id + '\')" class="text-sm text-red-400 hover:text-red-300">Cancel</button>';
+					} else if (event.user_registration.waitlist_position > 0) {
+						regStatus = '<span class="px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400">Waitlist #' + event.user_registration.waitlist_position + '</span>';
+					}
+				} else if (event.registration_enabled && !event.registration_closed) {
+					if (event.is_full && !event.waitlist_enabled) {
+						regStatus = '<span class="px-2 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400">Full</span>';
+					} else if (event.is_full && event.waitlist_enabled) {
+						regButton = '<button onclick="registerForEvent(\'' + event.name + '\')" class="px-4 py-2 rounded-lg btn-primary text-sm font-medium">Join Waitlist</button>';
+					} else {
+						regButton = '<button onclick="registerForEvent(\'' + event.name + '\')" class="px-4 py-2 rounded-lg btn-primary text-sm font-medium">Register</button>';
+					}
+				}
+
+				// Capacity info
+				let capacityInfo = '';
+				if (event.max_capacity && event.max_capacity > 0) {
+					const registered = event.total_registrations || 0;
+					capacityInfo = `<div class="text-xs" style="color: var(--text-muted);">${registered}/${event.max_capacity} registered</div>`;
+				}
+
+				const bannerHtml = event.event_banner ? 
+					`<img src="${event.event_banner}" alt="${event.event_name}" class="w-full h-48 object-cover rounded-t-xl">` : 
+					`<div class="w-full h-48 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 rounded-t-xl flex items-center justify-center">
+						<i class="ri-calendar-event-line text-6xl opacity-50" style="color: var(--primary);"></i>
+					</div>`;
+
+				if (currentViewMode === 'list') {
+					return `
+						<div class="glass-card rounded-xl overflow-hidden flex flex-col md:flex-row">
+							<div class="md:w-64 flex-shrink-0">
+								${bannerHtml}
+							</div>
+							<div class="p-6 flex-1 flex flex-col">
+								<div class="flex items-start justify-between mb-3">
+									<div class="flex-1">
+										<h3 class="font-bold text-xl mb-2" style="color: var(--text-main);">${event.event_name}</h3>
+										<div class="flex items-center gap-4 text-sm mb-3" style="color: var(--text-muted);">
+											<span class="flex items-center gap-1"><i class="ri-calendar-line"></i> ${formattedDate} ${formattedTime}</span>
+											<span class="flex items-center gap-1"><i class="ri-map-pin-line"></i> ${event.location || 'TBA'}</span>
+										</div>
+									</div>
+									${regStatus}
+								</div>
+								${capacityInfo}
+								<div class="mt-auto pt-4 flex items-center justify-between">
+									<a href="/events/${event.name}" class="text-sm font-medium hover:underline" style="color: var(--primary);">View Details <i class="ri-arrow-right-line ml-1"></i></a>
+									${regButton}
+								</div>
+							</div>
+						</div>
+					`;
+				} else {
+					return `
+						<div class="glass-card rounded-xl overflow-hidden flex flex-col">
+							${bannerHtml}
+							<div class="p-6 flex-1 flex flex-col">
+								<div class="flex items-start justify-between mb-3">
+									<span class="px-2 py-1 rounded text-xs font-medium bg-violet-500/20 text-violet-400">${event.event_type || 'Event'}</span>
+									${regStatus}
+								</div>
+								<h3 class="font-bold text-lg mb-3" style="color: var(--text-main);">${event.event_name}</h3>
+								<div class="space-y-2 mb-4 text-sm" style="color: var(--text-muted);">
+									<div class="flex items-center gap-2">
+										<i class="ri-calendar-line"></i>
+										<span>${formattedDate} at ${formattedTime}</span>
+									</div>
+									<div class="flex items-center gap-2">
+										<i class="ri-map-pin-line"></i>
+										<span>${event.location || 'TBA'}</span>
+									</div>
+									${capacityInfo}
+								</div>
+								<div class="mt-auto pt-4 flex items-center justify-between border-t" style="border-color: var(--border-color);">
+									<a href="/events/${event.name}" class="text-sm font-medium hover:underline" style="color: var(--primary);">View Details</a>
+									${regButton}
+								</div>
+							</div>
+						</div>
+					`;
+				}
+			}).join('');
+		};
+
+		// Render pagination
+		const renderPagination = () => {
+			const paginationContainer = document.getElementById('paginationContainer');
+			const totalPages = Math.ceil(totalEvents / eventsPerPage);
+
+			if (totalPages <= 1) {
+				paginationContainer.innerHTML = '';
+				return;
+			}
+
+			let paginationHTML = '';
+
+			// Previous button
+			if (currentPage > 0) {
+				paginationHTML += `
+					<button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style="border-color: var(--border-color); color: var(--text-main);" onclick="loadEvents(${currentPage - 1})">
+						Previous
+					</button>
+				`;
+			}
+
+			// Page info
+			paginationHTML += `
+				<span class="px-4 py-2" style="color: var(--text-muted);">
+					Page ${currentPage + 1} of ${totalPages}
+				</span>
+			`;
+
+			// Next button
+			if (currentPage < totalPages - 1) {
+				paginationHTML += `
+					<button class="px-4 py-2 rounded-lg border transition-colors hover:bg-white/5" style="border-color: var(--border-color); color: var(--text-main);" onclick="loadEvents(${currentPage + 1})">
+						Next
+					</button>
+				`;
+			}
+
+			paginationContainer.innerHTML = paginationHTML;
+		};
+
+		// Register for event
+		window.registerForEvent = async (eventId) => {
+			try {
+				const result = await NetworkxAPI.registerForEvent(eventId);
+				alert(result.message || 'Registration successful!');
+				loadEvents(currentPage);
+			} catch (error) {
+				alert(error.message || 'Failed to register for event');
+			}
+		};
+
+		// Cancel registration
+		window.cancelRegistration = async (registrationId) => {
+			if (!confirm('Are you sure you want to cancel your registration?')) return;
+			try {
+				const result = await NetworkxAPI.cancelRegistration(registrationId);
+				alert(result.message || 'Registration cancelled');
+				loadEvents(currentPage);
+			} catch (error) {
+				alert(error.message || 'Failed to cancel registration');
+			}
+		};
+
+		// Event listeners
+		document.getElementById('searchBtn').addEventListener('click', () => {
+			currentSearchTerm = document.getElementById('searchInput').value.trim() || null;
+			currentPage = 0;
+			loadEvents(0);
+		});
+
+		document.getElementById('searchInput').addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				currentSearchTerm = document.getElementById('searchInput').value.trim() || null;
+				currentPage = 0;
+				loadEvents(0);
+			}
+		});
+
+		document.getElementById('filterType').addEventListener('change', (e) => {
+			if (e.target.value) {
+				currentFilters.event_type = e.target.value;
+			} else {
+				delete currentFilters.event_type;
+			}
+			currentPage = 0;
+			loadEvents(0);
+		});
+
+		document.getElementById('filterLocation').addEventListener('change', (e) => {
+			if (e.target.value) {
+				currentFilters.location_type = e.target.value;
+			} else {
+				delete currentFilters.location_type;
+			}
+			currentPage = 0;
+			loadEvents(0);
+		});
+
+		document.getElementById('filterView').addEventListener('change', (e) => {
+			currentViewType = e.target.value;
+			currentPage = 0;
+			loadEvents(0);
+		});
+
+		document.getElementById('viewGrid').addEventListener('click', () => {
+			currentViewMode = 'grid';
+			document.getElementById('viewGrid').classList.add('active');
+			document.getElementById('viewList').classList.remove('active');
+			loadEvents(currentPage);
+		});
+
+		document.getElementById('viewList').addEventListener('click', () => {
+			currentViewMode = 'list';
+			document.getElementById('viewList').classList.add('active');
+			document.getElementById('viewGrid').classList.remove('active');
+			loadEvents(currentPage);
+		});
+
+		// Initial load
+		document.addEventListener('DOMContentLoaded', () => {
+			loadEvents(0);
+		});
+	</script>
+</body>
+
+</html>
+

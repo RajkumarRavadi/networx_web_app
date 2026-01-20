@@ -85,22 +85,24 @@
 				</a>
 
 				<!-- Stat 2 -->
-				<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group">
+				<a href="/events" class="block group">
+					<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group transition-transform group-hover:scale-[1.02] cursor-pointer">
 
-					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-						<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
-					</div>
-
-					<div class="relative z-10">
-						<div
-							class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-500/20 flex items-center justify-center mb-2 md:mb-4 text-emerald-400">
-							<i class="ri-calendar-event-line text-xl md:text-2xl"></i>
+						<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+							<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
 						</div>
 
-						<div class="text-2xl md:text-3xl font-bold mb-1" id="upcomingEvents">-</div>
-						<div class="text-xs md:text-sm font-medium">Upcoming Events</div>
+						<div class="relative z-10">
+							<div
+								class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-500/20 flex items-center justify-center mb-2 md:mb-4 text-emerald-400">
+								<i class="ri-calendar-event-line text-xl md:text-2xl"></i>
+							</div>
+
+							<div class="text-2xl md:text-3xl font-bold mb-1" id="upcomingEvents">-</div>
+							<div class="text-xs md:text-sm font-medium">Upcoming Events</div>
+						</div>
 					</div>
-				</div>
+				</a>
 
 				<!-- Stat 3 -->
 				<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group">
@@ -195,7 +197,10 @@
 
 					<!-- Upcoming Events -->
 					<div class="glass-panel p-6 rounded-2xl">
-						<h3 class="text-lg font-bold mb-4">Upcoming Events</h3>
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-lg font-bold">Featured Events</h3>
+							<a href="/events" class="text-sm font-medium hover:underline" style="color: var(--primary);">View All</a>
+						</div>
 						<div id="upcomingEventsList">
 							<div class="loader mx-auto"></div>
 						</div>
@@ -288,10 +293,77 @@
 			}
 		};
 
+		const loadFeaturedEvents = async () => {
+			try {
+				const container = document.getElementById('upcomingEventsList');
+				if (!container) return;
+
+				// Get featured events (is_featured = 1, upcoming, limit 3)
+				const result = await NetworkxAPI.getEvents(
+					{ is_featured: 1 },
+					3,
+					0,
+					null,
+					'upcoming'
+				);
+
+				if (result.events && result.events.length > 0) {
+					container.innerHTML = result.events.map(event => {
+						const eventDate = new Date(event.event_date);
+						const formattedDate = eventDate.toLocaleDateString('en-US', {
+							month: 'short',
+							day: 'numeric',
+							year: 'numeric'
+						});
+						const formattedTime = eventDate.toLocaleTimeString('en-US', {
+							hour: 'numeric',
+							minute: '2-digit'
+						});
+
+						return `
+							<a href="/events/${event.name}" class="block mb-4 last:mb-0 group">
+								<div class="p-4 rounded-lg border hover:shadow-lg transition-all" style="border-color: var(--border-color); background: var(--bg-card);">
+									${event.event_banner ? `
+										<img src="${event.event_banner}" alt="${event.event_name}" class="w-full h-32 object-cover rounded-lg mb-3">
+									` : ''}
+									<h4 class="font-bold mb-1 group-hover:underline" style="color: var(--text-main);">${event.event_name}</h4>
+									<div class="flex items-center gap-2 text-sm mb-2" style="color: var(--text-muted);">
+										<i class="ri-calendar-line"></i>
+										<span>${formattedDate} at ${formattedTime}</span>
+									</div>
+									${event.location ? `
+										<div class="flex items-center gap-2 text-sm" style="color: var(--text-muted);">
+											<i class="ri-map-pin-line"></i>
+											<span>${event.location}</span>
+										</div>
+									` : ''}
+								</div>
+							</a>
+						`;
+					}).join('');
+				} else {
+					container.innerHTML = `
+						<p class="text-sm text-center" style="color: var(--text-muted);">No featured events at the moment.</p>
+						<a href="/events" class="block text-center mt-3 text-sm font-medium hover:underline" style="color: var(--primary);">Browse All Events</a>
+					`;
+				}
+			} catch (e) {
+				console.error('Error loading featured events:', e);
+				const container = document.getElementById('upcomingEventsList');
+				if (container) {
+					container.innerHTML = `
+						<p class="text-sm text-center text-red-400">Error loading events.</p>
+					`;
+				}
+			}
+		};
+
 
 
 		document.addEventListener('DOMContentLoaded', () => {
 			loadDashboardData();
+			loadProfileStrength();
+			loadFeaturedEvents();
 			loadProfileStrength();
 		});
 	</script>

@@ -264,6 +264,108 @@ const NetworkxAPI = {
 			console.error('Error fetching applications:', error);
 			throw error;
 		}
+	},
+
+	// Events API methods
+	getEvents: async (filters = {}, limit = 20, offset = 0, searchTerm = null, viewType = 'upcoming') => {
+		try {
+			if (!window.frappe || !window.frappe.call) {
+				throw new Error('Frappe is not initialized');
+			}
+			const response = await window.frappe.call({
+				method: 'networx_web_app.networx_web_app.apis.events.get_events.get_events',
+				args: {
+					filters: filters,
+					limit: limit,
+					offset: offset,
+					search_term: searchTerm,
+					view_type: viewType
+				}
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error fetching events:', error);
+			throw error;
+		}
+	},
+
+	getEventDetail: async (eventId) => {
+		try {
+			if (!window.frappe || !window.frappe.call) {
+				throw new Error('Frappe is not initialized');
+			}
+			const response = await window.frappe.call({
+				method: 'networx_web_app.networx_web_app.apis.events.get_event_detail.get_event_detail',
+				args: {
+					event_id: eventId
+				},
+				freeze: true
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error fetching event detail:', error);
+			throw error;
+		}
+	},
+
+	registerForEvent: async (eventId, registrationData = null) => {
+		try {
+			if (!window.frappe || !window.frappe.call) {
+				throw new Error('Frappe is not initialized');
+			}
+			const response = await window.frappe.call({
+				method: 'networx_web_app.networx_web_app.apis.events.register_for_event.register_for_event',
+				args: {
+					event_id: eventId,
+					registration_data: registrationData
+				},
+				freeze: true,
+				freeze_message: 'Registering for event...'
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error registering for event:', error);
+			throw error;
+		}
+	},
+
+	cancelRegistration: async (registrationId, reason = null) => {
+		try {
+			if (!window.frappe || !window.frappe.call) {
+				throw new Error('Frappe is not initialized');
+			}
+			const response = await window.frappe.call({
+				method: 'networx_web_app.networx_web_app.apis.events.register_for_event.cancel_registration',
+				args: {
+					registration_id: registrationId,
+					reason: reason
+				},
+				freeze: true,
+				freeze_message: 'Cancelling registration...'
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error cancelling registration:', error);
+			throw error;
+		}
+	},
+
+	getMyRegistrations: async (status = null) => {
+		try {
+			if (!window.frappe || !window.frappe.call) {
+				throw new Error('Frappe is not initialized');
+			}
+			const response = await window.frappe.call({
+				method: 'networx_web_app.networx_web_app.apis.events.get_my_registrations.get_my_registrations',
+				args: {
+					status: status
+				}
+			});
+			return response.message;
+		} catch (error) {
+			console.error('Error fetching my registrations:', error);
+			throw error;
+		}
 	}
 };
 
