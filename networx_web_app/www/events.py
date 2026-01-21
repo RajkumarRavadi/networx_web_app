@@ -9,5 +9,8 @@ def get_context(context):
 	context.user = frappe.session.user if frappe.session.user != "Guest" else None
 	context.is_guest = frappe.session.user == "Guest"
 	
+	# Add CSRF token to context for use in JavaScript
+	context.csrf_token = frappe.sessions.get_csrf_token()
+	
 	return context
 

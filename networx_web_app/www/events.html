@@ -14,6 +14,11 @@
 
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+	
+	<!-- CSRF Token -->
+	{% if csrf_token %}
+	<meta name="csrf-token" content="{{ csrf_token }}">
+	{% endif %}
 
 	<script>
 		(function () {
@@ -152,22 +157,73 @@
 
 	<!-- Scripts -->
 	<script>
+		// Helper function to get CSRF token
+		const getCSRFToken = () => {
+			// Try multiple sources for CSRF token
+			if (window.frappe && window.frappe.csrf_token) {
+				return window.frappe.csrf_token;
+			}
+
+			// Try meta tag
+			const metaTag = document.querySelector('meta[name="csrf-token"]');
+			if (metaTag) {
+				const token = metaTag.getAttribute('content');
+				if (token) {
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+
+			// Try to get from cookies
+			const cookies = document.cookie.split(';');
+			for (let cookie of cookies) {
+				const [name, value] = cookie.trim().split('=');
+				if (name === 'csrf_token') {
+					const token = decodeURIComponent(value);
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+
+			console.warn('CSRF token not found');
+			return null;
+		};
+
 		// Initialize frappe object FIRST before any other scripts
 		(function() {
 			if (!window.frappe) {
 				window.frappe = {};
 			}
 			if (!window.frappe.session) {
-			window.frappe.session = {
-				user: '{{ user if user else "Guest" }}',
-				user_fullname: '{{ frappe.session.user_fullname if not is_guest and frappe.session.user_fullname else "Guest" }}'
-			};
+				window.frappe.session = {
+					user: '{{ user if user else "Guest" }}',
+					user_fullname: '{{ frappe.session.user_fullname if not is_guest and frappe.session.user_fullname else "Guest" }}'
+				};
 			}
 			
-			// Simple frappe.call implementation
+			// Enhanced frappe.call implementation with POST support
+			window.frappe.csrf_token = {% if csrf_token %}'{{ csrf_token }}'{% else %}getCSRFToken(){% endif %};
 			window.frappe.call = function (opts) {
-				const params = new URLSearchParams();
-				if (opts.args) {
+				// Determine if this is a write operation (POST) or read operation (GET)
+				const writeMethods = ['register_for_event', 'cancel_registration', 'update', 'insert', 'save', 'delete'];
+				const isWriteOperation = writeMethods.some(method => opts.method && opts.method.includes(method));
+				const method = isWriteOperation ? 'POST' : 'GET';
+				
+				// Build request
+				let url = '/api/method/' + opts.method;
+				const fetchOptions = {
+					method: method,
+					headers: { 
+						'Accept': 'application/json'
+					},
+					credentials: 'same-origin'
+				};
+				
+				// For GET, add params to URL
+				if (method === 'GET' && opts.args) {
+					const params = new URLSearchParams();
 					for (const [key, value] of Object.entries(opts.args)) {
 						if (value === null || value === undefined) continue;
 						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
@@ -178,20 +234,60 @@
 							params.append(key, value);
 						}
 					}
+					if (params.toString()) {
+						url += '?' + params.toString();
+					}
+				} else if (method === 'POST' && opts.args) {
+					// For POST, send as form-encoded (Frappe expects this format)
+					const params = new URLSearchParams();
+					for (const [key, value] of Object.entries(opts.args)) {
+						if (value === null || value === undefined) continue;
+						if (typeof value === 'object' || Array.isArray(value)) {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, String(value));
+						}
+					}
+					fetchOptions.body = params;
+					fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+					
+					// Add CSRF token for POST requests
+					const csrfToken = getCSRFToken();
+					if (csrfToken) {
+						fetchOptions.headers['X-Frappe-CSRF-Token'] = csrfToken;
+					} else {
+						console.error('CSRF token not found - POST request may fail');
+					}
 				}
-				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				return fetch(url, {
-					method: 'GET',
-					headers: { 'Accept': 'application/json' },
-					credentials: 'same-origin'
-				})
-					.then(response => {
-						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-						return response.json();
+				
+				return fetch(url, fetchOptions)
+					.then(async response => {
+						const data = await response.json();
+						
+						// Check for Frappe errors
+						if (data.exc || data.exc_type) {
+							const error = new Error(data.exc || data.message || 'An error occurred');
+							error.exc = data.exc;
+							error.exc_type = data.exc_type;
+							error.response = data;
+							throw error;
+						}
+						
+						if (!response.ok) {
+							const error = new Error(data.message || `HTTP error! status: ${response.status}`);
+							error.response = data;
+							throw error;
+						}
+						
+						return data;
 					})
 					.then(data => {
 						if (opts.callback) opts.callback(data);
 						return data;
+					})
+					.catch(error => {
+						if (opts.error) opts.error(error);
+						throw error;
 					});
 			};
 		})();
@@ -415,26 +511,103 @@
 			paginationContainer.innerHTML = paginationHTML;
 		};
 
+		// Helper function to extract error message from Frappe error
+		const extractErrorMessage = (error) => {
+			if (!error) return 'An unknown error occurred';
+			
+			// Try to extract from Frappe error response
+			if (error.exc_type && error.exc) {
+				// Frappe exception format
+				return error.exc || error.exc_type;
+			}
+			
+			if (error.message) {
+				// Check if it's a JSON string
+				try {
+					const parsed = JSON.parse(error.message);
+					if (parsed.exc) return parsed.exc;
+					if (parsed.message) return parsed.message;
+				} catch (e) {
+					// Not JSON, use as is
+				}
+				return error.message;
+			}
+			
+			if (error.response && error.response.exc) {
+				return error.response.exc;
+			}
+			
+			if (error.response && error.response.message) {
+				return error.response.message;
+			}
+			
+			return 'Failed to register for event. Please try again.';
+		};
+
+		// Show toast notification
+		const showToast = (message, type = 'success') => {
+			const toast = document.createElement('div');
+			toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl backdrop-blur-md border ${
+				type === 'success' 
+					? 'bg-emerald-500/90 text-white border-emerald-400' 
+					: 'bg-red-500/90 text-white border-red-400'
+			} transition-all transform translate-x-full`;
+			toast.innerHTML = `
+				<div class="flex items-center gap-3">
+					<i class="ri-${type === 'success' ? 'check-line' : 'error-warning-line'} text-xl"></i>
+					<span class="font-medium">${message}</span>
+				</div>
+			`;
+			document.body.appendChild(toast);
+			
+			// Animate in
+			setTimeout(() => {
+				toast.classList.remove('translate-x-full');
+			}, 10);
+			
+			// Remove after 4 seconds
+			setTimeout(() => {
+				toast.classList.add('translate-x-full');
+				setTimeout(() => toast.remove(), 300);
+			}, 4000);
+		};
+
 		// Register for event
 		window.registerForEvent = async (eventId) => {
+			// Check if user is logged in
+			const isLoggedIn = (window.frappe && window.frappe.session && window.frappe.session.user && window.frappe.session.user !== 'Guest');
+			if (!isLoggedIn) {
+				// Save current URL to redirect back after login
+				document.cookie = `redirect_to=${window.location.pathname}; path=/`;
+				window.location.href = '/login';
+				return;
+			}
+
 			try {
 				const result = await NetworkxAPI.registerForEvent(eventId);
-				alert(result.message || 'Registration successful!');
+				showToast(result?.message || 'Successfully registered for event!', 'success');
+				// Reload events to show updated registration status
 				loadEvents(currentPage);
 			} catch (error) {
-				alert(error.message || 'Failed to register for event');
+				console.error('Registration error:', error);
+				const errorMessage = extractErrorMessage(error);
+				showToast(errorMessage, 'error');
 			}
 		};
 
 		// Cancel registration
 		window.cancelRegistration = async (registrationId) => {
 			if (!confirm('Are you sure you want to cancel your registration?')) return;
+			
 			try {
 				const result = await NetworkxAPI.cancelRegistration(registrationId);
-				alert(result.message || 'Registration cancelled');
+				showToast(result?.message || 'Registration cancelled successfully', 'success');
+				// Reload events to show updated registration status
 				loadEvents(currentPage);
 			} catch (error) {
-				alert(error.message || 'Failed to cancel registration');
+				console.error('Cancel registration error:', error);
+				const errorMessage = extractErrorMessage(error);
+				showToast(errorMessage, 'error');
 			}
 		};
 
