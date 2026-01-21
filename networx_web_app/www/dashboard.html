@@ -88,20 +88,20 @@
 				<a href="/events" class="block group">
 					<div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-6 relative overflow-hidden group transition-transform group-hover:scale-[1.02] cursor-pointer">
 
-						<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-							<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
-						</div>
-
-						<div class="relative z-10">
-							<div
-								class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-500/20 flex items-center justify-center mb-2 md:mb-4 text-emerald-400">
-								<i class="ri-calendar-event-line text-xl md:text-2xl"></i>
-							</div>
-
-							<div class="text-2xl md:text-3xl font-bold mb-1" id="upcomingEvents">-</div>
-							<div class="text-xs md:text-sm font-medium">Upcoming Events</div>
-						</div>
+					<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+						<i class="ri-calendar-event-fill text-6xl text-emerald-500"></i>
 					</div>
+
+					<div class="relative z-10">
+						<div
+							class="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-emerald-500/20 flex items-center justify-center mb-2 md:mb-4 text-emerald-400">
+							<i class="ri-calendar-event-line text-xl md:text-2xl"></i>
+						</div>
+
+						<div class="text-2xl md:text-3xl font-bold mb-1" id="upcomingEvents">-</div>
+						<div class="text-xs md:text-sm font-medium">Upcoming Events</div>
+					</div>
+				</div>
 				</a>
 
 				<!-- Stat 3 -->
@@ -217,17 +217,39 @@
 				user_fullname: '{{ user_fullname }}'
 			},
 			call(opts) {
-				return fetch(`/api/method/${opts.method}`, {
+				const params = new URLSearchParams();
+				if (opts.args) {
+					for (const [key, value] of Object.entries(opts.args)) {
+						if (value === null || value === undefined) continue;
+						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
+						if (value === '') continue;
+						if (typeof value === 'object') {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, value);
+						}
+					}
+				}
+				const url = `/api/method/${opts.method}` + (params.toString() ? '?' + params.toString() : '');
+				return fetch(url, {
 					method: 'GET',
+					headers: { 'Accept': 'application/json' },
 					credentials: 'same-origin'
 				})
-					.then(r => r.json())
-					.then(d => opts.callback ? opts.callback(d) : d);
+					.then(r => {
+						if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+						return r.json();
+					})
+					.then(d => {
+						if (opts.callback) opts.callback(d);
+						return d;
+					});
 			}
 		};
 	</script>
 
 	<script src="/assets/networx_web_app/js/api.js"></script>
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
 
 	<script>
 		document.getElementById('currentDate').textContent =
@@ -290,6 +312,82 @@
 				}
 			} catch (e) {
 				console.error('Profile strength error:', e);
+			}
+		};
+
+		const loadRecentApplications = async () => {
+			try {
+				const container = document.getElementById('recentApplicationsList');
+				if (!container) return;
+
+				const applications = await NetworkxAPI.getRecentApplications(5);
+
+				if (applications && applications.length > 0) {
+					container.innerHTML = applications.map(app => {
+						const appDate = new Date(app.creation);
+						const formattedDate = appDate.toLocaleDateString('en-US', {
+							month: 'short',
+							day: 'numeric',
+							year: 'numeric'
+						});
+
+						let statusBadge = '';
+						if (app.status === 'Submitted') {
+							statusBadge = '<span class="px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">Submitted</span>';
+						} else if (app.status === 'Under Review') {
+							statusBadge = '<span class="px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400">Under Review</span>';
+						} else if (app.status === 'Accepted') {
+							statusBadge = '<span class="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">Accepted</span>';
+						} else if (app.status === 'Rejected') {
+							statusBadge = '<span class="px-2 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400">Rejected</span>';
+						}
+
+						const logoHtml = app.company_logo ? 
+							`<img src="${app.company_logo}" alt="${app.company_name}" class="w-10 h-10 rounded-lg object-cover bg-white border border-gray-100">` : 
+							`<div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold" style="background: var(--bg-body); color: var(--primary);">${(app.company_name || 'C').charAt(0)}</div>`;
+
+						return `
+							<a href="/job_detail?id=${app.job_opening}" class="block mb-3 last:mb-0 group">
+								<div class="p-4 rounded-xl border transition-all duration-300 hover:shadow-md hover:border-violet-500/30 hover:-translate-y-0.5" style="border-color: var(--border-color); background: var(--bg-card);">
+									<div class="flex items-center gap-4">
+										<div class="flex-shrink-0">
+											${logoHtml}
+										</div>
+										<div class="flex-1 min-w-0">
+											<h4 class="font-bold text-sm truncate group-hover:text-violet-500 transition-colors" style="color: var(--text-main);">${app.job_title || 'Job Application'}</h4>
+											<div class="text-xs truncate" style="color: var(--text-muted);">${app.company_name || 'Company'}</div>
+										</div>
+										<div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
+											${statusBadge}
+											<div class="text-[10px] flex items-center gap-1" style="color: var(--text-muted);">
+												<i class="ri-time-line"></i> ${formattedDate}
+											</div>
+										</div>
+									</div>
+								</div>
+							</a>
+						`;
+					}).join('');
+				} else {
+					container.innerHTML = `
+						<div class="text-center py-8">
+							<div class="text-4xl mb-3">📄</div>
+							<p class="text-sm mb-2" style="color: var(--text-muted);">No applications yet</p>
+							<a href="/jobs" class="text-sm font-medium hover:underline inline-block" style="color: var(--primary);">Browse Jobs</a>
+						</div>
+					`;
+				}
+			} catch (e) {
+				console.error('Error loading recent applications:', e);
+				const container = document.getElementById('recentApplicationsList');
+				if (container) {
+					container.innerHTML = `
+						<div class="text-center py-8">
+							<p class="text-sm text-red-400 mb-2">Error loading applications.</p>
+							<button onclick="loadRecentApplications()" class="text-sm font-medium hover:underline" style="color: var(--primary);">Try Again</button>
+						</div>
+					`;
+				}
 			}
 		};
 
@@ -363,8 +461,8 @@
 		document.addEventListener('DOMContentLoaded', () => {
 			loadDashboardData();
 			loadProfileStrength();
+			loadRecentApplications();
 			loadFeaturedEvents();
-			loadProfileStrength();
 		});
 	</script>
 

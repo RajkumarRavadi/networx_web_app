@@ -14,6 +14,72 @@
 
 	<!-- Custom Theme -->
 	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+	
+	<!-- CSRF Token -->
+	{% if csrf_token %}
+	<meta name="csrf-token" content="{{ csrf_token }}">
+	{% endif %}
+	
+	<style>
+		/* Event specific styles */
+		.event-hero {
+			position: relative;
+			min-height: 70vh;
+			overflow: hidden;
+		}
+		.event-hero-bg {
+			position: absolute;
+			inset: 0;
+			z-index: 0;
+			transform: scale(1);
+			transition: transform 10s ease;
+		}
+		.event-hero:hover .event-hero-bg {
+			transform: scale(1.05);
+		}
+		.event-hero-overlay {
+			position: absolute;
+			inset: 0;
+			/* Dark gradient overlay for text readability in both modes */
+			background: linear-gradient(to top, var(--bg-body) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.7) 100%);
+			z-index: 1;
+		}
+		.event-hero-content {
+			position: relative;
+			z-index: 10;
+		}
+		
+		/* Animations */
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.animate-fade-in-up {
+			animation: fadeInUp 0.8s ease-out forwards;
+			opacity: 0;
+		}
+		
+		.delay-100 { animation-delay: 0.1s; }
+		.delay-200 { animation-delay: 0.2s; }
+		.delay-300 { animation-delay: 0.3s; }
+
+		/* Custom scrollbar for related events */
+		.related-scroll::-webkit-scrollbar {
+			width: 6px;
+			height: 6px;
+		}
+		.related-scroll::-webkit-scrollbar-thumb {
+			background: rgba(156, 163, 175, 0.5);
+			border-radius: 3px;
+		}
+	</style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
@@ -25,7 +91,7 @@
 	{% endif %}
 
 	<!-- Main Content -->
-	<main class="flex-1 overflow-y-auto relative">
+	<main class="flex-1 overflow-y-auto relative scroll-smooth">
 		<!-- Mobile Header -->
 		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
 			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
@@ -37,135 +103,321 @@
 			{% endif %}
 		</header>
 
-		<div class="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto pb-20">
+		<div id="loadingState" class="flex justify-center py-40">
+			<div class="loader"></div>
+		</div>
 
-			<!-- Back Button -->
-			<a href="/events" class="inline-flex items-center gap-2 mb-6 text-sm font-medium hover:underline"
-				style="color: var(--text-muted);">
-				<i class="ri-arrow-left-line"></i> Back to Events
-			</a>
+		<div id="eventContent" class="hidden pb-24 md:pb-0">
+			
+			<!-- Hero Section -->
+			<div class="event-hero flex items-end pb-12 pt-32 px-4 sm:px-6 md:px-10">
+				<!-- Background Image -->
+				<div class="event-hero-bg transition-transform duration-[10000ms] ease-linear">
+					<img id="heroImage" src="" alt="Event Banner" class="w-full h-full object-cover">
+					<!-- Fallback Gradient if no image -->
+					<div id="heroFallback" class="w-full h-full bg-gradient-to-br from-violet-900 to-indigo-950 hidden"></div>
+				</div>
+				<div class="event-hero-overlay"></div>
 
-			<!-- Loading State -->
-			<div id="loadingState" class="flex justify-center py-20">
-				<div class="loader"></div>
-			</div>
-
-			<!-- Event Content -->
-			<div id="eventContent" class="hidden">
-
-				<!-- Hero Section -->
-				<div class="glass-panel rounded-xl md:rounded-2xl mb-6 md:mb-8 relative overflow-hidden">
-					<div id="eventBanner" class="w-full h-64 md:h-96 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
-						<i class="ri-calendar-event-line text-8xl opacity-50" style="color: var(--primary);"></i>
-					</div>
-					<div class="p-6 md:p-8">
-						<div class="flex items-start justify-between mb-4">
-							<div class="flex-1">
-								<div class="flex items-center gap-3 mb-3">
-									<span id="eventType" class="px-3 py-1 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400">Event</span>
-									<span id="eventStatus" class="px-3 py-1 rounded-lg text-sm font-medium bg-green-500/20 text-green-400">Published</span>
+				<!-- Content -->
+				<div class="event-hero-content w-full max-w-7xl mx-auto">
+					<div class="flex flex-col md:flex-row gap-8 md:items-end justify-between">
+						<div class="flex-1 space-y-5">
+							<a href="/events" class="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-2 text-sm font-medium animate-fade-in-up bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm w-fit">
+								<i class="ri-arrow-left-line"></i> Back to Events
+							</a>
+							
+							<div class="animate-fade-in-up delay-100">
+								<div id="heroStatusBadge" class="mb-3 inline-block shadow-lg">
+									<!-- Injected status badge -->
 								</div>
-								<h1 class="text-3xl md:text-4xl font-bold mb-3" style="color: var(--text-main);" id="eventName">Loading...</h1>
-								<div class="flex flex-wrap gap-4 text-sm mb-4" style="color: var(--text-muted);">
-									<span class="flex items-center gap-2"><i class="ri-calendar-line"></i> <span id="eventDate">Date</span></span>
-									<span class="flex items-center gap-2"><i class="ri-map-pin-line"></i> <span id="eventLocation">Location</span></span>
-									<span class="flex items-center gap-2"><i class="ri-user-line"></i> <span id="organizerName">Organizer</span></span>
+								<h1 id="heroTitle" class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight drop-shadow-xl shadow-black/50">
+									Loading...
+								</h1>
+							</div>
+
+							<!-- Compact Facts Row -->
+							<div class="flex flex-wrap items-center gap-x-6 gap-y-3 text-white text-sm md:text-base font-medium animate-fade-in-up delay-200">
+								<div class="flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+									<i class="ri-calendar-line text-violet-300"></i>
+									<span id="heroDate" class="text-white">Date</span>
+								</div>
+								<div class="flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+									<i class="ri-map-pin-line text-violet-300"></i>
+									<span id="heroLocation" class="text-white">Location</span>
+								</div>
+								<!-- Registered Count in Hero -->
+								<div id="heroRegisteredCount" class="flex items-center gap-2 bg-gradient-to-r from-violet-600/40 to-indigo-600/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-violet-400/30">
+									<div class="flex -space-x-1.5">
+										<div class="w-5 h-5 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 border-2 border-white/50 shadow-sm"></div>
+										<div class="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white/50 shadow-sm"></div>
+										<div class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 border-2 border-white/50 shadow-sm"></div>
+									</div>
+									<span class="text-white font-bold"><span id="heroRegistrationCount">0</span> <span class="text-white/80 font-normal text-xs">registered</span></span>
 								</div>
 							</div>
-						</div>
-						<div id="registrationSection" class="mt-6">
-							<!-- Registration button/status will be injected here -->
+
+							<!-- Action Buttons -->
+							<div id="heroActionButtons" class="flex flex-wrap items-center gap-4 pt-4 animate-fade-in-up delay-300">
+								<!-- Register/Add to Calendar Button (dynamically updated) -->
+								<button id="heroRegisterButton" onclick="registerForEvent()" class="hidden px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-bold backdrop-blur-md shadow-lg shadow-violet-600/30 transition-all hover:scale-105 flex items-center gap-2">
+									<i class="ri-user-add-line text-lg"></i> Register Now
+								</button>
+								<button id="heroCalendarButton" onclick="addToCalendar()" class="px-5 py-2.5 rounded-xl bg-black/30 hover:bg-black/40 text-white text-sm font-semibold backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-2">
+									<i class="ri-calendar-plus-line text-lg"></i> Add to Calendar
+								</button>
+								<button onclick="shareEvent()" class="px-5 py-2.5 rounded-xl bg-black/30 hover:bg-black/40 text-white text-sm font-semibold backdrop-blur-md border border-white/10 transition-all hover:scale-105 flex items-center gap-2">
+									<i class="ri-share-forward-line text-lg"></i> Share
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
+				
+				<!-- Scroll Indicator -->
+				<div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-white/50">
+					<i class="ri-arrow-down-line text-2xl"></i>
+				</div>
+			</div>
 
-				<!-- Main Content Grid -->
-				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-					<!-- Left Column (Main Content) -->
-					<div class="lg:col-span-2 space-y-6">
-						<!-- Description -->
-						<div class="glass-panel rounded-xl p-6">
-							<h2 class="text-xl font-bold mb-4" style="color: var(--text-main);">About This Event</h2>
-							<div id="eventDescription" class="prose max-w-none" style="color: var(--text-muted);">
+			<!-- Main Content Area -->
+			<div class="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto py-12 md:py-16">
+				<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+					
+					<!-- Left Column (Details) -->
+					<div class="lg:col-span-8 space-y-10">
+						
+						<!-- Mobile Registration Card (Visible only on mobile) -->
+						<div id="mobileRegistrationCard" class="md:hidden relative overflow-hidden p-6 rounded-3xl border border-violet-500/30 bg-white/5 backdrop-blur-xl shadow-2xl shadow-violet-500/10 animate-fade-in-up delay-300">
+							<div class="absolute top-0 right-0 w-32 h-32 bg-violet-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+							<!-- Injected by JS -->
+						</div>
+
+						<!-- About -->
+						<section id="aboutSection" class="scroll-mt-24">
+							<h2 class="text-2xl font-bold mb-4 flex items-center gap-3" style="color: var(--text-main);">
+								<span class="w-8 h-1 rounded-full bg-violet-500"></span>
+								About the Event
+							</h2>
+							<div id="eventDescription" class="prose max-w-none prose-lg leading-relaxed" style="color: var(--text-muted);">
 								Loading...
+							</div>
+						</section>
+
+						<!-- Organizer Info (New) -->
+						<section id="organizerSection" class="hidden scroll-mt-24">
+							<h2 class="text-2xl font-bold mb-6 flex items-center gap-3" style="color: var(--text-main);">
+								<span class="w-8 h-1 rounded-full bg-pink-500"></span>
+								Organizer
+							</h2>
+							<div class="glass-panel p-6 rounded-2xl flex items-start gap-4">
+								<div class="w-16 h-16 rounded-full flex items-center justify-center text-pink-500 text-2xl font-bold shrink-0" style="background: rgba(236, 72, 153, 0.1);">
+									<i class="ri-user-star-line"></i>
+								</div>
+								<div>
+									<h3 id="organizerName" class="text-lg font-bold" style="color: var(--text-main);">Organizer Name</h3>
+									<p id="organizerContact" class="text-sm mt-1" style="color: var(--text-muted);">Contact info</p>
+									<div class="mt-3 flex gap-2">
+										<button class="px-3 py-1 rounded-lg bg-pink-500/10 text-pink-500 text-xs font-medium hover:bg-pink-500/20 transition-colors">
+											Follow
+										</button>
+										<button class="px-3 py-1 rounded-lg text-xs font-medium transition-colors" style="background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color);">
+											View Profile
+										</button>
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<!-- Highlights / Resources -->
+						<section id="resourcesSection" class="hidden">
+							<h2 class="text-2xl font-bold mb-6 flex items-center gap-3" style="color: var(--text-main);">
+								<span class="w-8 h-1 rounded-full bg-emerald-500"></span>
+								Resources & Materials
+							</h2>
+							<div id="resourcesList" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<!-- Injected by JS -->
+							</div>
+						</section>
+
+						<!-- Tags -->
+						<section id="tagsSection" class="hidden">
+							<h3 class="text-lg font-bold mb-4" style="color: var(--text-main);">Tags</h3>
+							<div id="tagsList" class="flex flex-wrap gap-2">
+								<!-- Injected -->
+							</div>
+						</section>
+
+					</div>
+
+					<!-- Right Column (Sidebar) -->
+					<div class="lg:col-span-4 space-y-6 relative">
+						
+						<!-- Registration Card (Desktop - Static, not sticky) -->
+						<div class="hidden md:block">
+							<div id="desktopRegistrationCard" class="glass-panel p-6 lg:p-8 rounded-2xl shadow-2xl border border-violet-500/20 backdrop-blur-xl">
+								<!-- Injected by JS -->
+							</div>
+							
+							<!-- Social Proof / Registration Count -->
+							<div id="socialProof" class="mt-4 text-center transition-opacity duration-500">
+								<div class="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl border border-violet-500/20 backdrop-blur-sm" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);">
+									<div class="flex -space-x-2">
+										<div class="w-6 h-6 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 shadow-sm" style="border: 2px solid var(--bg-body);"></div>
+										<div class="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shadow-sm" style="border: 2px solid var(--bg-body);"></div>
+										<div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 shadow-sm" style="border: 2px solid var(--bg-body);"></div>
+									</div>
+									<div class="flex flex-col items-start">
+										<span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-muted);">Registered</span>
+										<span class="text-lg font-extrabold" style="color: var(--text-main);"><span id="registrationCount">0</span> <span class="text-sm font-normal" style="color: var(--text-muted);">candidates</span></span>
+									</div>
+								</div>
 							</div>
 						</div>
 
-						<!-- Resources -->
-						<div id="resourcesSection" class="glass-panel rounded-xl p-6 hidden">
-							<h2 class="text-xl font-bold mb-4" style="color: var(--text-main);">Resources</h2>
-							<div id="resourcesList" class="space-y-3">
-								<!-- Resources will be injected here -->
+						<!-- Details Sidebar -->
+						<div class="glass-panel p-6 rounded-2xl space-y-6">
+							<h3 class="font-bold text-lg pb-3 mb-4 flex items-center gap-2" style="color: var(--text-main); border-bottom: 1px solid var(--border-color);">
+								<i class="ri-information-line text-violet-500"></i> Event Details
+							</h3>
+							
+							<div class="space-y-5">
+								<!-- Date & Time -->
+								<div class="flex gap-3 items-start">
+									<div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0 text-violet-500 mt-0.5">
+										<i class="ri-time-line"></i>
+									</div>
+									<div>
+										<div class="text-xs font-bold uppercase tracking-wider mb-0.5" style="color: var(--text-muted);">Date & Time</div>
+										<div id="sidebarDateTime" class="font-medium text-sm leading-snug" style="color: var(--text-main);">-</div>
+										<button onclick="addToCalendar()" class="text-xs hover:underline mt-1 font-medium" style="color: var(--primary);">Add to Calendar</button>
+									</div>
+								</div>
+
+								<!-- Location -->
+								<div class="flex gap-3 items-start">
+									<div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0 text-blue-500 mt-0.5">
+										<i class="ri-map-pin-line"></i>
+									</div>
+									<div>
+										<div class="text-xs font-bold uppercase tracking-wider mb-0.5" style="color: var(--text-muted);">Location</div>
+										<div id="sidebarLocation" class="font-medium text-sm leading-snug" style="color: var(--text-main);">-</div>
+										<div id="sidebarVenue" class="text-xs mt-1" style="color: var(--text-muted);"></div>
+										<a id="sidebarOnlineLink" href="#" target="_blank" class="hidden inline-flex items-center gap-1 text-xs hover:underline mt-1 font-medium" style="color: #3b82f6;">
+											Join Meeting <i class="ri-external-link-line"></i>
+										</a>
+									</div>
+								</div>
+
+								<!-- Capacity -->
+								<div class="flex gap-3 items-start">
+									<div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0 text-orange-500 mt-0.5">
+										<i class="ri-group-line"></i>
+									</div>
+									<div class="w-full">
+										<div class="flex justify-between items-center mb-1">
+											<div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-muted);">Capacity</div>
+											<div id="sidebarCapacity" class="text-xs font-bold" style="color: var(--text-main);">-</div>
+										</div>
+										<div class="w-full rounded-full h-1.5 overflow-hidden" style="background: var(--border-color);">
+											<div id="capacityBar" class="bg-gradient-to-r from-orange-400 to-red-500 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Organizer -->
+								<div class="flex gap-3 items-start">
+									<div class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center shrink-0 text-pink-500 mt-0.5">
+										<i class="ri-user-star-line"></i>
+									</div>
+									<div>
+										<div class="text-xs font-bold uppercase tracking-wider mb-0.5" style="color: var(--text-muted);">Organizer</div>
+										<div id="sidebarOrganizer" class="font-medium text-sm leading-snug" style="color: var(--text-main);">-</div>
+										<a id="sidebarOrganizerEmail" href="#" class="text-xs hover:underline mt-1 font-medium" style="color: #ec4899;">Contact Organizer</a>
+									</div>
+								</div>
 							</div>
 						</div>
 
 						<!-- Related Events -->
-						<div id="relatedEventsSection" class="glass-panel rounded-xl p-6 hidden">
-							<h2 class="text-xl font-bold mb-4" style="color: var(--text-main);">Related Events</h2>
-							<div id="relatedEventsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<!-- Related events will be injected here -->
-							</div>
-						</div>
-					</div>
-
-					<!-- Right Column (Sidebar) -->
-					<div class="space-y-6">
-						<!-- Event Details Card -->
-						<div class="glass-panel rounded-xl p-6">
-							<h3 class="font-bold mb-4" style="color: var(--text-main);">Event Details</h3>
-							<div class="space-y-4 text-sm">
-								<div>
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Date & Time</div>
-									<div style="color: var(--text-main);" id="eventDateTime">-</div>
-								</div>
-								<div>
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Location</div>
-									<div style="color: var(--text-main);" id="eventLocationDetail">-</div>
-								</div>
-								<div id="venueAddressContainer" class="hidden">
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Venue Address</div>
-									<div style="color: var(--text-main);" id="venueAddress">-</div>
-								</div>
-								<div id="onlineLinkContainer" class="hidden">
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Meeting Link</div>
-									<a id="onlineLink" href="#" target="_blank" class="text-violet-400 hover:underline">Join Online</a>
-								</div>
-								<div>
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Organizer</div>
-									<div style="color: var(--text-main);" id="organizerDetails">-</div>
-								</div>
-								<div id="capacityInfo" class="hidden">
-									<div class="font-medium mb-1" style="color: var(--text-muted);">Capacity</div>
-									<div style="color: var(--text-main);" id="capacityDetails">-</div>
-								</div>
+						<div id="relatedEventsSection" class="glass-panel p-6 rounded-2xl hidden">
+							<h3 class="font-bold text-lg mb-4" style="color: var(--text-main);">Related Events</h3>
+							<div id="relatedEventsList" class="space-y-4">
+								<!-- Injected -->
 							</div>
 						</div>
 
-						<!-- Tags -->
-						<div id="tagsSection" class="glass-panel rounded-xl p-6 hidden">
-							<h3 class="font-bold mb-4" style="color: var(--text-main);">Tags</h3>
-							<div id="tagsList" class="flex flex-wrap gap-2">
-								<!-- Tags will be injected here -->
-							</div>
-						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
-	</div>
+		
+		<!-- Mobile Sticky Footer Removed as per request -->
+
+	</main>
 
 	<!-- Scripts -->
 	<script>
+		// Helper function to get CSRF token
+		const getCSRFToken = () => {
+			// Try multiple sources for CSRF token
+			if (window.frappe && window.frappe.csrf_token) {
+				return window.frappe.csrf_token;
+			}
+
+			// Try meta tag
+			const metaTag = document.querySelector('meta[name="csrf-token"]');
+			if (metaTag) {
+				const token = metaTag.getAttribute('content');
+				if (token) {
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+
+			// Try to get from cookies
+			const cookies = document.cookie.split(';');
+			for (let cookie of cookies) {
+				const [name, value] = cookie.trim().split('=');
+				if (name === 'csrf_token') {
+					const token = decodeURIComponent(value);
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+
+			console.warn('CSRF token not found');
+			return null;
+		};
+
 		// Initialize frappe
 		window.frappe = {
 			session: {
 				user: '{{ user if user else "Guest" }}',
 				user_fullname: '{{ frappe.session.user_fullname if not is_guest and frappe.session.user_fullname else "Guest" }}'
 			},
+			csrf_token: {% if csrf_token %}'{{ csrf_token }}'{% else %}getCSRFToken(){% endif %},
 			call: function (opts) {
-				const params = new URLSearchParams();
-				if (opts.args) {
+				// Determine if this is a write operation (POST) or read operation (GET)
+				const writeMethods = ['register_for_event', 'cancel_registration', 'update', 'insert', 'save', 'delete'];
+				const isWriteOperation = writeMethods.some(method => opts.method && opts.method.includes(method));
+				const method = isWriteOperation ? 'POST' : 'GET';
+				
+				// Build request
+				let url = '/api/method/' + opts.method;
+				const fetchOptions = {
+					method: method,
+					headers: { 
+						'Accept': 'application/json'
+					},
+					credentials: 'same-origin'
+				};
+				
+				// For GET, add params to URL
+				if (method === 'GET' && opts.args) {
+					const params = new URLSearchParams();
 					for (const [key, value] of Object.entries(opts.args)) {
 						if (value === null || value === undefined) continue;
 						if (typeof value === 'object' && Object.keys(value).length === 0) continue;
@@ -176,20 +428,60 @@
 							params.append(key, value);
 						}
 					}
+					if (params.toString()) {
+						url += '?' + params.toString();
+					}
+				} else if (method === 'POST' && opts.args) {
+					// For POST, send as form-encoded (Frappe expects this format)
+					const params = new URLSearchParams();
+					for (const [key, value] of Object.entries(opts.args)) {
+						if (value === null || value === undefined) continue;
+						if (typeof value === 'object' || Array.isArray(value)) {
+							params.append(key, JSON.stringify(value));
+						} else {
+							params.append(key, String(value));
+						}
+					}
+					fetchOptions.body = params;
+					fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+					
+					// Add CSRF token for POST requests
+					const csrfToken = getCSRFToken();
+					if (csrfToken) {
+						fetchOptions.headers['X-Frappe-CSRF-Token'] = csrfToken;
+					} else {
+						console.error('CSRF token not found - POST request may fail');
+					}
 				}
-				const url = '/api/method/' + opts.method + (params.toString() ? '?' + params.toString() : '');
-				return fetch(url, {
-					method: 'GET',
-					headers: { 'Accept': 'application/json' },
-					credentials: 'same-origin'
-				})
-					.then(response => {
-						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-						return response.json();
+				
+				return fetch(url, fetchOptions)
+					.then(async response => {
+						const data = await response.json();
+						
+						// Check for Frappe errors
+						if (data.exc || data.exc_type) {
+							const error = new Error(data.exc || data.message || 'An error occurred');
+							error.exc = data.exc;
+							error.exc_type = data.exc_type;
+							error.response = data;
+							throw error;
+						}
+						
+						if (!response.ok) {
+							const error = new Error(data.message || `HTTP error! status: ${response.status}`);
+							error.response = data;
+							throw error;
+						}
+						
+						return data;
 					})
 					.then(data => {
 						if (opts.callback) opts.callback(data);
 						return data;
+					})
+					.catch(error => {
+						if (opts.error) opts.error(error);
+						throw error;
 					});
 			}
 		};
@@ -239,60 +531,133 @@
 
 		// Render event details
 		const renderEventDetails = () => {
-			// Banner
+			// Hero Background
 			if (eventData.event_banner) {
-				document.getElementById('eventBanner').innerHTML = `<img src="${eventData.event_banner}" alt="${eventData.event_name}" class="w-full h-full object-cover">`;
+				document.getElementById('heroImage').src = eventData.event_banner;
+			} else {
+				document.getElementById('heroImage').classList.add('hidden');
+				document.getElementById('heroFallback').classList.remove('hidden');
 			}
 
-			// Basic info
-			document.getElementById('eventName').textContent = eventData.event_name;
-			document.getElementById('eventType').textContent = eventData.event_type || 'Event';
+			// Hero Content
+			document.getElementById('heroTitle').textContent = eventData.event_name;
+			// document.getElementById('heroType').textContent = eventData.event_type || 'Event'; // Removed from HTML
+			// Removed heroStatus as it's no longer in the HTML
 			
+			// Status color logic and Badge
+			let statusBadge = '';
+			const badgeClass = "px-3 py-1.5 rounded-lg text-white text-xs font-bold border border-white/20 backdrop-blur-md shadow-lg";
+			if(eventData.event_status === 'Cancelled') {
+				statusBadge = `<span class="${badgeClass} bg-red-500/80">Cancelled</span>`;
+			} else if(eventData.event_status === 'Completed') {
+				statusBadge = `<span class="${badgeClass} bg-gray-500/80">Completed</span>`;
+			} else if(eventData.is_full) {
+				statusBadge = `<span class="${badgeClass} bg-orange-500/80">Full</span>`;
+			} else {
+				statusBadge = `<span class="${badgeClass} bg-emerald-500/80">Open</span>`;
+			}
+			document.getElementById('heroStatusBadge').innerHTML = statusBadge;
+
+			// Hero Button Logic: Show Register if not registered, show Add to Calendar if registered
+			const heroRegisterBtn = document.getElementById('heroRegisterButton');
+			const heroCalendarBtn = document.getElementById('heroCalendarButton');
+			
+			// Check if user is registered
+			const isRegistered = eventData.user_registration && 
+				eventData.user_registration.status !== 'Cancelled' &&
+				eventData.user_registration.status !== undefined;
+			
+			// Show Register button if registration is enabled and user is not registered
+			if (eventData.registration_enabled && !eventData.registration_closed && !eventData.is_full && !isRegistered) {
+				heroRegisterBtn.classList.remove('hidden');
+				heroCalendarBtn.classList.add('hidden');
+			} else {
+				// Show Add to Calendar button (either user is registered or registration not available)
+				heroRegisterBtn.classList.add('hidden');
+				heroCalendarBtn.classList.remove('hidden');
+			}
+
 			const eventDate = new Date(eventData.event_date);
 			const formattedDate = eventDate.toLocaleDateString('en-US', {
-				weekday: 'long',
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
+				weekday: 'short', month: 'short', day: 'numeric'
 			});
-			const formattedTime = eventDate.toLocaleTimeString('en-US', {
-				hour: 'numeric',
-				minute: '2-digit'
-			});
-			document.getElementById('eventDate').textContent = `${formattedDate} at ${formattedTime}`;
-			document.getElementById('eventDateTime').textContent = `${formattedDate} at ${formattedTime}`;
+			const formattedTime = eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 			
-			document.getElementById('eventLocation').textContent = eventData.location || 'TBA';
-			document.getElementById('eventLocationDetail').textContent = eventData.location || 'TBA';
+			document.getElementById('heroDate').textContent = `${formattedDate}, ${formattedTime}`;
+			document.getElementById('heroLocation').textContent = eventData.location || 'Online';
+			// document.getElementById('heroType').textContent = eventData.event_type || 'Event'; // Removed
+			// document.getElementById('heroOrganizer').textContent = eventData.organizer_name || 'NETWORX'; // Removed
+
+			// Sidebar Details
+			document.getElementById('sidebarDateTime').textContent = `${eventDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} at ${formattedTime}`;
+			document.getElementById('sidebarLocation').textContent = eventData.location || 'Online';
 			
 			if (eventData.venue_address) {
-				document.getElementById('venueAddress').textContent = eventData.venue_address;
-				document.getElementById('venueAddressContainer').classList.remove('hidden');
+				document.getElementById('sidebarVenue').textContent = eventData.venue_address;
 			}
-
 			if (eventData.online_meeting_link) {
-				document.getElementById('onlineLink').href = eventData.online_meeting_link;
-				document.getElementById('onlineLinkContainer').classList.remove('hidden');
+				const link = document.getElementById('sidebarOnlineLink');
+				link.href = eventData.online_meeting_link;
+				link.classList.remove('hidden');
 			}
 
-			document.getElementById('organizerName').textContent = eventData.organizer_name || 'TBA';
-			document.getElementById('organizerDetails').textContent = eventData.organizer_name || 'TBA';
+			document.getElementById('sidebarOrganizer').textContent = eventData.organizer_name || 'NETWORX';
 			if (eventData.organizer_email) {
-				document.getElementById('organizerDetails').innerHTML += `<br><a href="mailto:${eventData.organizer_email}" class="text-violet-400 hover:underline">${eventData.organizer_email}</a>`;
+				const emailLink = document.getElementById('sidebarOrganizerEmail');
+				emailLink.href = `mailto:${eventData.organizer_email}`;
+				emailLink.textContent = 'Contact Organizer';
+			} else {
+				document.getElementById('sidebarOrganizerEmail').classList.add('hidden');
 			}
+
+			// Organizer Section in Main Content
+			if (eventData.organizer_name) {
+				document.getElementById('organizerName').textContent = eventData.organizer_name;
+				document.getElementById('organizerContact').textContent = eventData.organizer_email || '';
+				document.getElementById('organizerSection').classList.remove('hidden');
+			}
+
+			// Capacity
+			const registered = eventData.total_registrations || 0;
+			if (eventData.max_capacity > 0) {
+				const percent = Math.min((registered / eventData.max_capacity) * 100, 100);
+				document.getElementById('sidebarCapacity').textContent = `${registered} / ${eventData.max_capacity}`;
+				document.getElementById('capacityBar').style.width = `${percent}%`;
+			} else {
+				document.getElementById('sidebarCapacity').textContent = registered > 0 ? `${registered} registered` : 'Unlimited';
+				document.getElementById('capacityBar').style.width = '0%';
+			}
+			
+			// Update Hero Registration Count
+			document.getElementById('heroRegistrationCount').textContent = registered;
+			
+			// Social Proof - Always show registered count (in sidebar)
+			document.getElementById('registrationCount').textContent = registered;
+			// Keep it visible to show "0 candidates" when no registrations yet
 
 			// Description
 			document.getElementById('eventDescription').innerHTML = eventData.description || 'No description available.';
 
-			// Registration section
-			renderRegistrationSection();
-
-			// Capacity info
-			if (eventData.max_capacity && eventData.max_capacity > 0) {
-				const registered = eventData.total_registrations || 0;
-				const available = eventData.available_spots || 0;
-				document.getElementById('capacityDetails').textContent = `${registered}/${eventData.max_capacity} registered (${available} spots available)`;
-				document.getElementById('capacityInfo').classList.remove('hidden');
+			// Resources
+			if (eventData.resources && eventData.resources.length > 0) {
+				document.getElementById('resourcesList').innerHTML = eventData.resources.map(resource => {
+					const link = resource.resource_url || (resource.resource_file ? `/files/${resource.resource_file}` : '#');
+					return `
+						<a href="${link}" target="_blank" class="flex items-center gap-4 p-4 rounded-xl glass-card hover:border-emerald-500/30 transition-all group">
+							<div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+								<i class="ri-file-text-line text-2xl"></i>
+							</div>
+							<div class="flex-1 min-w-0">
+								<div class="font-bold text-sm truncate" style="color: var(--text-main);">${resource.resource_name}</div>
+								<div class="text-xs mt-0.5" style="color: var(--text-muted);">${resource.resource_type}</div>
+							</div>
+							<div class="w-8 h-8 rounded-full flex items-center justify-center group-hover:text-emerald-500 transition-colors" style="background: var(--bg-card); color: var(--text-muted);">
+								<i class="ri-download-line"></i>
+							</div>
+						</a>
+					`;
+				}).join('');
+				document.getElementById('resourcesSection').classList.remove('hidden');
 			}
 
 			// Tags
@@ -300,153 +665,416 @@
 				const tags = eventData.tags.split(',').map(t => t.trim()).filter(t => t);
 				if (tags.length > 0) {
 					document.getElementById('tagsList').innerHTML = tags.map(tag => 
-						`<span class="px-3 py-1 rounded-lg text-xs bg-white/5 border border-white/10" style="color: var(--text-main);">${tag}</span>`
+						`<a href="/events?search=${tag}" class="px-3 py-1.5 rounded-lg text-sm bg-violet-500/10 text-violet-500 font-medium hover:bg-violet-500/20 transition-colors cursor-pointer">${tag}</a>`
 					).join('');
 					document.getElementById('tagsSection').classList.remove('hidden');
 				}
 			}
 
-			// Resources
-			if (eventData.resources && eventData.resources.length > 0) {
-				document.getElementById('resourcesList').innerHTML = eventData.resources.map(resource => {
-					const link = resource.resource_url || (resource.resource_file ? `/files/${resource.resource_file}` : '#');
-					return `
-						<a href="${link}" target="_blank" class="flex items-center gap-3 p-3 rounded-lg border hover:bg-white/5 transition-colors" style="border-color: var(--border-color);">
-							<i class="ri-file-line text-xl" style="color: var(--primary);"></i>
-							<div class="flex-1">
-								<div class="font-medium" style="color: var(--text-main);">${resource.resource_name}</div>
-								<div class="text-xs" style="color: var(--text-muted);">${resource.resource_type}</div>
-							</div>
-							<i class="ri-external-link-line"></i>
-						</a>
-					`;
-				}).join('');
-				document.getElementById('resourcesSection').classList.remove('hidden');
-			}
-
-			// Related events
+			// Related Events
 			if (eventData.related_events && eventData.related_events.length > 0) {
 				document.getElementById('relatedEventsList').innerHTML = eventData.related_events.map(event => {
 					const date = new Date(event.event_date);
-					const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+					const fDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 					return `
-						<a href="/events/${event.name}" class="p-4 rounded-lg border hover:bg-white/5 transition-colors" style="border-color: var(--border-color);">
-							${event.event_banner ? `<img src="${event.event_banner}" alt="${event.event_name}" class="w-full h-32 object-cover rounded-lg mb-2">` : ''}
-							<div class="font-medium mb-1" style="color: var(--text-main);">${event.event_name}</div>
-							<div class="text-xs" style="color: var(--text-muted);">${formattedDate} • ${event.location || 'TBA'}</div>
+						<a href="/events/${event.name}" class="flex items-start gap-3 p-3 rounded-xl transition-colors group" style="background: transparent;" onmouseover="this.style.background='var(--bg-card)'" onmouseout="this.style.background='transparent'">
+							<div class="w-16 h-16 rounded-lg shrink-0 overflow-hidden" style="background: var(--bg-card);">
+								${event.event_banner ? `<img src="${event.event_banner}" class="w-full h-full object-cover">` : 
+								`<div class="w-full h-full flex items-center justify-center bg-violet-500/10 text-violet-500"><i class="ri-calendar-line"></i></div>`}
+							</div>
+							<div class="flex-1 min-w-0 pt-1">
+								<div class="font-bold text-sm truncate transition-colors" style="color: var(--text-main);">${event.event_name}</div>
+								<div class="text-xs mt-1 flex items-center gap-2" style="color: var(--text-muted);">
+									<span><i class="ri-calendar-line"></i> ${fDate}</span>
+									<span>•</span>
+									<span class="truncate">${event.location || 'TBA'}</span>
+								</div>
+							</div>
 						</a>
 					`;
 				}).join('');
 				document.getElementById('relatedEventsSection').classList.remove('hidden');
 			}
+
+			// Mobile Footer Price - Removed
+			/*
+			const currency = eventData.currency === 'USD' ? '$' : eventData.currency === 'INR' ? '₹' : eventData.currency;
+			if (!eventData.is_free && eventData.registration_fee > 0) {
+				document.getElementById('mobileFooterPrice').textContent = `${currency}${eventData.registration_fee}`;
+			} else {
+				document.getElementById('mobileFooterPrice').textContent = 'Free';
+				document.getElementById('mobileFooterPrice').className = "text-xl font-extrabold text-emerald-500";
+			}
+			*/
+
+			// Registration Cards
+			renderRegistrationCards();
+			
+			// Init Sticky Observer - Removed
+			// initStickyFooterObserver();
 		};
 
-		// Render registration section
-		const renderRegistrationSection = () => {
-			const container = document.getElementById('registrationSection');
+		// Add to Calendar
+		window.addToCalendar = () => {
+			if (!eventData) return;
+			const start = new Date(eventData.event_date).toISOString().replace(/-|:|\.\d\d\d/g, "");
+			// Assume 1 hour duration if not specified (or calculate from end_date if available)
+			let end = start;
+			if (eventData.end_date) {
+				end = new Date(eventData.end_date).toISOString().replace(/-|:|\.\d\d\d/g, "");
+			} else {
+				// Add 1 hour
+				const d = new Date(eventData.event_date);
+				d.setHours(d.getHours() + 1);
+				end = d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+			}
 			
+			const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventData.event_name)}&dates=${start}/${end}&details=${encodeURIComponent(eventData.description || '')}&location=${encodeURIComponent(eventData.location || '')}`;
+			window.open(url, '_blank');
+		};
+
+		// Share Event
+		window.shareEvent = async () => {
+			if (navigator.share) {
+				try {
+					await navigator.share({
+						title: eventData.event_name,
+						text: `Check out this event: ${eventData.event_name}`,
+						url: window.location.href
+					});
+				} catch (err) {
+					console.log('Share failed', err);
+				}
+			} else {
+				// Fallback to copy
+				navigator.clipboard.writeText(window.location.href);
+				alert('Link copied to clipboard!');
+			}
+		};
+
+		// Scroll to Registration
+		window.scrollToRegistration = () => {
+			// On mobile, scroll to mobile card (which is hidden but we can scroll to top of details)
+			// Or better, scroll to the desktop card which is hidden on mobile?
+			// Actually, on mobile we have mobileRegistrationCard.
+			const card = document.getElementById('mobileRegistrationCard');
+			if (card) {
+				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		};
+
+		// Sticky Footer Observer - Removed
+		/*
+		const initStickyFooterObserver = () => {
+			// ...
+		};
+		*/
+
+		const renderRegistrationCards = () => {
+			const cardContent = getRegistrationCardContent();
+			document.getElementById('desktopRegistrationCard').innerHTML = cardContent;
+			document.getElementById('mobileRegistrationCard').innerHTML = cardContent;
+		};
+
+		const getRegistrationCardContent = () => {
 			if (!eventData.registration_enabled) {
-				container.innerHTML = '<p class="text-sm" style="color: var(--text-muted);">Registration is not available for this event.</p>';
-				return;
+				return `
+					<div class="text-center py-4">
+						<div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-3" style="background: var(--bg-card);">
+							<i class="ri-lock-2-line text-2xl" style="color: var(--text-muted);"></i>
+						</div>
+						<h3 class="font-bold text-lg mb-1" style="color: var(--text-main);">Registration Closed</h3>
+						<p class="text-sm" style="color: var(--text-muted);">Registration is not available for this event.</p>
+					</div>
+				`;
 			}
 
 			if (eventData.registration_closed) {
-				container.innerHTML = '<p class="text-sm text-red-400">Registration deadline has passed.</p>';
-				return;
+				return `
+					<div class="text-center py-4">
+						<div class="w-16 h-16 rounded-full bg-red-500/10 mx-auto flex items-center justify-center mb-3">
+							<i class="ri-timer-line text-2xl text-red-500"></i>
+						</div>
+						<h3 class="font-bold text-lg mb-1" style="color: var(--text-main);">Deadline Passed</h3>
+						<p class="text-sm" style="color: var(--text-muted);">Registration closed on ${new Date(eventData.registration_deadline).toLocaleDateString()}.</p>
+					</div>
+				`;
 			}
 
 			if (eventData.user_registration) {
-				// User is registered
-				if (eventData.user_registration.status === 'Confirmed') {
-					container.innerHTML = `
-						<div class="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-							<div class="flex items-center justify-between">
-								<div>
-									<div class="font-medium text-green-400 mb-1">✓ You're Registered</div>
-									<div class="text-sm" style="color: var(--text-muted);">Registration ID: ${eventData.user_registration.registration_id}</div>
-								</div>
-								<button onclick="cancelRegistration('${eventData.user_registration.registration_id}')" class="px-4 py-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors text-sm">
-									Cancel
-								</button>
+				const reg = eventData.user_registration;
+				if (reg.status === 'Confirmed') {
+					return `
+						<div class="text-center py-4">
+							<div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/20 mx-auto flex items-center justify-center mb-4">
+								<i class="ri-check-line text-3xl text-emerald-500"></i>
 							</div>
+							<h3 class="font-bold text-xl mb-1 text-emerald-500">You're Registered!</h3>
+							<p class="text-sm mb-6" style="color: var(--text-muted);">We've sent a confirmation email to you.</p>
+							
+							<div class="bg-emerald-500/10 rounded-xl p-4 mb-6">
+								<div class="text-xs uppercase tracking-wider text-emerald-600 font-semibold mb-1">Registration ID</div>
+								<div class="font-mono text-lg font-bold text-emerald-700">${reg.registration_id}</div>
+							</div>
+
+							<button onclick="cancelRegistration('${reg.registration_id}')" class="text-sm text-red-400 hover:text-red-500 hover:underline">
+								Cancel Registration
+							</button>
 						</div>
 					`;
-				} else if (eventData.user_registration.waitlist_position > 0) {
-					container.innerHTML = `
-						<div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-							<div class="font-medium text-yellow-400 mb-1">⏳ You're on Waitlist</div>
-							<div class="text-sm" style="color: var(--text-muted);">Position: #${eventData.user_registration.waitlist_position}</div>
-							<button onclick="cancelRegistration('${eventData.user_registration.registration_id}')" class="mt-3 px-4 py-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors text-sm">
-								Cancel
+				} else if (reg.waitlist_position > 0) {
+					return `
+						<div class="text-center py-4">
+							<div class="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 mx-auto flex items-center justify-center mb-4">
+								<i class="ri-hourglass-line text-3xl text-amber-500"></i>
+							</div>
+							<h3 class="font-bold text-xl mb-1 text-amber-500">You're on the Waitlist</h3>
+							<p class="text-sm mb-6" style="color: var(--text-muted);">We'll notify you if a spot opens up.</p>
+							
+							<div class="bg-amber-500/10 rounded-xl p-4 mb-6">
+								<div class="text-xs uppercase tracking-wider text-amber-600 font-semibold mb-1">Waitlist Position</div>
+								<div class="font-mono text-2xl font-bold text-amber-700">#${reg.waitlist_position}</div>
+							</div>
+
+							<button onclick="cancelRegistration('${reg.registration_id}')" class="text-sm text-red-400 hover:text-red-500 hover:underline">
+								Leave Waitlist
+							</button>
+						</div>
+					`;
+				} else {
+					// Pending approval
+					return `
+						<div class="text-center py-4">
+							<div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 mx-auto flex items-center justify-center mb-4">
+								<i class="ri-time-line text-3xl text-blue-500"></i>
+							</div>
+							<h3 class="font-bold text-xl mb-1 text-blue-500">Registration Pending</h3>
+							<p class="text-sm mb-6" style="color: var(--text-muted);">Your registration is awaiting approval.</p>
+							<button onclick="cancelRegistration('${reg.registration_id}')" class="text-sm text-red-400 hover:text-red-500 hover:underline">
+								Cancel Request
 							</button>
 						</div>
 					`;
 				}
-			} else {
-				// Not registered
-				if (eventData.is_full && !eventData.waitlist_enabled) {
-					container.innerHTML = '<p class="text-sm text-red-400">Event is full and waitlist is not available.</p>';
-				} else if (eventData.is_full && eventData.waitlist_enabled) {
-					container.innerHTML = `
-						<button onclick="registerForEvent()" class="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium hover:from-violet-700 hover:to-indigo-700 transition-all">
-							Join Waitlist
-						</button>
-					`;
-				} else {
-					container.innerHTML = `
-						<button onclick="registerForEvent()" class="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium hover:from-violet-700 hover:to-indigo-700 transition-all">
-							Register for Event
-						</button>
-					`;
-				}
+			}
 
-				if (eventData.registration_type === 'Both' || eventData.registration_type === 'External Link') {
-					if (eventData.registration_link) {
-						container.innerHTML += `
-							<a href="${eventData.registration_link}" target="_blank" class="mt-3 w-full block px-6 py-3 rounded-lg border text-center font-medium hover:bg-white/5 transition-colors" style="border-color: var(--border-color); color: var(--text-main);">
-								Register Externally <i class="ri-external-link-line ml-1"></i>
-							</a>
-						`;
-					}
+			// Not Registered
+			let buttonText = "Register Now";
+			let buttonClass = "w-full py-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-lg shadow-lg shadow-violet-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group";
+			// Add shine effect
+			// buttonClass += " after:content-[''] after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:transition-all after:duration-1000 group-hover:after:left-full";
+			
+			let subText = "Secure your spot today!";
+
+			if (eventData.is_full) {
+				if (eventData.waitlist_enabled) {
+					buttonText = "Join Waitlist";
+					buttonClass = "w-full py-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg shadow-lg shadow-amber-500/30 transition-all";
+					subText = "Event is full. Join the waitlist.";
+				} else {
+					return `
+						<div class="text-center py-4">
+							<div class="w-16 h-16 rounded-full bg-red-500/10 mx-auto flex items-center justify-center mb-3">
+								<i class="ri-close-circle-line text-2xl text-red-500"></i>
+							</div>
+							<h3 class="font-bold text-lg mb-1" style="color: var(--text-main);">Event Full</h3>
+							<p class="text-sm" style="color: var(--text-muted);">Registration is closed as capacity has been reached.</p>
+						</div>
+					`;
 				}
 			}
+
+			let priceDisplay = '';
+			const currency = eventData.currency === 'USD' ? '$' : eventData.currency === 'INR' ? '₹' : eventData.currency;
+			
+			if (!eventData.is_free && eventData.registration_fee > 0) {
+				priceDisplay = `
+					<div class="flex justify-between items-end mb-6 pb-4" style="border-bottom: 1px dashed var(--border-color);">
+						<span class="text-sm font-bold uppercase tracking-wider" style="color: var(--text-muted);">Registration Fee</span>
+						<span class="text-4xl font-extrabold" style="color: var(--text-main);">${currency}${eventData.registration_fee}</span>
+					</div>
+				`;
+			} else {
+				priceDisplay = `
+					<div class="flex justify-between items-end mb-6 pb-4" style="border-bottom: 1px dashed var(--border-color);">
+						<span class="text-sm font-bold uppercase tracking-wider" style="color: var(--text-muted);">Price</span>
+						<span class="text-4xl font-extrabold text-emerald-500">Free</span>
+					</div>
+				`;
+			}
+
+			let externalLink = '';
+			// Logic fix: Ensure we check strings properly if they are coming from backend as strings
+			if ((eventData.registration_type === 'Both' || eventData.registration_type === 'External Link') && eventData.registration_link) {
+				externalLink = `
+					<a href="${eventData.registration_link}" target="_blank" class="block w-full py-4 mt-3 rounded-xl border-2 border-violet-500/30 text-center font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all flex items-center justify-center gap-2">
+						Register on External Site <i class="ri-external-link-line"></i>
+					</a>
+				`;
+			}
+
+			// Only show internal register button if type is Internal or Both, OR if type is not set (defaulting to internal for safety if enabled)
+			let internalButton = '';
+			// Default to Internal if not specified but enabled
+			const regType = eventData.registration_type || 'Internal';
+			
+			if (regType === 'Internal' || regType === 'Both') {
+				internalButton = `
+					<button onclick="registerForEvent()" class="${buttonClass}">
+						${buttonText} <i class="ri-arrow-right-line ml-1"></i>
+					</button>
+				`;
+			}
+
+			// Fallback if no buttons
+			if (!internalButton && !externalLink) {
+				return `
+					<div>
+						${priceDisplay}
+						<div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+							<p class="text-sm font-medium text-amber-600">Registration details not available.</p>
+						</div>
+					</div>
+				`;
+			}
+
+			return `
+				<div>
+					${priceDisplay}
+					<div class="space-y-3">
+						${internalButton}
+						${externalLink}
+					</div>
+					<p class="text-xs text-center mt-4 font-medium flex items-center justify-center gap-1" style="color: var(--text-muted);">
+						<i class="ri-shield-check-line"></i> ${subText}
+					</p>
+				</div>
+			`;
 		};
 
-		// Register for event
+		// Helper function to extract error message from Frappe error
+		const extractErrorMessage = (error) => {
+			if (!error) return 'An unknown error occurred';
+			
+			// Try to extract from Frappe error response
+			if (error.exc_type && error.exc) {
+				// Frappe exception format
+				return error.exc || error.exc_type;
+			}
+			
+			if (error.message) {
+				// Check if it's a JSON string
+				try {
+					const parsed = JSON.parse(error.message);
+					if (parsed.exc) return parsed.exc;
+					if (parsed.message) return parsed.message;
+				} catch (e) {
+					// Not JSON, use as is
+				}
+				return error.message;
+			}
+			
+			if (error.response && error.response.exc) {
+				return error.response.exc;
+			}
+			
+			if (error.response && error.response.message) {
+				return error.response.message;
+			}
+			
+			return 'Failed to register for event. Please try again.';
+		};
+
+		// Show toast notification
+		const showToast = (message, type = 'success') => {
+			const toast = document.createElement('div');
+			toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl backdrop-blur-md border ${
+				type === 'success' 
+					? 'bg-emerald-500/90 text-white border-emerald-400' 
+					: 'bg-red-500/90 text-white border-red-400'
+			} transition-all transform translate-x-full`;
+			toast.innerHTML = `
+				<div class="flex items-center gap-3">
+					<i class="ri-${type === 'success' ? 'check-line' : 'error-warning-line'} text-xl"></i>
+					<span class="font-medium">${message}</span>
+				</div>
+			`;
+			document.body.appendChild(toast);
+			
+			// Animate in
+			setTimeout(() => {
+				toast.classList.remove('translate-x-full');
+			}, 10);
+			
+			// Remove after 4 seconds
+			setTimeout(() => {
+				toast.classList.add('translate-x-full');
+				setTimeout(() => toast.remove(), 300);
+			}, 4000);
+		};
+
+		// Register function
 		window.registerForEvent = async () => {
 			if (!isLoggedIn) {
-				alert('Please login to register for events');
+				// Save current URL to redirect back after login
+				document.cookie = `redirect_to=${window.location.pathname}; path=/`;
 				window.location.href = '/login';
 				return;
 			}
 
+			// Get all register buttons (desktop and mobile)
+			const desktopBtn = document.querySelector('#desktopRegistrationCard button[onclick="registerForEvent()"]');
+			const mobileBtn = document.querySelector('#mobileRegistrationCard button[onclick="registerForEvent()"]');
+			const heroBtn = document.querySelector('.hero-register-btn');
+			
+			const buttons = [desktopBtn, mobileBtn, heroBtn].filter(Boolean);
+			const originalTexts = buttons.map(btn => btn.innerText);
+			
+			// Disable all buttons
+			buttons.forEach(btn => {
+				btn.disabled = true;
+				btn.innerText = 'Processing...';
+			});
+
 			try {
 				const result = await NetworkxAPI.registerForEvent(eventId);
-				alert(result.message || 'Registration successful!');
-				loadEventDetails();
+				
+				// Show success message
+				if (result && result.message) {
+					showToast(result.message, 'success');
+				} else {
+					showToast('Successfully registered for event!', 'success');
+				}
+				
+				// Reload event details to show updated registration status
+				await loadEventDetails();
 			} catch (error) {
-				alert(error.message || 'Failed to register for event');
+				console.error('Registration error:', error);
+				const errorMessage = extractErrorMessage(error);
+				showToast(errorMessage, 'error');
+				
+				// Re-enable buttons
+				buttons.forEach((btn, index) => {
+					btn.disabled = false;
+					btn.innerText = originalTexts[index];
+				});
 			}
 		};
 
-		// Cancel registration
-		window.cancelRegistration = async (registrationId) => {
-			if (!confirm('Are you sure you want to cancel your registration?')) return;
+		// Cancel function
+		window.cancelRegistration = async (id) => {
+			if (!confirm('Are you sure? This action cannot be undone instantly.')) return;
 			try {
-				const result = await NetworkxAPI.cancelRegistration(registrationId);
-				alert(result.message || 'Registration cancelled');
-				loadEventDetails();
+				const result = await NetworkxAPI.cancelRegistration(id);
+				showToast(result?.message || 'Registration cancelled successfully', 'success');
+				await loadEventDetails();
 			} catch (error) {
-				alert(error.message || 'Failed to cancel registration');
+				const errorMessage = extractErrorMessage(error);
+				showToast(errorMessage, 'error');
 			}
 		};
 
-		// Initial load
-		document.addEventListener('DOMContentLoaded', () => {
-			loadEventDetails();
-		});
+		document.addEventListener('DOMContentLoaded', loadEventDetails);
 	</script>
 </body>
-
 </html>
-

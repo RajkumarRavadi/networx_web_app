@@ -325,7 +325,25 @@ const NetworkxAPI = {
 			return response.message;
 		} catch (error) {
 			console.error('Error registering for event:', error);
-			throw error;
+			// Extract error message from Frappe response
+			let errorMessage = 'Failed to register for event';
+			if (error.exc) {
+				errorMessage = error.exc;
+			} else if (error.message) {
+				// Try to parse if it's JSON
+				try {
+					const parsed = JSON.parse(error.message);
+					errorMessage = parsed.exc || parsed.message || errorMessage;
+				} catch (e) {
+					errorMessage = error.message;
+				}
+			} else if (error.response && error.response.exc) {
+				errorMessage = error.response.exc;
+			}
+			const enhancedError = new Error(errorMessage);
+			enhancedError.originalError = error;
+			enhancedError.exc = error.exc || (error.response && error.response.exc);
+			throw enhancedError;
 		}
 	},
 
@@ -346,7 +364,24 @@ const NetworkxAPI = {
 			return response.message;
 		} catch (error) {
 			console.error('Error cancelling registration:', error);
-			throw error;
+			// Extract error message from Frappe response
+			let errorMessage = 'Failed to cancel registration';
+			if (error.exc) {
+				errorMessage = error.exc;
+			} else if (error.message) {
+				try {
+					const parsed = JSON.parse(error.message);
+					errorMessage = parsed.exc || parsed.message || errorMessage;
+				} catch (e) {
+					errorMessage = error.message;
+				}
+			} else if (error.response && error.response.exc) {
+				errorMessage = error.response.exc;
+			}
+			const enhancedError = new Error(errorMessage);
+			enhancedError.originalError = error;
+			enhancedError.exc = error.exc || (error.response && error.response.exc);
+			throw enhancedError;
 		}
 	},
 

@@ -353,10 +353,11 @@ def get_recent_applications(limit=5):
 	
 	# Fetch job titles
 	for app in applications:
-		job = frappe.db.get_value("Job Opening", app.job_opening, ["job_title", "company_name"], as_dict=True)
+		job = frappe.db.get_value("Job Opening", app.job_opening, ["job_title", "company_name", "company_logo"], as_dict=True)
 		if job:
 			app.job_title = job.job_title
 			app.company_name = job.company_name
+			app.company_logo = job.company_logo
 			
 	return applications
 
