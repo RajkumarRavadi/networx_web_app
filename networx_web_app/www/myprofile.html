@@ -1211,7 +1211,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Experience ${index + 1}</span>
-						<button onclick="removeExperienceItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="experience" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1258,7 +1258,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Education ${index + 1}</span>
-						<button onclick="removeEducationItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="education" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1316,7 +1316,7 @@
 					<input type="text" class="flex-1 p-2 rounded form-input" placeholder="Skill Name" 
 						value="${(item.skill_name || item.name || item.skill || '').replace(/"/g, '&quot;')}" 
 						data-field="skill_name">
-					<button onclick="removeSkillItem(${index})" class="text-red-400 hover:text-red-300 p-2">
+				<button type="button" data-remove-section="skills" class="text-red-400 hover:text-red-300 p-2">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -1335,7 +1335,7 @@
 				<div class="p-3 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-2">
 						<span class="text-sm font-medium" style="color: var(--text-main);">${contactType || 'Contact'}</span>
-						<button onclick="removeContactItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="contact" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1368,7 +1368,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Experience</span>
-					<button onclick="removeExperienceItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="experience" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -1407,7 +1407,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Education</span>
-					<button onclick="removeEducationItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="education" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -1447,7 +1447,7 @@
 			newItem.setAttribute('data-index', newIndex);
 			newItem.innerHTML = `
 				<input type="text" class="flex-1 p-2 rounded form-input" placeholder="Skill Name" data-field="skill_name">
-				<button onclick="removeSkillItem(${newIndex})" class="text-red-400 hover:text-red-300 p-2">
+				<button type="button" data-remove-section="skills" class="text-red-400 hover:text-red-300 p-2">
 					<i class="ri-delete-bin-line"></i>
 				</button>
 			`;
@@ -1465,7 +1465,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-2">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Contact</span>
-					<button onclick="removeContactItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="contact" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -1484,46 +1484,39 @@
 		};
 
 		// Remove Item Functions
-		window.removeExperienceItem = (index) => {
-			const container = document.getElementById('experienceItemsEdit');
+		const removeItemByIndex = (containerId, index) => {
+			const container = document.getElementById(containerId);
+			if (!container) return;
 			const item = container.querySelector(`[data-index="${index}"]`);
 			if (item) item.remove();
-			// Reindex remaining items
 			Array.from(container.children).forEach((child, i) => {
 				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeExperienceItem(${i})`);
 			});
 		};
 
-		window.removeEducationItem = (index) => {
-			const container = document.getElementById('educationItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeEducationItem(${i})`);
-			});
-		};
+		window.removeExperienceItem = (index) => removeItemByIndex('experienceItemsEdit', index);
+		window.removeEducationItem = (index) => removeItemByIndex('educationItemsEdit', index);
+		window.removeSkillItem = (index) => removeItemByIndex('skillsItemsEdit', index);
+		window.removeContactItem = (index) => removeItemByIndex('contactItemsEdit', index);
 
-		window.removeSkillItem = (index) => {
-			const container = document.getElementById('skillsItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeSkillItem(${i})`);
-			});
-		};
-
-		window.removeContactItem = (index) => {
-			const container = document.getElementById('contactItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeContactItem(${i})`);
-			});
-		};
+		document.addEventListener('click', (event) => {
+			const button = event.target.closest('button[data-remove-section]');
+			if (!button) return;
+			event.preventDefault();
+			event.stopPropagation();
+			const item = button.closest('[data-index]');
+			if (!item) return;
+			const index = parseInt(item.getAttribute('data-index'), 10);
+			const section = button.getAttribute('data-remove-section');
+			if (section === 'experience') return window.removeExperienceItem(index);
+			if (section === 'education') return window.removeEducationItem(index);
+			if (section === 'skills') return window.removeSkillItem(index);
+			if (section === 'contact') return window.removeContactItem(index);
+			if (section === 'volunteer') return window.removeVolunteerItem(index);
+			if (section === 'certifications') return window.removeCertificationItem(index);
+			if (section === 'awards') return window.removeAwardItem(index);
+			if (section === 'projects') return window.removeProjectItem(index);
+		}, true);
 
 		// Save Section Function
 		window.saveSection = async (section) => {
@@ -1738,7 +1731,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Volunteer ${index + 1}</span>
-						<button onclick="removeVolunteerItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="volunteer" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1803,7 +1796,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Certification ${index + 1}</span>
-						<button onclick="removeCertificationItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="certifications" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1866,7 +1859,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Award ${index + 1}</span>
-						<button onclick="removeAwardItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="awards" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -1958,7 +1951,7 @@
 				<div class="p-4 rounded-lg border" style="border-color: var(--border-color); background: var(--bg-card);" data-index="${index}">
 					<div class="flex justify-between items-center mb-3">
 						<span class="text-sm font-medium" style="color: var(--text-main);">Project ${index + 1}</span>
-						<button onclick="removeProjectItem(${index})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="projects" class="text-red-400 hover:text-red-300">
 							<i class="ri-delete-bin-line"></i>
 						</button>
 					</div>
@@ -2063,7 +2056,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Volunteer</span>
-					<button onclick="removeVolunteerItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="volunteer" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -2090,7 +2083,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Certification</span>
-					<button onclick="removeCertificationItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="certifications" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -2117,7 +2110,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Award</span>
-					<button onclick="removeAwardItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="awards" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -2142,7 +2135,7 @@
 			newItem.innerHTML = `
 				<div class="flex justify-between items-center mb-3">
 					<span class="text-sm font-medium" style="color: var(--text-main);">New Project</span>
-					<button onclick="removeProjectItem(${newIndex})" class="text-red-400 hover:text-red-300">
+					<button type="button" data-remove-section="projects" class="text-red-400 hover:text-red-300">
 						<i class="ri-delete-bin-line"></i>
 					</button>
 				</div>
@@ -2200,45 +2193,10 @@
 			}
 		};
 
-		window.removeVolunteerItem = (index) => {
-			const container = document.getElementById('volunteerItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeVolunteerItem(${i})`);
-			});
-		};
-
-		window.removeCertificationItem = (index) => {
-			const container = document.getElementById('certificationsItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeCertificationItem(${i})`);
-			});
-		};
-
-		window.removeAwardItem = (index) => {
-			const container = document.getElementById('awardsItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeAwardItem(${i})`);
-			});
-		};
-
-		window.removeProjectItem = (index) => {
-			const container = document.getElementById('projectsItemsEdit');
-			const item = container.querySelector(`[data-index="${index}"]`);
-			if (item) item.remove();
-			Array.from(container.children).forEach((child, i) => {
-				child.setAttribute('data-index', i);
-				child.querySelector('button').setAttribute('onclick', `removeProjectItem(${i})`);
-			});
-		};
+		window.removeVolunteerItem = (index) => removeItemByIndex('volunteerItemsEdit', index);
+		window.removeCertificationItem = (index) => removeItemByIndex('certificationsItemsEdit', index);
+		window.removeAwardItem = (index) => removeItemByIndex('awardsItemsEdit', index);
+		window.removeProjectItem = (index) => removeItemByIndex('projectsItemsEdit', index);
 
 		// Motivational Quotes Array
 		const motivationalQuotes = [
