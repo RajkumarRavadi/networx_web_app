@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Bulk email campaign - NETWORX</title>
+
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+	<link rel="stylesheet" href="/assets/networx_web_app/css/networx_theme.css">
+
+	{% if csrf_token %}
+	<meta name="csrf-token" content="{{ csrf_token }}">
+	{% endif %}
+
+	<script>
+		(function () {
+			const savedTheme = localStorage.getItem('networx-theme');
+			const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			document.documentElement.setAttribute(
+				'data-theme',
+				savedTheme === 'dark' || (!savedTheme && systemDark) ? 'dark' : 'light'
+			);
+		})();
+	</script>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+	{% set active_page = 'bulk_email_campaign' %}
+	{% include "networx_web_app/templates/includes/sidebar.html" %}
+
+	<main class="flex-1 overflow-y-auto relative">
+		<header class="md:hidden glass-panel sticky top-0 z-30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+			<span class="font-bold text-xl" style="color: var(--text-main);">NETWORX</span>
+			<button type="button" onclick="toggleMobileSidebar()" class="p-2 rounded-lg hover:bg-white/5 transition-colors"
+				style="color: var(--text-main);" aria-label="Open menu">
+				<i class="ri-menu-line text-2xl"></i>
+			</button>
+		</header>
+
+		<div class="p-4 sm:p-6 md:p-10 max-w-3xl mx-auto pb-24">
+			<div class="mb-8">
+				<h1 class="text-3xl font-bold mb-2" style="color: var(--text-main);">Bulk email campaign</h1>
+				<p class="text-lg" style="color: var(--text-muted);">Internal MVP: upload a list, queue sends via Frappe email (no campaign database).</p>
+			</div>
+
+			<div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4 mb-6" style="border-color: var(--border-color);">
+				<p class="text-sm leading-relaxed" style="color: var(--text-muted);">
+					<strong style="color: var(--text-main);">Excel:</strong> first sheet, first row headers <code class="text-xs px-1 rounded bg-white/10">Name</code> and
+					<code class="text-xs px-1 rounded bg-white/10">Email</code> (case-insensitive). Max <strong>{{ max_recipients }}</strong> valid rows per run.
+					Use <code class="text-xs px-1 rounded bg-white/10">{% raw %}{{name}}{% endraw %}</code> and <code class="text-xs px-1 rounded bg-white/10">{% raw %}{{email}}{% endraw %}</code> in subject or body.
+				</p>
+				<p class="text-sm leading-relaxed" style="color: var(--text-muted);">
+					Requires a bench worker on the <strong>long</strong> queue and outgoing Email Account. Frappe may still create Email Queue records.
+				</p>
+			</div>
+
+			<div id="formAlert" class="hidden rounded-xl p-4 text-sm mb-4 border" role="alert"></div>
+
+			<form id="bulkEmailForm" class="glass-panel rounded-2xl p-6 md:p-8 border border-white/10 space-y-6"
+				style="border-color: var(--border-color);">
+				<div>
+					<label for="excelFile" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Excel file (.xlsx)</label>
+					<input type="file" id="excelFile" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required
+						class="block w-full text-sm rounded-lg border cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium"
+						style="border-color: var(--border-color); color: var(--text-main); background: var(--bg-card);">
+				</div>
+
+				<div>
+					<label for="subject" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Subject</label>
+					<input type="text" id="subject" name="subject" required maxlength="200" placeholder="Campaign subject"
+						class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 outline-none transition-all"
+						style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+				</div>
+
+				<div>
+					<label for="message" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Message</label>
+					<textarea id="message" name="message" rows="10" required placeholder="{% raw %}Hello {{name}}, …{% endraw %}"
+						class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 outline-none transition-all font-mono text-sm"
+						style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);"></textarea>
+				</div>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label for="delay_seconds" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Delay between sends (seconds)</label>
+						<input type="number" id="delay_seconds" name="delay_seconds" value="2" min="0" max="120" step="1"
+							class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-violet-500/40 outline-none"
+							style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+					</div>
+					<div>
+						<label for="batch_size" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Batch size</label>
+						<input type="number" id="batch_size" name="batch_size" value="20" min="1" max="500" step="1"
+							class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-violet-500/40 outline-none"
+							style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+					</div>
+					<div class="sm:col-span-2">
+						<label for="batch_pause_seconds" class="block text-sm font-medium mb-2" style="color: var(--text-main);">Pause after each batch (seconds)</label>
+						<input type="number" id="batch_pause_seconds" name="batch_pause_seconds" value="60" min="0" max="600" step="1"
+							class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-violet-500/40 outline-none"
+							style="border-color: var(--border-color); background: var(--bg-card); color: var(--text-main);">
+					</div>
+				</div>
+
+				<div class="flex items-start gap-3">
+					<input type="checkbox" id="send_as_html" name="send_as_html" value="1"
+						class="mt-1 h-4 w-4 rounded border-violet-500 text-violet-600 focus:ring-violet-500">
+					<label for="send_as_html" class="text-sm" style="color: var(--text-muted);">
+						Send as HTML (wraps content in Frappe email container; use HTML in the message body).
+					</label>
+				</div>
+
+				<button type="submit" id="submitBtn"
+					class="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+					Queue campaign
+				</button>
+			</form>
+		</div>
+	</main>
+
+	<script src="/assets/networx_web_app/js/theme_toggle.js"></script>
+	<script>
+		const getCSRFToken = () => {
+			if (window.frappe && window.frappe.csrf_token) {
+				return window.frappe.csrf_token;
+			}
+			const metaTag = document.querySelector('meta[name="csrf-token"]');
+			if (metaTag) {
+				const token = metaTag.getAttribute('content');
+				if (token) {
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+			const cookies = document.cookie.split(';');
+			for (let cookie of cookies) {
+				const [name, value] = cookie.trim().split('=');
+				if (name === 'csrf_token') {
+					const token = decodeURIComponent(value);
+					window.frappe = window.frappe || {};
+					window.frappe.csrf_token = token;
+					return token;
+				}
+			}
+			return null;
+		};
+
+		window.frappe = window.frappe || {};
+		window.frappe.session = {
+			user: '{{ user }}',
+			user_fullname: '{{ user_fullname | e }}'
+		};
+		window.frappe.csrf_token = {% if csrf_token %}'{{ csrf_token }}'{% else %}null{% endif %};
+
+		window.frappe.call = function (opts) {
+			const url = '/api/method/' + opts.method;
+			const fetchOptions = {
+				method: 'POST',
+				headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+				credentials: 'same-origin'
+			};
+			const params = new URLSearchParams();
+			if (opts.args) {
+				for (const [key, value] of Object.entries(opts.args)) {
+					if (value === null || value === undefined) continue;
+					params.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+				}
+			}
+			fetchOptions.body = params;
+			const csrfToken = getCSRFToken();
+			if (csrfToken) {
+				fetchOptions.headers['X-Frappe-CSRF-Token'] = csrfToken;
+			}
+			return fetch(url, fetchOptions).then(async (response) => {
+				const data = await response.json();
+				if (data.exc || data.exc_type) {
+					const err = new Error(data.message || data.exc || 'Request failed');
+					err.response = data;
+					throw err;
+				}
+				if (!response.ok) {
+					const err = new Error(data.message || 'HTTP ' + response.status);
+					err.response = data;
+					throw err;
+				}
+				if (opts.callback) opts.callback(data);
+				return data;
+			});
+		};
+
+		const showAlert = (type, text) => {
+			const el = document.getElementById('formAlert');
+			el.classList.remove('hidden', 'border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-200', 'border-red-500/30', 'bg-red-500/10', 'text-red-200');
+			if (type === 'success') {
+				el.classList.add('border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-200');
+			} else {
+				el.classList.add('border-red-500/30', 'bg-red-500/10', 'text-red-200');
+			}
+			el.textContent = text;
+		};
+
+		const handleSubmit = async (e) => {
+			e.preventDefault();
+			const btn = document.getElementById('submitBtn');
+			const fileInput = document.getElementById('excelFile');
+			if (!fileInput.files || !fileInput.files[0]) {
+				showAlert('error', 'Choose an .xlsx file.');
+				return;
+			}
+			const csrfToken = getCSRFToken();
+			if (!csrfToken) {
+				showAlert('error', 'Missing CSRF token. Refresh the page and try again.');
+				return;
+			}
+			const form = document.getElementById('bulkEmailForm');
+			const fd = new FormData();
+			fd.append('file', fileInput.files[0]);
+			fd.append('subject', document.getElementById('subject').value.trim());
+			fd.append('message', document.getElementById('message').value);
+			fd.append('delay_seconds', document.getElementById('delay_seconds').value);
+			fd.append('batch_size', document.getElementById('batch_size').value);
+			fd.append('batch_pause_seconds', document.getElementById('batch_pause_seconds').value);
+			if (document.getElementById('send_as_html').checked) {
+				fd.append('send_as_html', '1');
+			}
+			btn.disabled = true;
+			document.getElementById('formAlert').classList.add('hidden');
+			try {
+				const res = await fetch(
+					'/api/method/networx_web_app.networx_web_app.bulk_email_campaign.start_bulk_email_campaign',
+					{
+						method: 'POST',
+						body: fd,
+						headers: {
+							Accept: 'application/json',
+							'X-Frappe-CSRF-Token': csrfToken
+						},
+						credentials: 'same-origin'
+					}
+				);
+				const data = await res.json();
+				if (!res.ok || data.exc_type) {
+					const msg = data.message || data.exc || 'Request failed';
+					throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+				}
+				const msg = data.message || {};
+				const parts = [
+					msg.message || 'Job queued.',
+					'Recipients: ' + (msg.recipient_count ?? '—'),
+					'Skipped invalid: ' + (msg.skipped_invalid ?? 0),
+					'Skipped empty: ' + (msg.skipped_empty ?? 0)
+				];
+				showAlert('success', parts.join(' '));
+				form.reset();
+				document.getElementById('delay_seconds').value = '2';
+				document.getElementById('batch_size').value = '20';
+				document.getElementById('batch_pause_seconds').value = '60';
+			} catch (err) {
+				showAlert('error', err.message || 'Something went wrong.');
+			} finally {
+				btn.disabled = false;
+			}
+		};
+
+		document.getElementById('bulkEmailForm').addEventListener('submit', handleSubmit);
+	</script>
+</body>
+
+</html>

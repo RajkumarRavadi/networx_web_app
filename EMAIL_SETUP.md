@@ -130,3 +130,21 @@ After setting up email:
 4. Click "Send OTP"
 5. Check your email inbox for the OTP code
 
+## Bulk email campaign tool (MVP)
+
+The website page `/bulk_email_campaign` (System Manager only) uses **openpyxl** to read `.xlsx` files with `Name` and `Email` columns. Install app dependencies after pulling changes:
+
+```bash
+cd /path/to/frappe-bench
+bench setup requirements
+# or: bench pip install -e apps/networx_web_app
+```
+
+Background sends use `frappe.enqueue` on the **long** queue. Ensure **Redis** is running and a **worker** processes that queue, for example:
+
+```bash
+bench worker --queue long,default,short
+```
+
+Outgoing mail still uses your **Email Account** as above. Frappe may create **Email Queue** rows for each send; this MVP does not add separate campaign storage.
+
