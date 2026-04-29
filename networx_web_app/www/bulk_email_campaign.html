@@ -58,6 +58,34 @@
 			</div>
 
 			<div id="formAlert" class="hidden rounded-xl p-4 text-sm mb-4 border" role="alert"></div>
+			<div id="statusCard" class="hidden glass-panel rounded-2xl p-6 border border-white/10 mb-6"
+				style="border-color: var(--border-color);">
+				<div class="flex items-center justify-between gap-4">
+					<div>
+						<p class="text-sm font-medium" style="color: var(--text-main);">Campaign status</p>
+						<p id="statusJobId" class="text-xs mt-1" style="color: var(--text-muted);"></p>
+					</div>
+					<div class="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10"
+						style="color: var(--text-main);">
+						<span id="statusState">—</span>
+					</div>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+					<div class="rounded-xl p-4 border border-white/10 bg-white/5">
+						<p class="text-xs" style="color: var(--text-muted);">Total</p>
+						<p id="statusTotal" class="text-2xl font-bold mt-1" style="color: var(--text-main);">0</p>
+					</div>
+					<div class="rounded-xl p-4 border border-emerald-500/20 bg-emerald-500/10">
+						<p class="text-xs text-emerald-200/80">Sent</p>
+						<p id="statusSent" class="text-2xl font-bold mt-1 text-emerald-200">0</p>
+					</div>
+					<div class="rounded-xl p-4 border border-red-500/20 bg-red-500/10">
+						<p class="text-xs text-red-200/80">Failed</p>
+						<p id="statusFailed" class="text-2xl font-bold mt-1 text-red-200">0</p>
+					</div>
+				</div>
+				<p id="statusLastEmail" class="text-xs mt-4" style="color: var(--text-muted);"></p>
+			</div>
 
 			<form id="bulkEmailForm" class="glass-panel rounded-2xl p-6 md:p-8 border border-white/10 space-y-6"
 				style="border-color: var(--border-color);">
@@ -201,6 +229,56 @@
 			el.textContent = text;
 		};
 
+		let statusPollTimer = null;
+
+		const setStatusCard = (visible) => {
+			const card = document.getElementById('statusCard');
+			if (!card) return;
+			if (visible) card.classList.remove('hidden');
+			else card.classList.add('hidden');
+		};
+
+		const renderStatus = (status) => {
+			document.getElementById('statusJobId').textContent = status.job_id ? `Job: ${status.job_id}` : '';
+			document.getElementById('statusState').textContent = status.status || 'unknown';
+			document.getElementById('statusTotal').textContent = String(status.total ?? 0);
+			document.getElementById('statusSent').textContent = String(status.sent ?? 0);
+			document.getElementById('statusFailed').textContent = String(status.failed ?? 0);
+			const last = status.last_email ? `Last: ${status.last_email}` : '';
+			document.getElementById('statusLastEmail').textContent = last;
+		};
+
+		const startStatusPolling = (jobId) => {
+			if (!jobId) return;
+			if (statusPollTimer) {
+				clearInterval(statusPollTimer);
+				statusPollTimer = null;
+			}
+			setStatusCard(true);
+			document.getElementById('statusJobId').textContent = `Job: ${jobId}`;
+			document.getElementById('statusState').textContent = 'queued';
+
+			const pollOnce = async () => {
+				const url = `/api/method/networx_web_app.networx_web_app.bulk_email_campaign.get_bulk_email_campaign_status?job_id=${encodeURIComponent(jobId)}`;
+				const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+				const data = await res.json();
+				if (!res.ok || data.exc_type) {
+					throw new Error(data.message || data.exc || 'Status request failed');
+				}
+				const msg = data.message || {};
+				renderStatus(msg);
+				if (msg.status === 'finished') {
+					clearInterval(statusPollTimer);
+					statusPollTimer = null;
+				}
+			};
+
+			pollOnce().catch(() => {});
+			statusPollTimer = setInterval(() => {
+				pollOnce().catch(() => {});
+			}, 2000);
+		};
+
 		const handleSubmit = async (e) => {
 			e.preventDefault();
 			const btn = document.getElementById('submitBtn');
@@ -253,6 +331,9 @@
 					'Skipped empty: ' + (msg.skipped_empty ?? 0)
 				];
 				showAlert('success', parts.join(' '));
+				if (msg.job_id) {
+					startStatusPolling(msg.job_id);
+				}
 				form.reset();
 				document.getElementById('delay_seconds').value = '2';
 				document.getElementById('batch_size').value = '20';

@@ -20,12 +20,47 @@ MAX_DELAY_SECONDS = 120
 MAX_BATCH_PAUSE_SECONDS = 600
 MIN_BATCH_SIZE = 1
 MAX_BATCH_SIZE = 500
+STATUS_TTL_SECONDS = 60 * 60 * 6
 
 
 def _can_use_bulk_email_tool():
 	if frappe.session.user == "Guest":
 		return False
 	return "System Manager" in frappe.get_roles()
+
+
+def _status_cache_key(job_id: str) -> str:
+	return f"bulk_email_campaign_status:{job_id}"
+
+
+def _set_status(job_id: str, status: dict):
+	frappe.cache().set_value(_status_cache_key(job_id), status, expires_in_sec=STATUS_TTL_SECONDS)
+
+
+def _get_status(job_id: str) -> dict | None:
+	return frappe.cache().get_value(_status_cache_key(job_id), expires=True)
+
+
+@frappe.whitelist(methods=["GET"])
+def get_bulk_email_campaign_status(job_id: str):
+	if not _can_use_bulk_email_tool():
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+	if not job_id:
+		frappe.throw(_("job_id is required."))
+
+	status = _get_status(job_id) or {}
+	return {
+		"job_id": job_id,
+		"status": status.get("status", "unknown"),
+		"total": status.get("total", 0),
+		"sent": status.get("sent", 0),
+		"failed": status.get("failed", 0),
+		"current": status.get("current", 0),
+		"last_email": status.get("last_email"),
+		"error": status.get("error"),
+		"updated_at": status.get("updated_at"),
+	}
 
 
 def parse_xlsx_upload(file_storage) -> dict:
@@ -182,9 +217,26 @@ def start_bulk_email_campaign():
 	)
 	send_as_html = frappe.form_dict.get("send_as_html") in ("1", "true", "True", True, "on")
 
+	campaign_job_id = frappe.generate_hash(length=14)
+	_set_status(
+		campaign_job_id,
+		{
+			"status": "queued",
+			"total": len(contacts),
+			"sent": 0,
+			"failed": 0,
+			"current": 0,
+			"last_email": None,
+			"error": None,
+			"updated_at": frappe.utils.now(),
+		},
+	)
+
 	frappe.enqueue(
 		"networx_web_app.networx_web_app.bulk_email_campaign.send_bulk_email_job",
 		queue="long",
+		job_id=campaign_job_id,
+		campaign_job_id=campaign_job_id,
 		contacts=contacts,
 		subject_template=subject,
 		message_template=message,
@@ -197,6 +249,7 @@ def start_bulk_email_campaign():
 
 	return {
 		"queued": True,
+		"job_id": campaign_job_id,
 		"recipient_count": len(contacts),
 		"skipped_invalid": parsed.get("skipped_invalid", 0),
 		"skipped_empty": parsed.get("skipped_empty", 0),
@@ -212,17 +265,47 @@ def send_bulk_email_job(
 	batch_size: int = 20,
 	batch_pause_seconds: int = 60,
 	send_as_html: bool = False,
+	campaign_job_id: str | None = None,
+	job_id: str | None = None,
 ):
 	"""Worker: send one email per contact with throttling. Log failures; no custom DocTypes."""
+	campaign_job_id = campaign_job_id or job_id or frappe.generate_hash(length=14)
 	sent = 0
 	failed = 0
 	since_batch_sleep = 0
+
+	_set_status(
+		campaign_job_id,
+		{
+			"status": "running",
+			"total": len(contacts) if isinstance(contacts, list) else 0,
+			"sent": 0,
+			"failed": 0,
+			"current": 0,
+			"last_email": None,
+			"error": None,
+			"updated_at": frappe.utils.now(),
+		},
+	)
 
 	for contact in contacts:
 		email = contact.get("email")
 		name = contact.get("name") or ""
 		if not email:
 			failed += 1
+			_set_status(
+				campaign_job_id,
+				{
+					"status": "running",
+					"total": len(contacts),
+					"sent": sent,
+					"failed": failed,
+					"current": sent + failed,
+					"last_email": None,
+					"error": None,
+					"updated_at": frappe.utils.now(),
+				},
+			)
 			continue
 
 		subject = _personalize(subject_template, name, email)
@@ -238,12 +321,26 @@ def send_bulk_email_job(
 				with_container=bool(send_as_html),
 			)
 			sent += 1
-		except Exception as e:
+		except Exception:
 			failed += 1
 			frappe.log_error(
 				message=f"{email}: {frappe.get_traceback()}",
 				title=f"Bulk email send failed: {email}",
 			)
+
+		_set_status(
+			campaign_job_id,
+			{
+				"status": "running",
+				"total": len(contacts),
+				"sent": sent,
+				"failed": failed,
+				"current": sent + failed,
+				"last_email": email,
+				"error": None,
+				"updated_at": frappe.utils.now(),
+			},
+		)
 
 		since_batch_sleep += 1
 		if batch_size > 0 and since_batch_sleep >= batch_size and batch_pause_seconds > 0:
@@ -254,3 +351,16 @@ def send_bulk_email_job(
 			time.sleep(delay_seconds)
 
 	frappe.logger().info(f"bulk_email_campaign job finished: sent={sent}, failed={failed}")
+	_set_status(
+		campaign_job_id,
+		{
+			"status": "finished",
+			"total": len(contacts),
+			"sent": sent,
+			"failed": failed,
+			"current": sent + failed,
+			"last_email": None,
+			"error": None,
+			"updated_at": frappe.utils.now(),
+		},
+	)
